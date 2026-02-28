@@ -41,7 +41,7 @@ export default function AddAdPage() {
   };
 
   return (
-    <Flex gap="md" justify="space-around" align="center" wrap="wrap">
+    <Flex justify="space-around" align="center" wrap="wrap">
       <AddAdForm
         values={adValues}
         onSubmit={handleSubmit}

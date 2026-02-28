@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Text, Flex } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Text, Flex, Anchor } from "@mantine/core";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
 
@@ -19,15 +18,11 @@ export default function HomePage() {
       <h1>Kuulutused</h1>
       {ads.length === 0 && <Text>Kuulutusi pole veel lisatud.</Text>}
 
-      <Flex gap="lg" align="center" direction="row" wrap="wrap" p="md">
+      <Flex align="center" direction="row" wrap="wrap">
         {ads.map((ad) => (
-          <Link
-            to={`/ads/${ad._id}`}
-            key={ad._id}
-            style={{ textDecoration: "none" }}
-          >
-            <AdCard ad={ad} clampLines={true} fixedLayout={true} />
-          </Link>
+          <Anchor href={`/ads/${ad._id}`} key={ad._id} underline="never">
+            <AdCard ad={ad} hoverable={true} />
+          </Anchor>
         ))}
       </Flex>
     </>

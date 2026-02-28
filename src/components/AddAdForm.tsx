@@ -4,7 +4,7 @@ import type { Ad } from "../context/AdsContext";
 import React from "react";
 
 interface AddAdFormProps {
-  onSubmit: (values: Ad) => void;
+  onSubmit: (values: Ad) => Promise<void>;
   onChange: (values: Ad) => void;
   values: Ad;
 }
@@ -26,23 +26,15 @@ export default function AddAdForm({
     },
   });
 
-  // Jälgi väärtuste muutusi ja edasta vanemale
   React.useEffect(() => {
     onChange(form.values);
   }, [form.values, onChange]);
 
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
-      <Textarea
-        label="Luuletus"
-        mt="md"
-        minRows={4}
-        {...form.getInputProps("poem")}
-      />
+      <Textarea label="Luuletus" {...form.getInputProps("poem")} />
       <Textarea
         label="Tekst enne lahkunu nime"
-        mt="md"
-        minRows={3}
         {...form.getInputProps("topText")}
       />
       <TextInput
@@ -53,16 +45,10 @@ export default function AddAdForm({
       <TextInput
         label="Perekonnanimi"
         withAsterisk
-        mt="md"
         {...form.getInputProps("lastName")}
       />
-      <TextInput
-        label="E-mail"
-        withAsterisk
-        mt="md"
-        {...form.getInputProps("email")}
-      />
-      <Group mt="md">
+      <TextInput label="E-mail" withAsterisk {...form.getInputProps("email")} />
+      <Group>
         <TextInput
           label="Sünniaasta"
           withAsterisk
@@ -75,16 +61,9 @@ export default function AddAdForm({
         />
       </Group>
 
-      <Textarea
-        label="Mälestustekst"
-        mt="md"
-        minRows={3}
-        {...form.getInputProps("bottomText")}
-      />
-      <Group justify="flex-end" mt="md">
-        <Button type="submit" variant="default">
-          Maksma
-        </Button>
+      <Textarea label="Mälestustekst" {...form.getInputProps("bottomText")} />
+      <Group>
+        <Button type="submit">Maksma</Button>
       </Group>
     </form>
   );

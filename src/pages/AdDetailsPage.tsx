@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-
 import { Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import type { Ad } from "../context/AdsContext";
@@ -23,5 +22,5 @@ export default function AdDetailsPage() {
   if (loading) return <Text>Laadimine...</Text>;
   if (!ad) return <Text>Kuulutust ei leitud.</Text>;
 
-  return <AdCard ad={ad} clampLines={false} fixedLayout={false} />;
+  return <AdCard ad={ad} />;
 }
