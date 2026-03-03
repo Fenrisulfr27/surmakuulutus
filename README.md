@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# Surmakuulutus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Surmakuulutus** is a **free online web app** for creating and posting obituaries. It features a modern, responsive interface and a full-stack setup, making it easy to submit, view, and manage obituary announcements online.
 
-Currently, two official plugins are available:
+**Live Demo:**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Frontend: [Netlify](https://surmakuulutus.netlify.app/)
+- Backend/API: [Github](https://github.com/Fenrisulfr27/surmakuulutus-back.gitm)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Project Structure
 
-## Expanding the ESLint configuration
+| Part                               | Description                                                                                                                                                                             |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend** (`surmakuulutus`)     | Built with **React + TypeScript + Vite**, includes responsive UI components from **Mantine**, routing with **React Router**. Hosted on **Netlify**.                                     |
+| **Backend** (`surmakuulutus-back`) | Built with **Node.js + TypeScript + Express**, connects to **MongoDB Atlas** for storing obituary data. Handles API routes, validation, and error management. Hosted on **Render.com**. |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Key Features
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Create and submit obituary posts via web form
+- Display obituaries in a clean, readable layout
+- Fully responsive UI for desktop and mobile devices
+- REST API backend handles data storage and retrieval
+- Hosted online for instant access
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Technologies Used
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**Frontend:** React, TypeScript, Vite, Mantine, React Router, ESLint
+**Backend:** Node.js, TypeScript, Express.js, MongoDB Atlas, Docker, Render.com
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Development Setup
+
+### Frontend
+
+```bash
+git clone https://github.com/Fenrisulfr27/surmakuulutus.git
+cd surmakuulutus
+npm install
+npm run dev
 ```
