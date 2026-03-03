@@ -10,15 +10,22 @@ export default function AdDetailsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!id) return;
+
     fetch(`https://surmakuulutus-back.onrender.com/ads/${id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         setAd(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, [id]);
-
   if (loading) return <Text>Laadimine...</Text>;
   if (!ad) return <Text>Kuulutust ei leitud.</Text>;
 
