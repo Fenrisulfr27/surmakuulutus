@@ -12,7 +12,7 @@ createRoot(document.getElementById("root")!).render(
     <MantineProvider
       theme={shadcnTheme}
       cssVariablesResolver={shadcnCssVariableResolver}
-      defaultColorScheme="dark"
+      defaultColorScheme="light"
     >
       <BrowserRouter>
         <App />

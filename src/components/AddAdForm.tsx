@@ -32,37 +32,56 @@ export default function AddAdForm({
 
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
-      <Textarea label="Luuletus" {...form.getInputProps("poem")} />
       <Textarea
+        label="Luuletus"
+        size="lg"
+        pt="lg"
+        {...form.getInputProps("poem")}
+      />
+      <Textarea
+        size="lg"
         label="Tekst enne lahkunu nime"
         {...form.getInputProps("topText")}
       />
       <TextInput
+        size="lg"
         label="Eesnimi"
         withAsterisk
         {...form.getInputProps("firstName")}
       />
       <TextInput
+        size="lg"
         label="Perekonnanimi"
         withAsterisk
         {...form.getInputProps("lastName")}
       />
-      <TextInput label="E-mail" withAsterisk {...form.getInputProps("email")} />
+      <TextInput
+        size="lg"
+        label="E-mail"
+        withAsterisk
+        {...form.getInputProps("email")}
+      />
       <Group>
         <TextInput
+          size="lg"
           label="Sünniaasta"
           withAsterisk
           {...form.getInputProps("birthYear")}
         />
         <TextInput
+          size="lg"
           label="Surmaaasta"
           withAsterisk
           {...form.getInputProps("deathYear")}
         />
       </Group>
 
-      <Textarea label="Mälestustekst" {...form.getInputProps("bottomText")} />
-      <Group>
+      <Textarea
+        size="lg"
+        label="Mälestustekst"
+        {...form.getInputProps("bottomText")}
+      />
+      <Group pt="sm">
         <Button type="submit">Maksma</Button>
       </Group>
     </form>

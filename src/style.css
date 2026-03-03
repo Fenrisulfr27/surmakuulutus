@@ -1,4 +1,27 @@
 /* Checkbox */
+body {
+  background-image: url("/src/assets/paper.jpg");
+  background-repeat: repeat;
+  background-position: bottom center;
+  font-family: "Times New Modern", serif;
+}
+
+@font-face {
+  font-family: "Times New Modern";
+  src: url("./assets/fonts/TimesNewModern.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.mantine-Card-root {
+  background-color: transparent !important;
+  border: 5px solid black !important;
+  border-radius: 2px;
+}
+
+[class*="AppShell-header"] {
+  background: transparent !important;
+}
 .mantine-Checkbox-root {
   --checkbox-color: var(--mantine-primary-color-filled);
   --checkbox-icon-color: var(--mantine-primary-color-contrast);
@@ -85,7 +108,7 @@
     --input-disabled-color: alpha(var(--mantine-color-text), 0.5);
 
     &[data-variant="default"] {
-      --input-bd: var(--mantine-color-default-border);
+      --input-bd: rgb(184, 184, 184);
       --input-bg: transparent;
       --input-bd-focus: var(--mantine-primary-color-filled);
     }
@@ -570,9 +593,10 @@
 
 /* Card */
 .mantine-Card-root {
-  background-color: var(--mantine-color-default);
+  background-color: var(--mantine-color-secondary-light);
   width: 300px;
-  height: auto;
+  height: 300px;
+
   word-break: break-word;
 }
 .mantine-Card-root .mantine-Card-section {
@@ -580,14 +604,15 @@
 }
 
 .homepage-card {
-  transition:
-    transform 0.4s,
-    box-shadow 0.4s;
+  overflow: hidden; /* oluline, et sisu ei läheks üle borderi */
 }
 
-.homepage-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(242, 23, 23, 0.6);
+.card-inner {
+  transition: transform 0.4s;
+}
+
+.homepage-card:hover .card-inner {
+  transform: scale(1.08);
 }
 
 /* Timeline */

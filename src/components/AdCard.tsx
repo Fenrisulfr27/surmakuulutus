@@ -1,5 +1,5 @@
-import { Card, Text, Image, Flex } from "@mantine/core";
-import cross from "../assets/cross.png";
+import { Card, Text, Image, Flex, Group } from "@mantine/core";
+import cross from "../assets/cross2.png";
 import type { Ad } from "../context/AdsContext";
 
 interface AdCardProps {
@@ -20,19 +20,30 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
   } = ad;
 
   return (
-    <Card className={hoverable ? "homepage-card" : undefined}>
-      <Flex align="center" direction="column">
-        <Text>{poem || "luuletus..."}</Text>
-        <Image src={cross} h={150} w="auto" />
-        <Text>{topText || "tekst..."}</Text>
-        <Text size="xl">
-          {firstName || "Eesnimi"} {lastName || "Perekonnanimi"}
-        </Text>
-        <Text>
-          {birthYear || "0000"} – {deathYear || "0000"}
-        </Text>
-        <Text>{bottomText || "tekst..."}</Text>
-      </Flex>
+    <Card
+      className={hoverable ? "homepage-card" : undefined}
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+    >
+      <div className="card-inner">
+        <Flex align="center" direction="column">
+          <Group justify="start" wrap="nowrap">
+            <Image src={cross} h={50} w="auto" />
+            <Text fs="italic">{poem}</Text>
+          </Group>
+
+          <Text pt="lg">{topText}</Text>
+          <Text size="xl" fw={700}>
+            {firstName} {lastName}
+          </Text>
+          <Text c="dimmed">
+            {birthYear} – {deathYear}
+          </Text>
+          <Text>{bottomText}</Text>
+        </Flex>
+      </div>
     </Card>
   );
 }
