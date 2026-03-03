@@ -8,7 +8,7 @@ export default function HomePage() {
   const [ads, setAds] = useState<Ad[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/ads")
+    fetch("https://surmakuulutus-back.onrender.com/ads")
       .then((res) => res.json())
       .then((data: Ad[]) => setAds(data))
       .catch((err) => console.error(err));

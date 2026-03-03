@@ -10,7 +10,7 @@ export default function AdDetailsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/ads/${id}`)
+    fetch(`https://surmakuulutus-back.onrender.com/ads${id}`)
       .then((res) => res.json())
       .then((data) => {
         setAd(data);
