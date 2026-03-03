@@ -5,7 +5,7 @@
 **Live Demo:**
 
 - Frontend: [Netlify](https://surmakuulutus.netlify.app/)
-- Backend/API: [Github](https://github.com/Fenrisulfr27/surmakuulutus-back.gitm)
+- Backend/API: [Github](hhttps://github.com/Fenrisulfr27/surmakuulutus-back)
 
 ---
 
