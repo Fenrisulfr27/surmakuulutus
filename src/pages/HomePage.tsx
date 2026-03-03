@@ -17,7 +17,7 @@ export default function HomePage() {
   return (
     <>
       <Flex justify="center">
-        <Image src={logo} h={200} w="auto" p="lg" />
+        <Image src={logo} h={{ base: 100, sm: 150, md: 200 }} w="auto" p="lg" />
       </Flex>
       {ads.length === 0 && <Text>Kuulutusi pole veel lisatud.</Text>}
 

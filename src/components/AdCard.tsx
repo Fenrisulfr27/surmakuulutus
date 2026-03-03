@@ -11,7 +11,7 @@ interface AdCardProps {
 export default function AdCard({ ad, hoverable }: AdCardProps) {
   const {
     firstName,
-    lastName,
+
     birthYear,
     deathYear,
     poem,
@@ -36,7 +36,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
 
           <Text pt="lg">{topText}</Text>
           <Text size="xl" fw={700}>
-            {firstName} {lastName}
+            {firstName}
           </Text>
           <Text c="dimmed">
             {birthYear} – {deathYear}

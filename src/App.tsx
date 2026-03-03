@@ -9,28 +9,31 @@ export default function App() {
   const navigate = useNavigate();
 
   return (
-    <AppShell>
+    <AppShell style={{ minWidth: 320 }}>
       <AppShell.Header withBorder={false} bg="secondary">
-        <Group justify="end" p="md">
-          <Group>
-            <Button onClick={() => navigate("/")} size="md">
-              Surmakuulutused
-            </Button>
-            <Button onClick={() => navigate("/lisa-kuulutus")} size="md">
-              Lisa kuulutus
-            </Button>
+        <Container size="xl">
+          <Group justify="end" p="md">
+            <Group wrap="wrap">
+              <Button onClick={() => navigate("/")} size="md">
+                Surmakuulutused
+              </Button>
+              <Button onClick={() => navigate("/lisa-kuulutus")} size="md">
+                Lisa kuulutus
+              </Button>
+            </Group>
           </Group>
-        </Group>
+        </Container>
       </AppShell.Header>
-      <Container size="xl" pt={50} px="md">
-        <AppShell.Main>
+
+      <AppShell.Main>
+        <Container size="xl" pt={150} px="md">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/lisa-kuulutus" element={<AddAdPage />} />
             <Route path="/ads/:id" element={<AdDetailsPage />} />
           </Routes>
-        </AppShell.Main>
-      </Container>
+        </Container>
+      </AppShell.Main>
     </AppShell>
   );
 }

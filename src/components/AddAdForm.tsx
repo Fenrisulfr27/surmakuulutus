@@ -1,5 +1,5 @@
-import { useForm, isNotEmpty, isEmail, matches } from "@mantine/form";
-import { Button, Group, TextInput, Textarea } from "@mantine/core";
+import { useForm, isNotEmpty, isEmail } from "@mantine/form";
+import { Button, Group, Space, TextInput, Textarea } from "@mantine/core";
 import type { Ad } from "../context/AdsContext";
 import React from "react";
 
@@ -19,10 +19,7 @@ export default function AddAdForm({
     initialValues: values,
     validate: {
       firstName: isNotEmpty(),
-      lastName: isNotEmpty(),
       email: isEmail(),
-      birthYear: matches(/^\d{4}$/, "Sisesta korrektne aasta (4 numbrit)"),
-      deathYear: matches(/^\d{4}$/, "Sisesta korrektne aasta (4 numbrit)"),
     },
   });
 
@@ -34,56 +31,60 @@ export default function AddAdForm({
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Textarea
         label="Luuletus"
+        placeholder="Mälestusteks tuhmunud me aeg.
+Pisarateks Sinu kaunis naer.
+Tühjuseks on roogitud mu hing.
+Ja südames vaid igatsen ma Sind."
         size="lg"
         pt="lg"
         {...form.getInputProps("poem")}
       />
       <Textarea
+        placeholder="Teatame kurbusega, et lahkus meie kallis"
         size="lg"
         label="Tekst enne lahkunu nime"
         {...form.getInputProps("topText")}
       />
       <TextInput
+        placeholder="ema"
         size="lg"
-        label="Eesnimi"
+        label="Nimi"
         withAsterisk
         {...form.getInputProps("firstName")}
       />
-      <TextInput
-        size="lg"
-        label="Perekonnanimi"
-        withAsterisk
-        {...form.getInputProps("lastName")}
-      />
-      <TextInput
-        size="lg"
-        label="E-mail"
-        withAsterisk
-        {...form.getInputProps("email")}
-      />
+
       <Group>
         <TextInput
           size="lg"
           label="Sünniaasta"
-          withAsterisk
+          placeholder="1992"
           {...form.getInputProps("birthYear")}
         />
         <TextInput
+          placeholder="2025"
           size="lg"
           label="Surmaaasta"
-          withAsterisk
           {...form.getInputProps("deathYear")}
         />
       </Group>
 
       <Textarea
         size="lg"
-        label="Mälestustekst"
+        label="Leinajad"
+        placeholder="Leinab Rein perega"
         {...form.getInputProps("bottomText")}
       />
-      <Group pt="sm">
-        <Button type="submit">Maksma</Button>
-      </Group>
+      <TextInput
+        placeholder="nimi@gmail.com"
+        size="lg"
+        label="Kuulutuse lisaja e-mail"
+        withAsterisk
+        {...form.getInputProps("email")}
+        pb="sm"
+      />
+
+      <Button type="submit">Salvesta</Button>
+      <Space h="xs" />
     </form>
   );
 }

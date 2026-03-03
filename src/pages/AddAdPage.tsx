@@ -10,7 +10,6 @@ export default function AddAdPage() {
 
   const [adValues, setAdValues] = React.useState<Ad>({
     firstName: "",
-    lastName: "",
     email: "",
     birthYear: "",
     deathYear: "",
