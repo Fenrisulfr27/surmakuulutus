@@ -55,7 +55,7 @@ export default function HomePage() {
   return (
     <>
       <Stack>
-        <Group>
+        <Group justify="center">
           {data?.data.length === 0 && (
             <Text ta="center">Kuulutusi pole veel lisatud.</Text>
           )}
@@ -66,12 +66,12 @@ export default function HomePage() {
             </Anchor>
           ))}
         </Group>
-        <Group justify="center" p="lg">
+        <Group justify="center">
           <Pagination
             value={page}
             onChange={handlePageChange}
             total={data?.totalPages || 1}
-            mt="lg"
+            p="lg"
           />
         </Group>
       </Stack>
