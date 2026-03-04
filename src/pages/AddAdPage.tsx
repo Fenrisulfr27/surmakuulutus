@@ -1,4 +1,3 @@
-import { Flex } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
 import AddAdForm from "../components/AddAdForm";
@@ -40,13 +39,13 @@ export default function AddAdPage() {
   };
 
   return (
-    <Flex justify="space-around" align="center" wrap="wrap">
+    <>
       <AddAdForm
         values={adValues}
         onSubmit={handleSubmit}
         onChange={setAdValues}
       />
       <AdCard ad={adValues} />
-    </Flex>
+    </>
   );
 }

@@ -2,9 +2,10 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import "@mantine/core/styles.css";
 import AddAdPage from "./pages/AddAdPage";
 import HomePage from "./pages/HomePage";
-import { AppShell, Button, Container, Group } from "@mantine/core";
+import { AppShell, Button, Container, Flex, Group, Image } from "@mantine/core";
 import AdDetailsPage from "./pages/AdDetailsPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import logo from "./assets/surmakuulutusedLogo.png";
 
 const queryClient = new QueryClient();
 
@@ -13,9 +14,8 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell style={{ minWidth: 320 }}>
-        {/* Header */}
-        <AppShell.Header withBorder={false} bg="secondary">
+      <AppShell>
+        <AppShell.Header withBorder={false}>
           <Container size="xl">
             <Group justify="end" p="md">
               <Group wrap="wrap">
@@ -30,15 +30,18 @@ export default function App() {
           </Container>
         </AppShell.Header>
 
-        {/* Main content */}
         <AppShell.Main>
-          <Container size="xl" pt={150} px="md">
+          <Flex justify="center" mb="xl" pt={150}>
+            <Image src={logo} h={{ base: 100, sm: 150, md: 200 }} w="auto" />
+          </Flex>
+
+          <Flex direction="row" wrap="wrap" justify="center" gap="lg">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/lisa-kuulutus" element={<AddAdPage />} />
               <Route path="/ads/:id" element={<AdDetailsPage />} />
             </Routes>
-          </Container>
+          </Flex>
         </AppShell.Main>
       </AppShell>
     </QueryClientProvider>
