@@ -1,48 +1,39 @@
 import { useParams } from "react-router-dom";
-import { Text, Center } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { Text, Center, Loader } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
 
 export default function AdDetailsPage() {
-  const { id } = useParams();
-  const [ad, setAd] = useState<Ad | null>(null);
-  const [notFound, setNotFound] = useState(false);
+  const { id } = useParams<{ id: string }>();
 
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchAd = async () => {
-      try {
-        const res = await fetch(
-          `https://surmakuulutus-back.onrender.com/ads/${id}`,
-        );
-
-        if (!res.ok) {
-          setNotFound(true);
-          return;
-        }
-
-        const data: Ad = await res.json();
-        setAd(data);
-      } catch (err) {
-        console.error(err);
-        setNotFound(true);
-      }
-    };
-
-    fetchAd();
-  }, [id]);
-
-  if (ad === null && !notFound) return null;
-  if (notFound) {
+  const {
+    data: ad,
+    isLoading,
+    isError,
+  } = useQuery<Ad, Error>({
+    queryKey: ["ad", id],
+    queryFn: async () => {
+      if (!id) throw new Error("Kuulutuse ID puudub");
+      const res = await fetch(
+        `https://surmakuulutus-back.onrender.com/ads/${id}`,
+      );
+      if (!res.ok) throw new Error("Kuulutust ei leitud");
+      return res.json();
+    },
+    enabled: !!id,
+  });
+  if (isLoading) {
     return (
-      <Center>
-        <Text>Kuulutust ei leitud.</Text>
+      <Center style={{ height: "50vh" }}>
+        <Loader />
       </Center>
     );
   }
 
-  if (!ad) return null;
+  if (isError || !ad) {
+    return <Text>Kuulutust ei leitud.</Text>;
+  }
+
   return <AdCard ad={ad} />;
 }
