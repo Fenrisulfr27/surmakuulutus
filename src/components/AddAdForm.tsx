@@ -36,7 +36,6 @@ Pisarateks Sinu kaunis naer.
 Tühjuseks on roogitud mu hing.
 Ja südames vaid igatsen ma Sind."
         size="lg"
-        pt="lg"
         {...form.getInputProps("poem")}
       />
       <Textarea
