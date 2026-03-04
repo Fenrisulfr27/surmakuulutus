@@ -5,13 +5,28 @@ import AdCard from "../components/AdCard";
 import logo from "../assets/surmakuulutusedLogo.png";
 
 export default function HomePage() {
-  const [ads, setAds] = useState<Ad[]>([]);
+  const [ads, setAds] = useState<Ad[] | null>(null);
 
   useEffect(() => {
-    fetch("https://surmakuulutus-back.onrender.com/ads")
-      .then((res) => res.json())
-      .then((data: Ad[]) => setAds(data))
-      .catch((err) => console.error(err));
+    const fetchAds = async () => {
+      try {
+        const response = await fetch(
+          "https://surmakuulutus-back.onrender.com/ads",
+        );
+
+        if (!response.ok) {
+          throw new Error("Andmete laadimine ebaõnnestus");
+        }
+
+        const data: Ad[] = await response.json();
+        setAds(data);
+      } catch (err) {
+        console.error(err);
+        setAds([]);
+      }
+    };
+
+    fetchAds();
   }, []);
 
   return (
@@ -19,15 +34,19 @@ export default function HomePage() {
       <Flex justify="center">
         <Image src={logo} h={{ base: 100, sm: 150, md: 200 }} w="auto" p="lg" />
       </Flex>
-      {ads.length === 0 && <Text>Kuulutusi pole veel lisatud.</Text>}
-
-      <Flex align="center" direction="row" wrap="wrap" gap="lg">
-        {ads.map((ad) => (
-          <Anchor href={`/ads/${ad._id}`} key={ad._id} underline="never">
-            <AdCard ad={ad} hoverable={true} />
-          </Anchor>
-        ))}
-      </Flex>
+      {ads === null && null}
+      {ads !== null && ads.length === 0 && (
+        <Text>Kuulutusi pole veel lisatud.</Text>
+      )}
+      {ads !== null && ads.length > 0 && (
+        <Flex align="center" direction="row" wrap="wrap" gap="lg">
+          {ads.map((ad) => (
+            <Anchor href={`/ads/${ad._id}`} key={ad._id} underline="never">
+              <AdCard ad={ad} hoverable />
+            </Anchor>
+          ))}
+        </Flex>
+      )}
     </>
   );
 }

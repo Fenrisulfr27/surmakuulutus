@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { Text } from "@mantine/core";
+import { Text, Center } from "@mantine/core";
 import { useEffect, useState } from "react";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
@@ -7,27 +7,42 @@ import AdCard from "../components/AdCard";
 export default function AdDetailsPage() {
   const { id } = useParams();
   const [ad, setAd] = useState<Ad | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!id) return;
 
-    fetch(`https://surmakuulutus-back.onrender.com/ads/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setAd(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [id]);
-  if (loading) return <Text>Laadimine...</Text>;
-  if (!ad) return <Text>Kuulutust ei leitud.</Text>;
+    const fetchAd = async () => {
+      try {
+        const res = await fetch(
+          `https://surmakuulutus-back.onrender.com/ads/${id}`,
+        );
 
+        if (!res.ok) {
+          setNotFound(true);
+          return;
+        }
+
+        const data: Ad = await res.json();
+        setAd(data);
+      } catch (err) {
+        console.error(err);
+        setNotFound(true);
+      }
+    };
+
+    fetchAd();
+  }, [id]);
+
+  if (ad === null && !notFound) return null;
+  if (notFound) {
+    return (
+      <Center>
+        <Text>Kuulutust ei leitud.</Text>
+      </Center>
+    );
+  }
+
+  if (!ad) return null;
   return <AdCard ad={ad} />;
 }

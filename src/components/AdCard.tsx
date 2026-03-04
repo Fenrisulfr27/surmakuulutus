@@ -39,7 +39,9 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
             {firstName}
           </Text>
           <Text c="dimmed">
-            {birthYear} – {deathYear}
+            {birthYear && deathYear
+              ? `${birthYear} – ${deathYear}`
+              : birthYear || deathYear}
           </Text>
           <Text>{bottomText}</Text>
         </Flex>
