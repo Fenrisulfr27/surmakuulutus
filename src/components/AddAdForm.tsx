@@ -31,10 +31,10 @@ export default function AddAdForm({
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Textarea
         label="Luuletus"
-        placeholder="Mälestusteks tuhmunud me aeg.
+        placeholder={`Mälestusteks tuhmunud me aeg.
 Pisarateks Sinu kaunis naer.
 Tühjuseks on roogitud mu hing.
-Ja südames vaid igatsen ma Sind."
+Ja südames vaid igatsen ma Sind.`}
         size="lg"
         {...form.getInputProps("poem")}
       />

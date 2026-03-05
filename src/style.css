@@ -5,7 +5,9 @@ body {
   background-position: bottom center;
   font-family: "Times New Modern", serif;
 }
-
+.mantine-Text-root {
+  white-space: pre-wrap;
+}
 @font-face {
   font-family: "Times New Modern";
   src: url("./assets/fonts/TimesNewModern.ttf") format("truetype");
