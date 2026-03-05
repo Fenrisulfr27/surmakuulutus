@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+
+Disallow: /assets/
+Disallow: /api/
+
+
+Sitemap: https://surmakuulutus.netlify.app/sitemap.xml
