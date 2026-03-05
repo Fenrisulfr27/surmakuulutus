@@ -18,7 +18,7 @@ export default function AddAdForm({
     mode: "controlled",
     initialValues: values,
     validate: {
-      firstName: isNotEmpty(),
+      name: isNotEmpty(),
       email: isEmail(),
     },
   });
@@ -49,7 +49,7 @@ Ja südames vaid igatsen ma Sind."
         size="lg"
         label="Nimi"
         withAsterisk
-        {...form.getInputProps("firstName")}
+        {...form.getInputProps("name")}
       />
 
       <Group>

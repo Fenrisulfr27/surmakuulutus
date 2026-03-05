@@ -61,7 +61,7 @@ export default function HomePage() {
           )}
 
           {data?.data.map((ad) => (
-            <Anchor href={`/ads/${ad._id}`} key={ad._id} underline="never">
+            <Anchor href={`/ads/${ad.slug}`} key={ad.slug} underline="never">
               <AdCard ad={ad} hoverable />
             </Anchor>
           ))}

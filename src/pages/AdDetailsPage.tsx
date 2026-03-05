@@ -5,23 +5,26 @@ import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
 
 export default function AdDetailsPage() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
 
   const {
     data: ad,
     isLoading,
     isError,
   } = useQuery<Ad, Error>({
-    queryKey: ["ad", id],
+    queryKey: ["ad", slug],
     queryFn: async () => {
-      if (!id) throw new Error("Kuulutuse ID puudub");
+      if (!slug) throw new Error("Slug puudub");
+
       const res = await fetch(
-        `https://surmakuulutus-back.onrender.com/ads/${id}`,
+        `https://surmakuulutus-back.onrender.com/ads/${slug}`,
       );
+
       if (!res.ok) throw new Error("Kuulutust ei leitud");
+
       return res.json();
     },
-    enabled: !!id,
+    enabled: !!slug,
   });
   if (isLoading) {
     return (

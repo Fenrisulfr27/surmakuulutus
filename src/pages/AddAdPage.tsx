@@ -8,7 +8,7 @@ export default function AddAdPage() {
   const navigate = useNavigate();
 
   const [adValues, setAdValues] = React.useState<Ad>({
-    firstName: "",
+    name: "",
     email: "",
     birthYear: "",
     deathYear: "",

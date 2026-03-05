@@ -3,7 +3,8 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 export interface Ad {
   _id?: string;
   poem?: string;
-  firstName: string;
+  slug?: string;
+  name: string;
   email: string;
   birthYear?: string;
   deathYear?: string;

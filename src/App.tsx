@@ -32,7 +32,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/lisa-kuulutus" element={<AddAdPage />} />
-            <Route path="/ads/:id" element={<AdDetailsPage />} />
+            <Route path="/ads/:slug" element={<AdDetailsPage />} />
           </Routes>
         </Flex>
       </Container>

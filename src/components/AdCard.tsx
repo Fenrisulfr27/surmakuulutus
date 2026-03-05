@@ -9,15 +9,7 @@ interface AdCardProps {
 }
 
 export default function AdCard({ ad, hoverable }: AdCardProps) {
-  const {
-    firstName,
-
-    birthYear,
-    deathYear,
-    poem,
-    bottomText,
-    topText,
-  } = ad;
+  const { name, birthYear, deathYear, poem, bottomText, topText } = ad;
 
   return (
     <Card
@@ -36,7 +28,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
 
           <Text pt="lg">{topText}</Text>
           <Text size="xl" fw={700}>
-            {firstName}
+            {name}
           </Text>
           <Text c="dimmed">
             {birthYear && deathYear
