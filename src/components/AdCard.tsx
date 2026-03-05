@@ -1,5 +1,5 @@
 import { Card, Text, Image, Flex, Group } from "@mantine/core";
-import cross from "../assets/cross2.png";
+import cross from "../assets/cross2.webp";
 import type { Ad } from "../context/AdsContext";
 
 interface AdCardProps {
@@ -22,7 +22,13 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
       <div className="card-inner">
         <Flex align="center" direction="column">
           <Group justify="start" wrap="nowrap">
-            <Image src={cross} h={50} w="auto" />
+            <Image
+              src={cross}
+              h={50}
+              w="auto"
+              alt="cross"
+              fetchPriority="high"
+            />
             <Text fs="italic">{poem}</Text>
           </Group>
 

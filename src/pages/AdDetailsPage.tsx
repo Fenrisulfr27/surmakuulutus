@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { Text, Center, Loader } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import type { Ad } from "../context/AdsContext";
+import { Helmet } from "react-helmet";
 import AdCard from "../components/AdCard";
 
 export default function AdDetailsPage() {
@@ -38,5 +39,17 @@ export default function AdDetailsPage() {
     return <Text>Kuulutust ei leitud.</Text>;
   }
 
-  return <AdCard ad={ad} />;
+  return (
+    <>
+      <Helmet>
+        <title>{ad.name} – Surmakuulutused</title>
+        <meta
+          name="description"
+          content="Surmakuulutused – avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus."
+        />
+      </Helmet>
+
+      <AdCard ad={ad} />
+    </>
+  );
 }
