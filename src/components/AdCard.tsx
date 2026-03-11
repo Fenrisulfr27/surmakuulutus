@@ -1,7 +1,8 @@
 import { Card, Text, Image, Flex, Group } from "@mantine/core";
 import cross from "../assets/cross2.webp";
 import type { Ad } from "../context/AdsContext";
-
+import dayjs from "dayjs";
+import "dayjs/locale/et";
 interface AdCardProps {
   ad: Ad;
   hoverable?: boolean;
@@ -37,9 +38,15 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
             {name}
           </Text>
           <Text c="dimmed">
-            {birthYear && deathYear
-              ? `${birthYear} – ${deathYear}`
-              : birthYear || deathYear}
+            <Text c="dimmed">
+              {birthYear && deathYear
+                ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
+                : birthYear
+                  ? dayjs(birthYear).format("DD.MM.YYYY")
+                  : deathYear
+                    ? dayjs(deathYear).format("DD.MM.YYYY")
+                    : ""}
+            </Text>
           </Text>
           <Text>{bottomText}</Text>
         </Flex>

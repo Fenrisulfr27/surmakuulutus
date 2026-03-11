@@ -1,5 +1,6 @@
 import { useForm, isNotEmpty, isEmail } from "@mantine/form";
 import { Button, Group, Space, TextInput, Textarea } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
 import type { Ad } from "../context/AdsContext";
 import React from "react";
 
@@ -22,11 +23,12 @@ export default function AddAdForm({
       email: isEmail(),
     },
   });
-
   React.useEffect(() => {
     onChange(form.values);
   }, [form.values, onChange]);
 
+  console.log("birthYear:", form.values.birthYear);
+  console.log("deathYear:", form.values.deathYear);
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Textarea
@@ -51,22 +53,22 @@ Ja südames vaid igatsen ma Sind.`}
         withAsterisk
         {...form.getInputProps("name")}
       />
-
       <Group>
-        <TextInput
+        <DateInput
           size="lg"
-          label="Sünniaasta"
-          placeholder="1992"
+          label="Sünniaeg"
+          locale="et"
           {...form.getInputProps("birthYear")}
         />
-        <TextInput
-          placeholder="2025"
+
+        <DateInput
           size="lg"
-          label="Surmaaasta"
+          valueFormat="DD.MM.YYYY"
+          label="Surmaaeg"
+          locale="et"
           {...form.getInputProps("deathYear")}
         />
       </Group>
-
       <Textarea
         size="lg"
         label="Leinajad"

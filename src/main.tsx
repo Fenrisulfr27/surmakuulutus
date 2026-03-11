@@ -7,6 +7,8 @@ import { shadcnTheme } from "./theme";
 import "@mantine/core/styles.css";
 import { shadcnCssVariableResolver } from "./cssVariableResolver";
 import "./style.css";
+import "@mantine/dates/styles.css";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MantineProvider
