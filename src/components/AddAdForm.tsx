@@ -3,6 +3,10 @@ import { Button, Group, Space, TextInput, Textarea } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import type { Ad } from "../context/AdsContext";
 import React from "react";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 interface AddAdFormProps {
   onSubmit: (values: Ad) => Promise<void>;
@@ -27,8 +31,6 @@ export default function AddAdForm({
     onChange(form.values);
   }, [form.values, onChange]);
 
-  console.log("birthYear:", form.values.birthYear);
-  console.log("deathYear:", form.values.deathYear);
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Textarea
@@ -55,8 +57,10 @@ Ja südames vaid igatsen ma Sind.`}
       />
       <Group>
         <DateInput
+          placeholder="19.01.1992"
           size="lg"
           label="Sünniaeg"
+          valueFormat="DD.MM.YYYY"
           locale="et"
           {...form.getInputProps("birthYear")}
         />
@@ -64,7 +68,9 @@ Ja südames vaid igatsen ma Sind.`}
         <DateInput
           size="lg"
           valueFormat="DD.MM.YYYY"
+          placeholder="23.03.2026"
           label="Surmaaeg"
+          maxDate={new Date(new Date().setDate(new Date().getDate() + 1))}
           locale="et"
           {...form.getInputProps("deathYear")}
         />
