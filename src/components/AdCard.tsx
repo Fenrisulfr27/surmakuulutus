@@ -30,10 +30,14 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
               alt="cross"
               fetchPriority="high"
             />
-            <Text fs="italic">{poem}</Text>
+            <Text fs="italic" style={{ whiteSpace: "pre-wrap" }}>
+              {poem}
+            </Text>
           </Group>
 
-          <Text pt="lg">{topText}</Text>
+          <Text pt="lg" style={{ whiteSpace: "pre-wrap" }}>
+            {topText}
+          </Text>
           <Text size="xl" fw={700}>
             {name}
           </Text>
@@ -48,7 +52,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
                     : ""}
             </Text>
           </Text>
-          <Text>{bottomText}</Text>
+          <Text style={{ whiteSpace: "pre-wrap" }}>{bottomText}</Text>
         </Flex>
       </div>
     </Card>
