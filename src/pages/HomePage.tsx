@@ -9,7 +9,6 @@ import {
   Pagination,
   Group,
   Stack,
-  Flex,
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -59,24 +58,27 @@ export default function HomePage() {
 
   return (
     <Box w="100%">
-      <Flex justify="center" className="app-title-section app-brand-section">
-        <h1
-          style={{
-            margin: 0,
-            textAlign: "center",
-            width: "100%",
-            maxWidth: "100%",
-            paddingInline: "1rem",
-            fontSize: "clamp(34px, 6vw, 72px)",
-            lineHeight: 1,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            overflowWrap: "anywhere",
-          }}
-        >
-          Surmakuulutused
-        </h1>
-      </Flex>
+      <h1
+        style={{
+          margin: 0,
+          marginBottom: "2.5rem",
+          textAlign: "center",
+          width: "100%",
+          maxWidth: "100%",
+          paddingInline: "1rem",
+          fontSize: "clamp(20px, 4.5vw, 72px)",
+          lineHeight: 1,
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          overflowWrap: "normal",
+          wordBreak: "keep-all",
+          display: "inline-block",
+        }}
+      >
+        Surmakuulutused
+      </h1>
+
       <Stack>
         <Group justify="center">
           {data?.data.length === 0 && (
