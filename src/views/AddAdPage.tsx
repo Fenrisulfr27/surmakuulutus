@@ -3,13 +3,14 @@
 import AdCard from "../components/AdCard";
 import AddAdForm from "../components/AddAdForm";
 import React from "react";
-import type { Ad } from "../context/AdsContext";
 import { useRouter } from "next/navigation";
+import type { AdFormValues } from "../lib/adValidation";
 
 export default function AddAdPage() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const [adValues, setAdValues] = React.useState<Ad>({
+  const [adValues, setAdValues] = React.useState<AdFormValues>({
     name: "",
     email: "",
     birthYear: "",
@@ -19,7 +20,9 @@ export default function AddAdPage() {
     topText: "",
   });
 
-  const handleSubmit = async (values: Ad) => {
+  const handleSubmit = async (values: AdFormValues) => {
+    setIsSubmitting(true);
+
     try {
       const res = await fetch("/api/ads", {
         method: "POST",
@@ -28,15 +31,25 @@ export default function AddAdPage() {
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Server error:", errorText);
-        throw new Error(errorText);
+        const payload = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        const message = payload?.error ?? "Midagi läks valesti";
+
+        console.error("Server error:", message);
+        throw new Error(message);
       }
 
       router.push("/");
     } catch (err) {
       console.error(err);
-      alert("Midagi läks valesti! Proovi uuesti.");
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Midagi läks valesti! Proovi uuesti.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -46,6 +59,7 @@ export default function AddAdPage() {
         values={adValues}
         onSubmit={handleSubmit}
         onChange={setAdValues}
+        isSubmitting={isSubmitting}
       />
       <AdCard ad={adValues} />
     </>

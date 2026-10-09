@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createAd, listAds, type Ad } from "../../../lib/ads";
+import { createAd, listAds } from "../../../lib/ads";
+import { validateAdForm } from "../../../lib/adValidation";
 
 export const runtime = "nodejs";
 
@@ -21,23 +22,20 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Ad;
+    const body = await request.json();
+    const parsed = validateAdForm(body);
 
-    if (!body.name) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Nimi on kohustuslik" },
+        {
+          error: parsed.errorMessage,
+          fieldErrors: parsed.fieldErrors,
+        },
         { status: 400 },
       );
     }
 
-    if (!body.email) {
-      return NextResponse.json(
-        { error: "E-mail on kohustuslik" },
-        { status: 400 },
-      );
-    }
-
-    const ad = await createAd(body);
+    const ad = await createAd(parsed.data);
     return NextResponse.json(ad, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Server error";

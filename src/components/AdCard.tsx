@@ -43,16 +43,14 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
           <Text size="xl" fw={700}>
             {name}
           </Text>
-          <Text c="dimmed">
-            <Text c="dimmed">
-              {birthYear && deathYear
-                ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
-                : birthYear
-                  ? dayjs(birthYear).format("DD.MM.YYYY")
-                  : deathYear
-                    ? dayjs(deathYear).format("DD.MM.YYYY")
-                    : ""}
-            </Text>
+          <Text c="dimmed" component="span">
+            {birthYear && deathYear
+              ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
+              : birthYear
+                ? dayjs(birthYear).format("DD.MM.YYYY")
+                : deathYear
+                  ? dayjs(deathYear).format("DD.MM.YYYY")
+                  : ""}
           </Text>
           <Text style={{ whiteSpace: "pre-wrap" }}>{bottomText}</Text>
         </Flex>

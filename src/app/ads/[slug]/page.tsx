@@ -10,8 +10,7 @@ interface PageProps {
 }
 
 async function getAd(slug: string): Promise<Ad | null> {
-  const ad = await getAdBySlug(slug);
-  return ad ? (ad.toObject() as Ad) : null;
+  return getAdBySlug(slug);
 }
 
 export async function generateMetadata({

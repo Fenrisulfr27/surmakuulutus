@@ -18,12 +18,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
+import type { AdsPageData } from "../lib/ads";
 
 interface HomePageProps {
   initialPage: number;
+  initialData: AdsPageData;
 }
 
-export default function HomePage({ initialPage }: HomePageProps) {
+export default function HomePage({ initialPage, initialData }: HomePageProps) {
   const router = useRouter();
   const [page, setPage] = useState(initialPage);
 
@@ -41,6 +43,8 @@ export default function HomePage({ initialPage }: HomePageProps) {
     Error
   >({
     queryKey: ["ads", page],
+    initialData: page === initialPage ? initialData : undefined,
+    staleTime: 60_000,
     queryFn: async () => {
       const res = await fetch(`/api/ads?page=${page}&limit=${limit}`);
       if (!res.ok) {

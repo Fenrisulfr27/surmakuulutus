@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { connectToDatabase } from "./mongodb";
+import type { AdFormValues } from "./adValidation";
 
 export interface Ad {
   _id?: string;
@@ -7,10 +8,17 @@ export interface Ad {
   slug?: string;
   name: string;
   email: string;
-  birthYear?: string;
-  deathYear?: string;
+  birthYear?: string | Date | null;
+  deathYear?: string | Date | null;
   bottomText?: string;
   topText?: string;
+}
+
+export interface AdsPageData {
+  data: Ad[];
+  totalPages: number;
+  currentPage: number;
+  totalAds: number;
 }
 
 const adSchema = new mongoose.Schema(
@@ -31,6 +39,10 @@ adSchema.index({ createdAt: -1 });
 
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 
+function toPlainAd(ad: unknown): Ad {
+  return JSON.parse(JSON.stringify(ad)) as Ad;
+}
+
 export const slugify = (text: string) => {
   return text
     .toLowerCase()
@@ -43,7 +55,7 @@ export const slugify = (text: string) => {
     .replace(/^-|-$/g, "");
 };
 
-export async function listAds(page = 1, limit = 6) {
+export async function listAds(page = 1, limit = 6): Promise<AdsPageData> {
   await connectToDatabase();
 
   const skip = (page - 1) * limit;
@@ -54,7 +66,7 @@ export async function listAds(page = 1, limit = 6) {
   ]);
 
   return {
-    data: ads,
+    data: ads.map(toPlainAd),
     totalPages: Math.ceil(totalAds / limit),
     currentPage: page,
     totalAds,
@@ -63,10 +75,11 @@ export async function listAds(page = 1, limit = 6) {
 
 export async function getAdBySlug(slug: string) {
   await connectToDatabase();
-  return AdModel.findOne({ slug });
+  const ad = await AdModel.findOne({ slug });
+  return ad ? toPlainAd(ad) : null;
 }
 
-export async function createAd(payload: Ad) {
+export async function createAd(payload: AdFormValues) {
   await connectToDatabase();
 
   const baseSlug = slugify(payload.name);
@@ -85,5 +98,5 @@ export async function createAd(payload: Ad) {
 
   await ad.save();
 
-  return ad;
+  return toPlainAd(ad);
 }
