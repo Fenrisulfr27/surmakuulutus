@@ -1,16 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import type { Ad } from "../lib/ads";
 
-export interface Ad {
-  _id?: string;
-  poem?: string;
-  slug?: string;
-  name: string;
-  email: string;
-  birthYear?: string;
-  deathYear?: string;
-  bottomText?: string;
-  topText?: string;
-}
+export type { Ad } from "../lib/ads";
 
 type AdsContextType = {
   ads: Ad[];

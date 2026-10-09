@@ -1,14 +1,15 @@
+"use client";
+
 import { Box, Button, Group } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+import Link from "next/link";
 
 export function AppHeader() {
-  const navigate = useNavigate();
-
   return (
     <Box component="header" className="app-header-section">
       <Group justify="space-between" align="center" p="lg">
         <Button
-          onClick={() => navigate("/")}
+          component={Link}
+          href="/"
           size="md"
           styles={{
             root: {
@@ -25,10 +26,10 @@ export function AppHeader() {
           Avaleht
         </Button>
         <Group wrap="wrap">
-          <Button onClick={() => navigate("/")} size="md">
+          <Button component={Link} href="/" size="md">
             Surmakuulutused
           </Button>
-          <Button onClick={() => navigate("/lisa-kuulutus")} size="md">
+          <Button component={Link} href="/lisa-kuulutus" size="md">
             Lisa kuulutus
           </Button>
         </Group>

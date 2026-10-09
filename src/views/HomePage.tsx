@@ -42,13 +42,18 @@ export default function HomePage({ initialPage }: HomePageProps) {
   >({
     queryKey: ["ads", page],
     queryFn: async () => {
-      const res = await fetch(
-        `https://surmakuulutus-back.onrender.com/ads?page=${page}&limit=${limit}`,
-      );
-      if (!res.ok) throw new Error("Andmete laadimine ebaõnnestus");
+      const res = await fetch(`/api/ads?page=${page}&limit=${limit}`);
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+
+        throw new Error(payload?.error ?? "Andmete laadimine ebaõnnestus");
+      }
       return res.json();
     },
     placeholderData: (previousData) => previousData,
+    retry: false,
   });
 
   const handlePageChange = (value: number) => {
@@ -65,7 +70,13 @@ export default function HomePage({ initialPage }: HomePageProps) {
   }
 
   if (isError) {
-    return <Text>Kuulutuste laadimine ebaõnnestus.</Text>;
+    return (
+      <Text>
+        {data
+          ? "Kuulutuste laadimine ebaõnnestus."
+          : "Kuulutuste laadimine ebaõnnestus. Kontrolli, et MONGO_URI on .env.local failis olemas."}
+      </Text>
+    );
   }
 
   return (

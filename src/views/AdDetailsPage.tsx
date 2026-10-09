@@ -8,5 +8,7 @@ interface AdDetailsPageProps {
 }
 
 export default function AdDetailsPage({ ad }: AdDetailsPageProps) {
-  return <AdCard ad={ad} />;
+  return (
+    <AdCard ad={ad} />
+  );
 }

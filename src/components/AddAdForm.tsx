@@ -1,3 +1,5 @@
+"use client";
+
 import { useForm, isNotEmpty, isEmail } from "@mantine/form";
 import { Button, Group, Space, Text, TextInput, Textarea } from "@mantine/core";
 import { DateInput } from "@mantine/dates";

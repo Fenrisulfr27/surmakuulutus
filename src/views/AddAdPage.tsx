@@ -21,7 +21,7 @@ export default function AddAdPage() {
 
   const handleSubmit = async (values: Ad) => {
     try {
-      const res = await fetch("https://surmakuulutus-back.onrender.com/ads", {
+      const res = await fetch("/api/ads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
