@@ -12,6 +12,7 @@ export interface Ad {
   deathYear?: string | Date | null;
   bottomText?: string;
   topText?: string;
+  createdAt?: string | Date;
 }
 
 export type PublicAd = Omit<Ad, "email">;
@@ -21,6 +22,15 @@ export interface AdsPageData {
   totalPages: number;
   currentPage: number;
   totalAds: number;
+}
+
+export type AdsSortOrder = "newest" | "oldest";
+
+export interface ListAdsOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort?: AdsSortOrder;
 }
 
 const adSchema = new mongoose.Schema(
@@ -38,6 +48,7 @@ const adSchema = new mongoose.Schema(
 );
 
 adSchema.index({ createdAt: -1 });
+adSchema.index({ name: 1 });
 
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 
@@ -59,20 +70,35 @@ export const slugify = (text: string) => {
     .replace(/^-|-$/g, "");
 };
 
-export async function listAds(page = 1, limit = 6): Promise<AdsPageData> {
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export async function listAds(options: ListAdsOptions = {}): Promise<AdsPageData> {
   await connectToDatabase();
 
-  const skip = (page - 1) * limit;
+  const page = Math.max(options.page ?? 1, 1);
+  const limit = Math.min(Math.max(options.limit ?? 6, 1), 50);
+  const search = options.search?.trim();
+  const sortOrder = options.sort === "oldest" ? 1 : -1;
+  const filter = search
+    ? { name: { $regex: escapeRegExp(search), $options: "i" } }
+    : {};
 
-  const [totalAds, ads] = await Promise.all([
-    AdModel.countDocuments(),
-    AdModel.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-  ]);
+  const totalAds = await AdModel.countDocuments(filter);
+  const totalPages = Math.ceil(totalAds / limit);
+  const currentPage = totalPages > 0 ? Math.min(page, totalPages) : 1;
+  const skip = (currentPage - 1) * limit;
+
+  const ads = await AdModel.find(filter)
+    .sort({ createdAt: sortOrder, _id: sortOrder })
+    .skip(skip)
+    .limit(limit);
 
   return {
     data: ads.map(toPublicAd),
-    totalPages: Math.ceil(totalAds / limit),
-    currentPage: page,
+    totalPages,
+    currentPage,
     totalAds,
   };
 }

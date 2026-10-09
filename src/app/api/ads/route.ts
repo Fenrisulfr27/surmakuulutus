@@ -9,8 +9,10 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const page = Math.max(Number(url.searchParams.get("page")) || 1, 1);
     const limit = Math.min(Number(url.searchParams.get("limit")) || 6, 50);
+    const search = url.searchParams.get("search") ?? "";
+    const sort = url.searchParams.get("sort") === "oldest" ? "oldest" : "newest";
 
-    const result = await listAds(page, limit);
+    const result = await listAds({ page, limit, search, sort });
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Server error";

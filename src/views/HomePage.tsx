@@ -15,43 +15,74 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
-import type { AdsPageData } from "../lib/ads";
+import type { AdsPageData, AdsSortOrder } from "../lib/ads";
 import { useLanguage } from "../context/language";
 
 interface HomePageProps {
   initialPage: number;
   initialData: AdsPageData;
+  initialSearch: string;
+  initialSort: AdsSortOrder;
 }
 
-export default function HomePage({ initialPage, initialData }: HomePageProps) {
+export default function HomePage({
+  initialPage,
+  initialData,
+  initialSearch,
+  initialSort,
+}: HomePageProps) {
   const router = useRouter();
   const { language, t } = useLanguage();
   const [page, setPage] = useState(initialPage);
-  const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [search, setSearch] = useState(initialSearch);
+  const [sortOrder, setSortOrder] = useState<AdsSortOrder>(initialSort);
+  const deferredSearch = useDeferredValue(search);
 
   const limit = 12;
 
-  useEffect(() => {
-    setPage(initialPage);
-  }, [initialPage]);
+  const buildSearchParams = useCallback((nextPage: number, nextSearch: string, nextSort: AdsSortOrder) => {
+    const params = new URLSearchParams();
+    const cleanSearch = nextSearch.trim();
 
-  const { data, isLoading, isError } = useQuery<
-    {
-      data: Ad[];
-      totalPages: number;
-    },
-    Error
-  >({
-    queryKey: ["ads", page],
-    initialData: page === initialPage ? initialData : undefined,
+    if (nextPage > 1) {
+      params.set("page", String(nextPage));
+    }
+
+    if (cleanSearch) {
+      params.set("search", cleanSearch);
+    }
+
+    if (nextSort !== "newest") {
+      params.set("sort", nextSort);
+    }
+
+    return params.toString();
+  }, []);
+
+  const navigateHome = useCallback((nextPage: number, nextSearch: string, nextSort: AdsSortOrder) => {
+    const query = buildSearchParams(nextPage, nextSearch, nextSort);
+    router.push(query ? `/?${query}` : "/");
+  }, [buildSearchParams, router]);
+
+  const listingQuery = buildSearchParams(page, search, sortOrder);
+  const currentListingHref = listingQuery ? `/?${listingQuery}` : "/";
+
+  const { data, isLoading, isError } = useQuery<AdsPageData, Error>({
+    queryKey: ["ads", page, deferredSearch.trim(), sortOrder],
+    initialData:
+      page === initialPage &&
+      deferredSearch === initialSearch &&
+      sortOrder === initialSort
+        ? initialData
+        : undefined,
     staleTime: 60_000,
     queryFn: async () => {
-      const res = await fetch(`/api/ads?page=${page}&limit=${limit}`);
+      const query = buildSearchParams(page, deferredSearch, sortOrder);
+      const separator = query ? `&${query}` : "";
+      const res = await fetch(`/api/ads?limit=${limit}${separator}`);
       if (!res.ok) {
         const payload = (await res.json().catch(() => null)) as {
           error?: string;
@@ -67,25 +98,35 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
 
   const handlePageChange = (value: number) => {
     setPage(value);
-    router.push(`/?page=${value}`);
+    navigateHome(value, search, sortOrder);
   };
 
-  const visibleAds = useMemo(() => {
-    const normalizedSearch = search.trim().toLocaleLowerCase(language);
-    const adTime = (ad: Ad) => {
-      const value = ad.deathYear ?? ad.birthYear;
-      const timestamp = value ? new Date(value).getTime() : 0;
-      return Number.isFinite(timestamp) ? timestamp : 0;
-    };
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
-    return [...(data?.data ?? [])]
-      .filter((ad) =>
-        ad.name.toLocaleLowerCase(language).includes(normalizedSearch),
-      )
-      .sort((a, b) =>
-        sortOrder === "newest" ? adTime(b) - adTime(a) : adTime(a) - adTime(b),
-      );
-  }, [data?.data, language, search, sortOrder]);
+  const handleClearSearch = () => {
+    setSearch("");
+    setPage(1);
+    router.replace(sortOrder === "newest" ? "/" : `/?sort=${sortOrder}`);
+  };
+
+  const handleSortChange = (value: string) => {
+    const nextSort = value === "oldest" ? "oldest" : "newest";
+    setSortOrder(nextSort);
+    setPage(1);
+    navigateHome(1, search, nextSort);
+  };
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const query = buildSearchParams(1, deferredSearch, sortOrder);
+      router.replace(query ? `/?${query}` : "/");
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [buildSearchParams, deferredSearch, router, sortOrder]);
 
   if (isLoading) {
     return (
@@ -123,36 +164,59 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
 
       <Stack gap="xl">
         <Group className="newspaper-tools" justify="space-between" align="end">
-          <TextInput
-            aria-label={language === "et" ? "Otsi nime järgi" : "Search by name"}
-            className="newspaper-search"
-            placeholder={language === "et" ? "Otsi nime järgi" : "Search by name"}
-            value={search}
-            onChange={(event) => setSearch(event.currentTarget.value)}
-          />
-          <SegmentedControl
-            aria-label={language === "et" ? "Sorteeri kuulutusi" : "Sort obituaries"}
-            className="newspaper-sort"
-            data={[
-              { label: language === "et" ? "Uuemad" : "Newest", value: "newest" },
-              { label: language === "et" ? "Vanemad" : "Oldest", value: "oldest" },
-            ]}
-            value={sortOrder}
-            onChange={(value) => setSortOrder(value as "newest" | "oldest")}
-          />
+          <Group className="newspaper-tool-controls" align="end" gap="sm">
+            <TextInput
+              aria-label={t("home.searchLabel")}
+              className="newspaper-search"
+              placeholder={t("home.searchPlaceholder")}
+              rightSection={
+                search ? (
+                  <button
+                    aria-label={t("home.clearSearch")}
+                    className="newspaper-clear-search"
+                    onClick={handleClearSearch}
+                    type="button"
+                  >
+                    x
+                  </button>
+                ) : undefined
+              }
+              rightSectionPointerEvents="all"
+              value={search}
+              onChange={(event) => handleSearchChange(event.currentTarget.value)}
+            />
+            <SegmentedControl
+              aria-label={t("home.sortLabel")}
+              className="newspaper-sort"
+              data={[
+                { label: t("home.sortNewest"), value: "newest" },
+                { label: t("home.sortOldest"), value: "oldest" },
+              ]}
+              value={sortOrder}
+              onChange={handleSortChange}
+            />
+          </Group>
+          <Text className="newspaper-result-count">
+            {data?.totalAds ?? 0} {t("home.resultCount")}
+          </Text>
         </Group>
 
+        <Text className="newspaper-section-heading">{t("home.sectionHeading")}</Text>
+
         <div className="home-card-grid">
-          {visibleAds.length === 0 && (
+          {data?.data.length === 0 && (
             <Text className="newspaper-state" ta="center">
-              {search ? (language === "et" ? "Selle nimega kuulutusi ei leitud." : "No obituaries match that name.") : t("home.empty")}
+              {search ? t("home.noSearchResults") : t("home.empty")}
             </Text>
           )}
 
-          {visibleAds.map((ad) => (
+          {data?.data.map((ad) => (
             <Anchor
               component={Link}
-              href={`/ads/${ad.slug}`}
+              href={{
+                pathname: `/ads/${ad.slug}`,
+                query: listingQuery ? { from: currentListingHref } : undefined,
+              }}
               key={ad.slug}
               prefetch={false}
               className="home-card-link"
@@ -162,14 +226,16 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
             </Anchor>
           ))}
         </div>
-        <Group justify="center">
-          <Pagination
-            value={page}
-            onChange={handlePageChange}
-            total={data?.totalPages || 1}
-            p="lg"
-          />
-        </Group>
+        {(data?.totalPages ?? 0) > 1 && (
+          <Group justify="center">
+            <Pagination
+              value={page}
+              onChange={handlePageChange}
+              total={data?.totalPages || 1}
+              p="lg"
+            />
+          </Group>
+        )}
       </Stack>
       <Box
         className="newspaper-submit-band"
@@ -189,9 +255,14 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
           }}
         >
           <Group gap="md" align="center" wrap="nowrap" justify="center">
-            <Text ta="center" className="newspaper-submit-heading">
-              {t("home.addAdHeading")}
-            </Text>
+            <div>
+              <Text ta="center" className="newspaper-submit-heading">
+                {t("home.addAdHeading")}
+              </Text>
+              <Text ta="center" className="newspaper-submit-copy">
+                {t("home.addAdIntro")}
+              </Text>
+            </div>
           </Group>
 
           <Button

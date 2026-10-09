@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@mantine/form";
-import { Button, Group, Space, Text, TextInput, Textarea } from "@mantine/core";
+import { Button, Group, Stack, Text, TextInput, Textarea } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import React from "react";
 import dayjs from "dayjs";
@@ -75,82 +75,104 @@ export default function AddAdForm({
   );
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <Textarea
-        label={renderLabel(t("form.poem"), form.values.poem, LIMITS.poem)}
-        placeholder={t("form.poemPlaceholder")}
-        size="lg"
-        maxLength={LIMITS.poem}
-        {...form.getInputProps("poem")}
-      />
-      <Textarea
-        placeholder={t("form.topTextPlaceholder")}
-        size="lg"
-        label={renderLabel(
-          t("form.topText"),
-          form.values.topText,
-          LIMITS.topText,
-        )}
-        maxLength={LIMITS.topText}
-        {...form.getInputProps("topText")}
-      />
-      <TextInput
-        placeholder={t("form.namePlaceholder")}
-        size="lg"
-        label={t("form.name")}
-        withAsterisk
-        {...form.getInputProps("name")}
-        error={fieldErrors.name}
-      />
-      <Group>
-        <DateInput
-          placeholder={t("form.birthDatePlaceholder")}
+    <form className="newspaper-form" onSubmit={handleSubmit} noValidate>
+      <Stack gap="lg">
+        <Text className="newspaper-form-note">{t("form.requiredNote")}</Text>
+        <Textarea
+          className="newspaper-input"
+          label={renderLabel(
+            `${t("form.topText")} (${t("form.optional")})`,
+            form.values.topText,
+            LIMITS.topText,
+          )}
+          placeholder={t("form.topTextPlaceholder")}
           size="lg"
-          label={t("form.birthDate")}
-          valueFormat="DD.MM.YYYY"
-          locale={language}
-          clearable
-          {...form.getInputProps("birthYear")}
-          error={fieldErrors.birthYear}
+          maxLength={LIMITS.topText}
+          autosize
+          minRows={2}
+          {...form.getInputProps("topText")}
+        />
+        <TextInput
+          className="newspaper-input"
+          placeholder={t("form.namePlaceholder")}
+          size="lg"
+          label={t("form.name")}
+          withAsterisk
+          {...form.getInputProps("name")}
+          error={fieldErrors.name}
+        />
+        <Group grow align="start">
+          <DateInput
+            className="newspaper-input"
+            placeholder={t("form.birthDatePlaceholder")}
+            size="lg"
+            label={`${t("form.birthDate")} (${t("form.optional")})`}
+            valueFormat="DD.MM.YYYY"
+            locale={language}
+            clearable
+            {...form.getInputProps("birthYear")}
+            error={fieldErrors.birthYear}
+          />
+
+          <DateInput
+            className="newspaper-input"
+            size="lg"
+            valueFormat="DD.MM.YYYY"
+            placeholder={t("form.deathDatePlaceholder")}
+            label={`${t("form.deathDate")} (${t("form.optional")})`}
+            minDate={
+              form.values.birthYear ? new Date(form.values.birthYear) : undefined
+            }
+            maxDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+            locale={language}
+            clearable
+            {...form.getInputProps("deathYear")}
+            error={fieldErrors.deathYear}
+          />
+        </Group>
+        <Textarea
+          className="newspaper-input"
+          label={renderLabel(
+            `${t("form.poem")} (${t("form.optional")})`,
+            form.values.poem,
+            LIMITS.poem,
+          )}
+          placeholder={t("form.poemPlaceholder")}
+          size="lg"
+          maxLength={LIMITS.poem}
+          autosize
+          minRows={4}
+          {...form.getInputProps("poem")}
+        />
+        <Textarea
+          className="newspaper-input"
+          size="lg"
+          label={renderLabel(
+            `${t("form.mourners")} (${t("form.optional")})`,
+            form.values.bottomText,
+            LIMITS.bottomText,
+          )}
+          maxLength={LIMITS.bottomText}
+          placeholder={t("form.mournersPlaceholder")}
+          autosize
+          minRows={2}
+          {...form.getInputProps("bottomText")}
+        />
+        <TextInput
+          className="newspaper-input"
+          placeholder={t("form.emailPlaceholder")}
+          size="lg"
+          label={t("form.email")}
+          description={t("form.emailHelp")}
+          withAsterisk
+          {...form.getInputProps("email")}
+          error={fieldErrors.email}
         />
 
-        <DateInput
-          size="lg"
-          valueFormat="DD.MM.YYYY"
-          placeholder={t("form.deathDatePlaceholder")}
-          label={t("form.deathDate")}
-          maxDate={new Date(new Date().setDate(new Date().getDate() + 1))}
-          locale={language}
-          clearable
-          {...form.getInputProps("deathYear")}
-          error={fieldErrors.deathYear}
-        />
-      </Group>
-      <Textarea
-        size="lg"
-        label={renderLabel(
-          t("form.mourners"),
-          form.values.bottomText,
-          LIMITS.bottomText,
-        )}
-        maxLength={LIMITS.bottomText}
-        placeholder={t("form.mournersPlaceholder")}
-        {...form.getInputProps("bottomText")}
-      />
-      <TextInput
-        placeholder={t("form.emailPlaceholder")}
-        size="lg"
-        label={t("form.email")}
-        withAsterisk
-        {...form.getInputProps("email")}
-        error={fieldErrors.email}
-        pb="sm"
-      />
-
-      <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
-        {t("form.save")}
-      </Button>
-      <Space h="xs" />
+        <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
+          {t("form.save")}
+        </Button>
+      </Stack>
     </form>
   );
 }

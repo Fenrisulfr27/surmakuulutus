@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ from?: string }>;
 }
 
 async function getAd(slug: string): Promise<Ad | null> {
@@ -26,13 +27,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const ad = await getAd(slug);
 
   if (!ad) {
     notFound();
   }
 
-  return <AdDetailsPage ad={ad} />;
+  return <AdDetailsPage ad={ad} from={query.from} />;
 }

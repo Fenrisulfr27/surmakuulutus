@@ -15,6 +15,7 @@ interface AdCardProps {
 export default function AdCard({ ad, hoverable }: AdCardProps) {
   const { t } = useLanguage();
   const { name, birthYear, deathYear, poem, bottomText, topText } = ad;
+  const hasOnlyName = !birthYear && !deathYear && !poem && !bottomText && !topText;
   const dateLabel =
     birthYear && deathYear
       ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
@@ -26,7 +27,11 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
 
   return (
     <Card
-      className={hoverable ? "homepage-card newspaper-card" : "newspaper-card"}
+      className={[
+        hoverable ? "homepage-card" : "",
+        "newspaper-card",
+        hasOnlyName ? "newspaper-card-compact" : "",
+      ].filter(Boolean).join(" ")}
       shadow="sm"
       padding="lg"
       radius="md"

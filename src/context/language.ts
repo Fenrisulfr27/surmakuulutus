@@ -12,6 +12,27 @@ export type TranslationKey =
   | "home.loadConfigError"
   | "home.addAdHeading"
   | "home.addAdCta"
+  | "home.addAdIntro"
+  | "home.searchPlaceholder"
+  | "home.searchLabel"
+  | "home.sortLabel"
+  | "home.sortNewest"
+  | "home.sortOldest"
+  | "home.resultCount"
+  | "home.noSearchResults"
+  | "home.clearSearch"
+  | "home.sectionHeading"
+  | "detail.backToList"
+  | "form.pageTitle"
+  | "form.pageIntro"
+  | "form.previewTitle"
+  | "form.requiredNote"
+  | "form.optional"
+  | "form.emailHelp"
+  | "form.successTitle"
+  | "form.successMessage"
+  | "form.viewAd"
+  | "form.createAnother"
   | "form.poem"
   | "form.poemPlaceholder"
   | "form.topText"
@@ -53,7 +74,29 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "home.loadConfigError":
       "Kuulutuste laadimine ebaõnnestus. Kontrolli, et MONGO_URI on .env.local failis olemas.",
     "home.addAdHeading": "Lisa kuulutus",
-    "home.addAdCta": "Lisama",
+    "home.addAdCta": "Lisa kuulutus",
+    "home.addAdIntro": "Avalda mälestuskuulutus väärikas ja rahulikus vormis.",
+    "home.searchPlaceholder": "Otsi nime järgi",
+    "home.searchLabel": "Otsi nime järgi",
+    "home.sortLabel": "Sorteeri kuulutusi",
+    "home.sortNewest": "Uuemad",
+    "home.sortOldest": "Vanemad",
+    "home.resultCount": "kuulutust",
+    "home.noSearchResults": "Selle nimega kuulutusi ei leitud.",
+    "home.clearSearch": "Tühjenda otsing",
+    "home.sectionHeading": "Viimased kuulutused",
+    "detail.backToList": "Tagasi kuulutuste juurde",
+    "form.pageTitle": "Lisa surmakuulutus",
+    "form.pageIntro":
+      "Koosta mälestuskuulutus rahulikus ajalehevormis.",
+    "form.previewTitle": "Eelvaade",
+    "form.requiredNote": "Tärniga väljad on kohustuslikud.",
+    "form.optional": "valikuline",
+    "form.emailHelp": "E-maili ei kuvata avalikus kuulutuses.",
+    "form.successTitle": "Kuulutus avaldatud",
+    "form.successMessage": "Mälestuskuulutus on lisatud.",
+    "form.viewAd": "Vaata kuulutust",
+    "form.createAnother": "Lisa uus kuulutus",
     "form.poem": "Luuletus",
     "form.poemPlaceholder": `Mälestusteks tuhmunud me aeg.
 Pisarateks Sinu kaunis naer.
@@ -71,7 +114,7 @@ Ja südames vaid igatsen ma Sind.`,
     "form.mournersPlaceholder": "Leinab Rein perega",
     "form.email": "Kuulutuse lisaja e-mail",
     "form.emailPlaceholder": "nimi@gmail.com",
-    "form.save": "Salvesta",
+    "form.save": "Avalda kuulutus",
     "form.serverFallback": "Midagi läks valesti",
     "form.genericError": "Midagi läks valesti! Proovi uuesti.",
     "card.crossAlt": "rist",
@@ -98,7 +141,29 @@ Ja südames vaid igatsen ma Sind.`,
     "home.loadConfigError":
       "Failed to load obituaries. Check that MONGO_URI exists in .env.local.",
     "home.addAdHeading": "Add obituary",
-    "home.addAdCta": "Add",
+    "home.addAdCta": "Add obituary",
+    "home.addAdIntro": "Publish a memorial notice in a quiet, dignified form.",
+    "home.searchPlaceholder": "Search by name",
+    "home.searchLabel": "Search by name",
+    "home.sortLabel": "Sort obituaries",
+    "home.sortNewest": "Newest",
+    "home.sortOldest": "Oldest",
+    "home.resultCount": "obituaries",
+    "home.noSearchResults": "No obituaries match that name.",
+    "home.clearSearch": "Clear search",
+    "home.sectionHeading": "Latest notices",
+    "detail.backToList": "Back to notices",
+    "form.pageTitle": "Add obituary",
+    "form.pageIntro":
+      "Create a memorial notice in a calm newspaper form.",
+    "form.previewTitle": "Preview",
+    "form.requiredNote": "Fields marked with an asterisk are required.",
+    "form.optional": "optional",
+    "form.emailHelp": "The email address is not shown publicly.",
+    "form.successTitle": "Obituary published",
+    "form.successMessage": "The memorial notice has been added.",
+    "form.viewAd": "View obituary",
+    "form.createAnother": "Create another",
     "form.poem": "Poem",
     "form.poemPlaceholder": `Time faded into memories.
 Your beautiful laugh into tears.
@@ -116,7 +181,7 @@ My heart still longs for you.`,
     "form.mournersPlaceholder": "Mourned by Rein and family",
     "form.email": "Submitter email",
     "form.emailPlaceholder": "name@gmail.com",
-    "form.save": "Save",
+    "form.save": "Publish obituary",
     "form.serverFallback": "Something went wrong",
     "form.genericError": "Something went wrong! Try again.",
     "card.crossAlt": "cross",
