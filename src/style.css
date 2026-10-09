@@ -4,32 +4,57 @@ body,
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 20px;
   min-height: 100%;
-  color: #e3ded6;
 }
 
 body {
   font-size: 20px;
-  color: #e3ded6;
-  background-color: #050403;
-  background-image:
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.82),
-      rgba(0, 0, 0, 0.78),
-      rgba(0, 0, 0, 0.98)
-    ),
-    radial-gradient(circle at center, rgba(0, 0, 0, 0.68), transparent 45%),
-    url("./assets/hero.webp");
+  color: var(--paper-ink);
+  background-color: var(--paper-bg);
+  background-image: var(--paper-bg-image);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+:root,
+[data-mantine-color-scheme="light"] {
+  --paper-bg: #e7e2dc;
+  --paper-sheet: #f8f6f1;
+  --paper-sheet-soft: #eee9e1;
+  --paper-ink: #151515;
+  --paper-muted: #625c54;
+  --paper-rule: rgba(21, 21, 21, 0.32);
+  --paper-rule-strong: rgba(21, 21, 21, 0.72);
+  --paper-accent: #111111;
+  --paper-bg-image:
+    linear-gradient(180deg, rgba(247, 244, 238, 0.88), rgba(231, 226, 220, 0.92)),
+    url("./assets/hero.webp");
+}
+
+[data-mantine-color-scheme="dark"] {
+  --paper-bg: #050403;
+  --paper-sheet: #0d0c09;
+  --paper-sheet-soft: #17140f;
+  --paper-ink: #ece5d8;
+  --paper-muted: #c1b39f;
+  --paper-rule: rgba(236, 229, 216, 0.2);
+  --paper-rule-strong: rgba(236, 229, 216, 0.48);
+  --paper-accent: #c7a873;
+  --paper-bg-image:
+    linear-gradient(180deg, rgba(5, 4, 3, 0.96), rgba(5, 4, 3, 0.92), rgba(5, 4, 3, 0.98)),
+    url("./assets/hero.webp");
+}
+
 .mantine-Text-root,
 .mantine-Button-root,
 .mantine-Badge-root {
   font-size: 20px;
+  color: var(--paper-ink);
 }
 
 h1,
@@ -42,21 +67,23 @@ button,
 .mantine-Title-root,
 .mantine-Button-root {
   font-family: "Cinzel", "Cormorant Garamond", Georgia, serif;
-  color: #ece5d8;
+  color: var(--paper-ink);
 }
 
 a {
-  color: #e3ded6;
+  color: var(--paper-ink);
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #ece5d8;
+  color: var(--paper-accent);
 }
 
 .app-header-section {
-  margin-bottom: 4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 1rem 0 1.5rem;
+  background: color-mix(in srgb, var(--paper-sheet) 90%, transparent);
+  border-top: 3px double var(--paper-rule-strong);
+  border-bottom: 3px double var(--paper-rule-strong);
 }
 
 .app-title-section {
@@ -71,19 +98,222 @@ a:hover {
   padding-top: 1rem;
 }
 
+.newspaper-nav {
+  min-height: 48px;
+}
+
+.newspaper-nav-actions {
+  border-left: 1px solid var(--paper-rule);
+  padding-left: 0.75rem;
+}
+
+.app-brand-button .mantine-Button-label {
+  color: var(--paper-ink) !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.newspaper-masthead {
+  margin-bottom: 1.25rem;
+  padding: 0.6rem 0.75rem 0.85rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--paper-sheet) 86%, transparent);
+  border-top: 1px solid var(--paper-rule-strong);
+  border-bottom: 4px double var(--paper-rule-strong);
+}
+
+.newspaper-masthead h1 {
+  margin: 0.1rem 0 0;
+  color: var(--paper-ink);
+  font-size: clamp(48px, 9vw, 112px) !important;
+  font-weight: 500;
+  letter-spacing: 0 !important;
+  line-height: 0.86 !important;
+  text-transform: none !important;
+  overflow-wrap: anywhere;
+}
+
+.newspaper-date,
+.newspaper-subtitle {
+  color: var(--paper-muted) !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.newspaper-tools {
+  padding: 0.75rem;
+  background: color-mix(in srgb, var(--paper-sheet) 84%, transparent);
+  border-top: 1px solid var(--paper-rule);
+  border-bottom: 1px solid var(--paper-rule);
+}
+
+.newspaper-search {
+  flex: 1 1 260px;
+  max-width: 430px;
+}
+
+.newspaper-search input,
+.mantine-SegmentedControl-root {
+  min-height: 42px;
+  color: var(--paper-ink);
+  background: var(--paper-sheet-soft) !important;
+  border: 1px solid var(--paper-rule-strong) !important;
+  border-radius: 0 !important;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1rem;
+}
+
+.newspaper-search input::placeholder {
+  color: var(--paper-muted);
+}
+
+.mantine-SegmentedControl-label {
+  color: var(--paper-ink);
+  font-family: "Cinzel", "Cormorant Garamond", Georgia, serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mantine-SegmentedControl-indicator {
+  background: color-mix(in srgb, var(--paper-accent) 28%, transparent) !important;
+  border-radius: 0 !important;
+}
+
+.home-card-grid {
+  column-count: 3;
+  column-gap: 1rem;
+}
+
 .home-card-link {
-  display: flex;
-  width: min(100%, 420px);
-  min-height: var(--home-card-height, auto);
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+  break-inside: avoid;
 }
 
 .homepage-card {
   width: 100%;
 }
 
+.newspaper-card {
+  background: var(--paper-sheet) !important;
+  border: 3px double var(--paper-rule-strong) !important;
+  border-radius: 0 !important;
+  color: var(--paper-ink);
+  box-shadow: none !important;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.home-card-link:hover .newspaper-card,
+.home-card-link:focus-visible .newspaper-card {
+  border-color: var(--paper-accent) !important;
+  background: color-mix(in srgb, var(--paper-sheet) 92%, var(--paper-accent));
+}
+
 .homepage-card .card-inner,
 .homepage-card .mantine-Flex-root {
-  height: 100%;
+  height: auto;
+}
+
+.newspaper-card-content {
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.newspaper-poem-row {
+  align-self: stretch;
+  justify-content: center;
+}
+
+.newspaper-poem {
+  color: var(--paper-muted) !important;
+  font-size: 1rem !important;
+  line-height: 1.22;
+}
+
+.newspaper-kicker,
+.newspaper-footer {
+  color: var(--paper-muted) !important;
+  font-size: 1rem !important;
+  line-height: 1.22;
+}
+
+.newspaper-name {
+  color: var(--paper-ink) !important;
+  font-size: clamp(30px, 3vw, 44px) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0;
+  line-height: 0.92;
+  margin-block: 0.12rem 0;
+  overflow-wrap: anywhere;
+}
+
+.newspaper-dates {
+  color: var(--paper-muted) !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em;
+  margin-block: 0;
+  text-transform: uppercase;
+}
+
+.newspaper-separator {
+  width: min(100%, 180px);
+  height: 4px;
+  margin: 0.35rem auto;
+  border-top: 1px solid var(--paper-rule);
+  border-bottom: 1px solid var(--paper-rule);
+}
+
+.newspaper-state {
+  display: block;
+  column-span: all;
+  padding: 2rem 1rem;
+  background: var(--paper-sheet);
+  border: 3px double var(--paper-rule-strong);
+  color: var(--paper-muted) !important;
+}
+
+.newspaper-submit-band {
+  margin-top: 2rem;
+  min-height: clamp(170px, 32vw, 230px);
+  overflow: hidden;
+  border-top: 4px double var(--paper-rule-strong);
+  border-bottom: 1px solid var(--paper-rule);
+  background: color-mix(in srgb, var(--paper-sheet) 70%, transparent);
+}
+
+.newspaper-submit-heading {
+  color: var(--paper-ink) !important;
+  font-size: clamp(28px, 5vw, 58px) !important;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.mantine-Button-root {
+  background: transparent !important;
+  border: 1px solid var(--paper-rule) !important;
+  border-radius: 0 !important;
+  color: var(--paper-ink) !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.mantine-Button-label {
+  color: var(--paper-ink) !important;
+  font-size: 0.78rem;
+}
+
+.mantine-Button-root:hover,
+.nav-button-active {
+  background: color-mix(in srgb, var(--paper-accent) 18%, transparent) !important;
+  border-color: var(--paper-accent) !important;
+}
+
+.mantine-Loader-root {
+  color: var(--paper-accent);
 }
 
 .cta-image-hidden-mobile {
@@ -93,5 +323,50 @@ a:hover {
 @media (min-width: 640px) {
   .cta-image-hidden-mobile {
     display: block;
+  }
+}
+
+@media (max-width: 980px) {
+  .home-card-grid {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    background-attachment: scroll;
+  }
+
+  .app-header-section {
+    margin-top: 0.5rem;
+  }
+
+  .newspaper-nav,
+  .newspaper-tools {
+    align-items: stretch;
+  }
+
+  .newspaper-nav-actions {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid var(--paper-rule);
+    padding-top: 0.5rem;
+    padding-left: 0;
+  }
+
+  .newspaper-masthead {
+    padding-inline: 0.25rem;
+  }
+
+  .home-card-grid {
+    column-count: 1;
+  }
+
+  .newspaper-search {
+    max-width: none;
+  }
+
+  .newspaper-sort {
+    width: 100%;
   }
 }

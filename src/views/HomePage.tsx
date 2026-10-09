@@ -3,7 +3,6 @@
 import {
   Box,
   Button,
-  Divider,
   Text,
   Anchor,
   Center,
@@ -11,10 +10,12 @@ import {
   Pagination,
   Group,
   Stack,
+  TextInput,
+  SegmentedControl,
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
@@ -28,10 +29,10 @@ interface HomePageProps {
 
 export default function HomePage({ initialPage, initialData }: HomePageProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [page, setPage] = useState(initialPage);
-  const cardRefs = useRef<Array<HTMLAnchorElement | null>>([]);
-  const [cardHeight, setCardHeight] = useState<number>();
+  const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   const limit = 12;
 
@@ -69,25 +70,22 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
     router.push(`/?page=${value}`);
   };
 
-  useLayoutEffect(() => {
-    cardRefs.current = cardRefs.current.slice(0, data?.data.length ?? 0);
-    const cards = cardRefs.current.filter(Boolean) as HTMLAnchorElement[];
+  const visibleAds = useMemo(() => {
+    const normalizedSearch = search.trim().toLocaleLowerCase(language);
+    const adTime = (ad: Ad) => {
+      const value = ad.deathYear ?? ad.birthYear;
+      const timestamp = value ? new Date(value).getTime() : 0;
+      return Number.isFinite(timestamp) ? timestamp : 0;
+    };
 
-    if (cards.length === 0) {
-      setCardHeight(undefined);
-      return;
-    }
-
-    setCardHeight(undefined);
-
-    const frame = requestAnimationFrame(() => {
-      setCardHeight(
-        Math.ceil(Math.max(...cards.map((card) => card.scrollHeight))),
+    return [...(data?.data ?? [])]
+      .filter((ad) =>
+        ad.name.toLocaleLowerCase(language).includes(normalizedSearch),
+      )
+      .sort((a, b) =>
+        sortOrder === "newest" ? adTime(b) - adTime(a) : adTime(a) - adTime(b),
       );
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [data?.data]);
+  }, [data?.data, language, search, sortOrder]);
 
   if (isLoading) {
     return (
@@ -109,58 +107,61 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
 
   return (
     <Box w="100%">
-      <h1
-        style={{
-          margin: 0,
-          marginBottom: "2.5rem",
-          textAlign: "center",
-          width: "100%",
-          maxWidth: "100%",
-          paddingInline: "1rem",
-          fontSize: "clamp(20px, 4.5vw, 72px)",
-          lineHeight: 1,
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-          whiteSpace: "nowrap",
-          overflowWrap: "normal",
-          wordBreak: "keep-all",
-          display: "inline-block",
-        }}
-      >
-        {t("home.title")}
-      </h1>
+      <section className="newspaper-masthead" aria-labelledby="home-title">
+        <Text className="newspaper-date">
+          {new Intl.DateTimeFormat(language, {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }).format(new Date())}
+        </Text>
+        <h1 id="home-title">{t("home.title")}</h1>
+        <Text className="newspaper-subtitle">
+          {language === "et" ? "Mälestused, mis jäävad" : "Memories that remain"}
+        </Text>
+      </section>
 
-      <Stack>
-        <Group
-          className="home-card-grid"
-          justify="center"
-          align="stretch"
-          style={
-            cardHeight
-              ? ({ "--home-card-height": `${cardHeight}px` } as CSSProperties)
-              : undefined
-          }
-        >
-          {data?.data.length === 0 && (
-            <Text ta="center">{t("home.empty")}</Text>
+      <Stack gap="xl">
+        <Group className="newspaper-tools" justify="space-between" align="end">
+          <TextInput
+            aria-label={language === "et" ? "Otsi nime järgi" : "Search by name"}
+            className="newspaper-search"
+            placeholder={language === "et" ? "Otsi nime järgi" : "Search by name"}
+            value={search}
+            onChange={(event) => setSearch(event.currentTarget.value)}
+          />
+          <SegmentedControl
+            aria-label={language === "et" ? "Sorteeri kuulutusi" : "Sort obituaries"}
+            className="newspaper-sort"
+            data={[
+              { label: language === "et" ? "Uuemad" : "Newest", value: "newest" },
+              { label: language === "et" ? "Vanemad" : "Oldest", value: "oldest" },
+            ]}
+            value={sortOrder}
+            onChange={(value) => setSortOrder(value as "newest" | "oldest")}
+          />
+        </Group>
+
+        <div className="home-card-grid">
+          {visibleAds.length === 0 && (
+            <Text className="newspaper-state" ta="center">
+              {search ? (language === "et" ? "Selle nimega kuulutusi ei leitud." : "No obituaries match that name.") : t("home.empty")}
+            </Text>
           )}
 
-          {data?.data.map((ad, index) => (
+          {visibleAds.map((ad) => (
             <Anchor
               component={Link}
               href={`/ads/${ad.slug}`}
               key={ad.slug}
               prefetch={false}
-              ref={(node) => {
-                cardRefs.current[index] = node;
-              }}
               className="home-card-link"
               underline="never"
             >
               <AdCard ad={ad} hoverable />
             </Anchor>
           ))}
-        </Group>
+        </div>
         <Group justify="center">
           <Pagination
             value={page}
@@ -171,14 +172,9 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
         </Group>
       </Stack>
       <Box
+        className="newspaper-submit-band"
         style={{
           position: "relative",
-          marginTop: "3rem",
-          minHeight: "clamp(220px, 50vw, 290px)",
-          borderTop: "1px solid rgba(255,255,255,0.04)",
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), radial-gradient(circle at center, rgba(255,255,255,0.02), transparent 45%)",
-          overflow: "hidden",
         }}
       >
         <Stack
@@ -193,38 +189,15 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
           }}
         >
           <Group gap="md" align="center" wrap="nowrap" justify="center">
-            <Divider color="rgba(255,255,255,0.14)" w={60} visibleFrom="sm" />
-            <Text
-              ta="center"
-              style={{
-                color: "#ddd7ce",
-                letterSpacing: 6,
-                textTransform: "uppercase",
-                fontSize: "clamp(20px, 5vw, 54px)",
-                lineHeight: 1.2,
-              }}
-            >
+            <Text ta="center" className="newspaper-submit-heading">
               {t("home.addAdHeading")}
             </Text>
-            <Divider color="rgba(255,255,255,0.14)" w={60} visibleFrom="sm" />
           </Group>
 
           <Button
             component={Link}
             href="/lisa-kuulutus"
             size="md"
-            radius={0}
-            styles={{
-              root: {
-                background: "#ece5d8",
-                color: "#111111",
-                border: "1px solid rgba(255,255,255,0.14)",
-                textTransform: "uppercase",
-                letterSpacing: 2,
-                minWidth: "clamp(200px, 60vw, 270px)",
-                height: "clamp(40px, 8vw, 52px)",
-              },
-            }}
           >
             {t("home.addAdCta")}
           </Button>

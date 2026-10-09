@@ -15,46 +15,67 @@ interface AdCardProps {
 export default function AdCard({ ad, hoverable }: AdCardProps) {
   const { t } = useLanguage();
   const { name, birthYear, deathYear, poem, bottomText, topText } = ad;
+  const dateLabel =
+    birthYear && deathYear
+      ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
+      : birthYear
+        ? dayjs(birthYear).format("DD.MM.YYYY")
+        : deathYear
+          ? dayjs(deathYear).format("DD.MM.YYYY")
+          : "";
 
   return (
     <Card
-      className={hoverable ? "homepage-card" : undefined}
+      className={hoverable ? "homepage-card newspaper-card" : "newspaper-card"}
       shadow="sm"
       padding="lg"
       radius="md"
       withBorder
     >
       <div className="card-inner">
-        <Flex align="center" direction="column" justify={hoverable ? "center" : undefined}>
-          <Group justify="start" wrap="nowrap">
-            <Image
-              src={cross.src}
-              h={50}
-              w="auto"
-              alt={t("card.crossAlt")}
-              fetchPriority="high"
-            />
-            <Text fs="italic" style={{ whiteSpace: "pre-wrap" }}>
-              {poem}
+        <Flex
+          align="center"
+          className="newspaper-card-content"
+          direction="column"
+        >
+          {topText && (
+            <Text className="newspaper-kicker" style={{ whiteSpace: "pre-wrap" }}>
+              {topText}
             </Text>
-          </Group>
+          )}
 
-          <Text pt="lg" style={{ whiteSpace: "pre-wrap" }}>
-            {topText}
-          </Text>
-          <Text size="xl" fw={700}>
+          <Text className="newspaper-name" size="xl" fw={700}>
             {name}
           </Text>
-          <Text c="dimmed" component="span">
-            {birthYear && deathYear
-              ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
-              : birthYear
-                ? dayjs(birthYear).format("DD.MM.YYYY")
-                : deathYear
-                  ? dayjs(deathYear).format("DD.MM.YYYY")
-                  : ""}
-          </Text>
-          <Text style={{ whiteSpace: "pre-wrap" }}>{bottomText}</Text>
+
+          {dateLabel && (
+            <Text className="newspaper-dates" component="span">
+              {dateLabel}
+            </Text>
+          )}
+
+          {(poem || bottomText) && <div className="newspaper-separator" />}
+
+          {poem && (
+            <Group className="newspaper-poem-row" justify="start" wrap="nowrap">
+              <Image
+                src={cross.src}
+                h={36}
+                w="auto"
+                alt={t("card.crossAlt")}
+                fetchPriority="high"
+              />
+              <Text className="newspaper-poem" fs="italic" style={{ whiteSpace: "pre-wrap" }}>
+                {poem}
+              </Text>
+            </Group>
+          )}
+
+          {bottomText && (
+            <Text className="newspaper-footer" style={{ whiteSpace: "pre-wrap" }}>
+              {bottomText}
+            </Text>
+          )}
         </Flex>
       </div>
     </Card>

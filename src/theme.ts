@@ -24,23 +24,11 @@ export const theme = createTheme({
     Text: {
       defaultProps: {
         ff: '"Cormorant Garamond", Georgia, serif',
-        c: "#e3ded6",
-      },
-      styles: {
-        root: {
-          color: "#e3ded6",
-        },
       },
     },
     Title: {
       defaultProps: {
         ff: '"Cinzel", "Cormorant Garamond", Georgia, serif',
-        c: "#ece5d8",
-      },
-      styles: {
-        root: {
-          color: "#ece5d8",
-        },
       },
     },
     Button: {
