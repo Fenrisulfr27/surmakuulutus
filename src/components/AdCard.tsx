@@ -25,7 +25,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
       withBorder
     >
       <div className="card-inner">
-        <Flex align="center" direction="column">
+        <Flex align="center" direction="column" justify={hoverable ? "center" : undefined}>
           <Group justify="start" wrap="nowrap">
             <Image
               src={cross.src}

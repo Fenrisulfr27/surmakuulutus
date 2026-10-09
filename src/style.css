@@ -71,6 +71,21 @@ a:hover {
   padding-top: 1rem;
 }
 
+.home-card-link {
+  display: flex;
+  width: min(100%, 420px);
+  min-height: var(--home-card-height, auto);
+}
+
+.homepage-card {
+  width: 100%;
+}
+
+.homepage-card .card-inner,
+.homepage-card .mantine-Flex-root {
+  height: 100%;
+}
+
 .cta-image-hidden-mobile {
   display: none;
 }

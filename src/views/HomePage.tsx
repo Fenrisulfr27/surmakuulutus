@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
@@ -30,6 +30,8 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
   const router = useRouter();
   const { t } = useLanguage();
   const [page, setPage] = useState(initialPage);
+  const cardRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const [cardHeight, setCardHeight] = useState<number>();
 
   const limit = 12;
 
@@ -66,6 +68,26 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
     setPage(value);
     router.push(`/?page=${value}`);
   };
+
+  useLayoutEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, data?.data.length ?? 0);
+    const cards = cardRefs.current.filter(Boolean) as HTMLAnchorElement[];
+
+    if (cards.length === 0) {
+      setCardHeight(undefined);
+      return;
+    }
+
+    setCardHeight(undefined);
+
+    const frame = requestAnimationFrame(() => {
+      setCardHeight(
+        Math.ceil(Math.max(...cards.map((card) => card.scrollHeight))),
+      );
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [data?.data]);
 
   if (isLoading) {
     return (
@@ -109,16 +131,30 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
       </h1>
 
       <Stack>
-        <Group justify="center">
+        <Group
+          className="home-card-grid"
+          justify="center"
+          align="stretch"
+          style={
+            cardHeight
+              ? ({ "--home-card-height": `${cardHeight}px` } as CSSProperties)
+              : undefined
+          }
+        >
           {data?.data.length === 0 && (
             <Text ta="center">{t("home.empty")}</Text>
           )}
 
-          {data?.data.map((ad) => (
+          {data?.data.map((ad, index) => (
             <Anchor
               component={Link}
               href={`/ads/${ad.slug}`}
               key={ad.slug}
+              prefetch={false}
+              ref={(node) => {
+                cardRefs.current[index] = node;
+              }}
+              className="home-card-link"
               underline="never"
             >
               <AdCard ad={ad} hoverable />
