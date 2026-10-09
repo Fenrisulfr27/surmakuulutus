@@ -14,8 +14,10 @@ export interface Ad {
   topText?: string;
 }
 
+export type PublicAd = Omit<Ad, "email">;
+
 export interface AdsPageData {
-  data: Ad[];
+  data: PublicAd[];
   totalPages: number;
   currentPage: number;
   totalAds: number;
@@ -39,8 +41,10 @@ adSchema.index({ createdAt: -1 });
 
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 
-function toPlainAd(ad: unknown): Ad {
-  return JSON.parse(JSON.stringify(ad)) as Ad;
+function toPublicAd(ad: unknown): PublicAd {
+  const plain = JSON.parse(JSON.stringify(ad)) as Ad;
+  delete (plain as Partial<Ad>).email;
+  return plain as PublicAd;
 }
 
 export const slugify = (text: string) => {
@@ -66,7 +70,7 @@ export async function listAds(page = 1, limit = 6): Promise<AdsPageData> {
   ]);
 
   return {
-    data: ads.map(toPlainAd),
+    data: ads.map(toPublicAd),
     totalPages: Math.ceil(totalAds / limit),
     currentPage: page,
     totalAds,
@@ -76,7 +80,7 @@ export async function listAds(page = 1, limit = 6): Promise<AdsPageData> {
 export async function getAdBySlug(slug: string) {
   await connectToDatabase();
   const ad = await AdModel.findOne({ slug });
-  return ad ? toPlainAd(ad) : null;
+  return ad ? toPublicAd(ad) : null;
 }
 
 export async function createAd(payload: AdFormValues) {
@@ -98,5 +102,5 @@ export async function createAd(payload: AdFormValues) {
 
   await ad.save();
 
-  return toPlainAd(ad);
+  return toPublicAd(ad);
 }

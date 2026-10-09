@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { Ad } from "../lib/ads";
+import type { PublicAd as Ad } from "../lib/ads";
 
-export type { Ad } from "../lib/ads";
+export type { PublicAd as Ad } from "../lib/ads";
 
 type AdsContextType = {
   ads: Ad[];
