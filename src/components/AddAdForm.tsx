@@ -85,7 +85,6 @@ export default function AddAdForm({
             form.values.topText,
             LIMITS.topText,
           )}
-          placeholder={t("form.topTextPlaceholder")}
           size="lg"
           maxLength={LIMITS.topText}
           autosize
@@ -121,7 +120,9 @@ export default function AddAdForm({
             placeholder={t("form.deathDatePlaceholder")}
             label={`${t("form.deathDate")} (${t("form.optional")})`}
             minDate={
-              form.values.birthYear ? new Date(form.values.birthYear) : undefined
+              form.values.birthYear
+                ? new Date(form.values.birthYear)
+                : undefined
             }
             maxDate={new Date(new Date().setDate(new Date().getDate() + 1))}
             locale={language}

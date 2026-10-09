@@ -60,7 +60,7 @@ export function AppHeader() {
             size="compact-sm"
             onClick={() => setColorScheme(nextColorScheme)}
           >
-            {nextColorScheme}
+            {nextColorScheme === "dark" ? t("nav.darkMode") : t("nav.lightMode")}
           </Button>
         </Group>
       </Group>

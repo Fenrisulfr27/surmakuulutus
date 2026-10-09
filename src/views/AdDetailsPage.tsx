@@ -4,6 +4,7 @@ import { Button, Stack } from "@mantine/core";
 import Link from "next/link";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
+import ObituaryShareMenu from "../components/ObituaryShareMenu";
 import { useLanguage } from "../context/language";
 
 interface AdDetailsPageProps {
@@ -13,7 +14,7 @@ interface AdDetailsPageProps {
 
 export default function AdDetailsPage({ ad, from }: AdDetailsPageProps) {
   const { t } = useLanguage();
-  const backHref = from?.startsWith("/") ? from : "/";
+  const backHref = from?.startsWith("/") && !from.startsWith("//") ? from : "/";
 
   return (
     <Stack className="ad-detail-page" gap="md">
@@ -21,6 +22,7 @@ export default function AdDetailsPage({ ad, from }: AdDetailsPageProps) {
         {t("detail.backToList")}
       </Button>
       <AdCard ad={ad} />
+      <ObituaryShareMenu ad={ad} />
     </Stack>
   );
 }

@@ -354,6 +354,40 @@ a:hover {
   margin-inline: auto;
 }
 
+.obituary-share {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.35rem 1rem 1rem;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.obituary-share-button {
+  min-width: min(100%, 280px);
+  min-height: 48px;
+  padding-inline: 1.45rem !important;
+  border: 1px solid var(--paper-rule-strong) !important;
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.obituary-share-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.55rem;
+  color: var(--paper-accent);
+  font-size: 1.05rem;
+}
+
+.obituary-share-status {
+  color: var(--paper-muted) !important;
+  font-size: 0.9rem !important;
+}
+
 .newspaper-state {
   display: block;
   column-span: all;

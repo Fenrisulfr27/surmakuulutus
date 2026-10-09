@@ -8,9 +8,27 @@ import "@mantine/dates/styles.css";
 import "../style.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.netlify.app",
+  ),
   title: "Surmakuulutused – Avaleht",
   description:
     "Surmakuulutused – avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus.",
+  openGraph: {
+    title: "Surmakuulutused",
+    description:
+      "Avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus.",
+    images: ["/og-preview.webp"],
+    siteName: "Surmakuulutused",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Surmakuulutused",
+    description:
+      "Avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus.",
+    images: ["/og-preview.webp"],
+  },
 };
 
 export default function RootLayout({

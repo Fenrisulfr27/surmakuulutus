@@ -6,6 +6,8 @@ export type TranslationKey =
   | "nav.home"
   | "nav.ads"
   | "nav.addAd"
+  | "nav.lightMode"
+  | "nav.darkMode"
   | "home.title"
   | "home.empty"
   | "home.loadError"
@@ -23,6 +25,9 @@ export type TranslationKey =
   | "home.clearSearch"
   | "home.sectionHeading"
   | "detail.backToList"
+  | "share.button"
+  | "share.copied"
+  | "share.copyFailed"
   | "form.pageTitle"
   | "form.pageIntro"
   | "form.previewTitle"
@@ -68,6 +73,8 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "nav.home": "Avaleht",
     "nav.ads": "Surmakuulutused",
     "nav.addAd": "Lisa kuulutus",
+    "nav.lightMode": "Hele",
+    "nav.darkMode": "Tume",
     "home.title": "Surmakuulutused",
     "home.empty": "Kuulutusi pole veel lisatud.",
     "home.loadError": "Kuulutuste laadimine ebaõnnestus.",
@@ -86,11 +93,13 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "home.clearSearch": "Tühjenda otsing",
     "home.sectionHeading": "Viimased kuulutused",
     "detail.backToList": "Tagasi kuulutuste juurde",
+    "share.button": "Kopeeri kuulutuse link",
+    "share.copied": "Link kopeeritud",
+    "share.copyFailed": "Linki ei õnnestunud kopeerida",
     "form.pageTitle": "Lisa surmakuulutus",
-    "form.pageIntro":
-      "Koosta mälestuskuulutus rahulikus ajalehevormis.",
+    "form.pageIntro": "Koosta mälestuskuulutus rahulikus ajalehevormis.",
     "form.previewTitle": "Eelvaade",
-    "form.requiredNote": "Tärniga väljad on kohustuslikud.",
+
     "form.optional": "valikuline",
     "form.emailHelp": "E-maili ei kuvata avalikus kuulutuses.",
     "form.successTitle": "Kuulutus avaldatud",
@@ -135,6 +144,8 @@ Ja südames vaid igatsen ma Sind.`,
     "nav.home": "Home",
     "nav.ads": "Obituaries",
     "nav.addAd": "Add obituary",
+    "nav.lightMode": "Light",
+    "nav.darkMode": "Dark",
     "home.title": "Obituaries",
     "home.empty": "No obituaries have been added yet.",
     "home.loadError": "Failed to load obituaries.",
@@ -153,11 +164,13 @@ Ja südames vaid igatsen ma Sind.`,
     "home.clearSearch": "Clear search",
     "home.sectionHeading": "Latest notices",
     "detail.backToList": "Back to notices",
+    "share.button": "Copy obituary link",
+    "share.copied": "Link copied!",
+    "share.copyFailed": "Failed to copy link",
     "form.pageTitle": "Add obituary",
-    "form.pageIntro":
-      "Create a memorial notice in a calm newspaper form.",
+    "form.pageIntro": "Create a memorial notice in a calm newspaper form.",
     "form.previewTitle": "Preview",
-    "form.requiredNote": "Fields marked with an asterisk are required.",
+
     "form.optional": "optional",
     "form.emailHelp": "The email address is not shown publicly.",
     "form.successTitle": "Obituary published",
@@ -170,7 +183,8 @@ Your beautiful laugh into tears.
 My soul has emptied into silence.
 My heart still longs for you.`,
     "form.topText": "Text before the deceased's name",
-    "form.topTextPlaceholder": "With sadness we announce the passing of our dear",
+    "form.topTextPlaceholder":
+      "With sadness we announce the passing of our dear",
     "form.name": "Name",
     "form.namePlaceholder": "mother",
     "form.birthDate": "Date of birth",
