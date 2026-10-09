@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import type { AdFieldErrors, AdFormValues } from "../lib/adValidation";
 import { validateAdForm } from "../lib/adValidation";
+import { useLanguage } from "../context/language";
 
 dayjs.extend(customParseFormat);
 
@@ -30,6 +31,7 @@ export default function AddAdForm({
   onChange,
   isSubmitting = false,
 }: AddAdFormProps) {
+  const { language, t } = useLanguage();
   const form = useForm({
     mode: "controlled",
     initialValues: values,
@@ -37,7 +39,7 @@ export default function AddAdForm({
   const [submitAttempted, setSubmitAttempted] = React.useState(false);
 
   const getFieldErrors = (currentValues: AdFormValues): AdFieldErrors => {
-    const validation = validateAdForm(currentValues);
+    const validation = validateAdForm(currentValues, language);
 
     return validation.success ? {} : validation.fieldErrors;
   };
@@ -48,7 +50,7 @@ export default function AddAdForm({
     event.preventDefault();
     setSubmitAttempted(true);
 
-    const validation = validateAdForm(form.values);
+    const validation = validateAdForm(form.values, language);
     if (!validation.success) {
       return;
     }
@@ -75,20 +77,17 @@ export default function AddAdForm({
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Textarea
-        label={renderLabel("Luuletus", form.values.poem, LIMITS.poem)}
-        placeholder={`Mälestusteks tuhmunud me aeg.
-Pisarateks Sinu kaunis naer.
-Tühjuseks on roogitud mu hing.
-Ja südames vaid igatsen ma Sind.`}
+        label={renderLabel(t("form.poem"), form.values.poem, LIMITS.poem)}
+        placeholder={t("form.poemPlaceholder")}
         size="lg"
         maxLength={LIMITS.poem}
         {...form.getInputProps("poem")}
       />
       <Textarea
-        placeholder="Teatame kurbusega, et lahkus meie kallis"
+        placeholder={t("form.topTextPlaceholder")}
         size="lg"
         label={renderLabel(
-          "Tekst enne lahkunu nime",
+          t("form.topText"),
           form.values.topText,
           LIMITS.topText,
         )}
@@ -96,70 +95,60 @@ Ja südames vaid igatsen ma Sind.`}
         {...form.getInputProps("topText")}
       />
       <TextInput
-        placeholder="ema"
+        placeholder={t("form.namePlaceholder")}
         size="lg"
-        label="Nimi"
+        label={t("form.name")}
         withAsterisk
-        error={fieldErrors.name}
         {...form.getInputProps("name")}
+        error={fieldErrors.name}
       />
-      {fieldErrors.name && (
-        <Text size="sm" c="red.6">
-          {fieldErrors.name}
-        </Text>
-      )}
       <Group>
         <DateInput
-          placeholder="19.01.1992"
+          placeholder={t("form.birthDatePlaceholder")}
           size="lg"
-          label="Sünniaeg"
+          label={t("form.birthDate")}
           valueFormat="DD.MM.YYYY"
-          locale="et"
+          locale={language}
           clearable
-          error={fieldErrors.birthYear}
           {...form.getInputProps("birthYear")}
+          error={fieldErrors.birthYear}
         />
 
         <DateInput
           size="lg"
           valueFormat="DD.MM.YYYY"
-          placeholder="23.03.2026"
-          label="Surmaaeg"
+          placeholder={t("form.deathDatePlaceholder")}
+          label={t("form.deathDate")}
           maxDate={new Date(new Date().setDate(new Date().getDate() + 1))}
-          locale="et"
+          locale={language}
           clearable
-          error={fieldErrors.deathYear}
           {...form.getInputProps("deathYear")}
+          error={fieldErrors.deathYear}
         />
       </Group>
       <Textarea
         size="lg"
         label={renderLabel(
-          "Leinajad",
+          t("form.mourners"),
           form.values.bottomText,
           LIMITS.bottomText,
         )}
         maxLength={LIMITS.bottomText}
-        placeholder="Leinab Rein perega"
+        placeholder={t("form.mournersPlaceholder")}
         {...form.getInputProps("bottomText")}
       />
       <TextInput
-        placeholder="nimi@gmail.com"
+        placeholder={t("form.emailPlaceholder")}
         size="lg"
-        label="Kuulutuse lisaja e-mail"
+        label={t("form.email")}
         withAsterisk
-        error={fieldErrors.email}
         {...form.getInputProps("email")}
+        error={fieldErrors.email}
         pb="sm"
       />
-      {fieldErrors.email && (
-        <Text size="sm" c="red.6">
-          {fieldErrors.email}
-        </Text>
-      )}
 
       <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
-        Salvesta
+        {t("form.save")}
       </Button>
       <Space h="xs" />
     </form>

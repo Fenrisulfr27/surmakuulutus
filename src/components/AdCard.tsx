@@ -5,6 +5,7 @@ import cross from "../assets/cross2.webp";
 import type { Ad } from "../context/AdsContext";
 import dayjs from "dayjs";
 import "dayjs/locale/et";
+import { useLanguage } from "../context/language";
 interface AdCardProps {
   ad: Ad;
   hoverable?: boolean;
@@ -12,6 +13,7 @@ interface AdCardProps {
 }
 
 export default function AdCard({ ad, hoverable }: AdCardProps) {
+  const { t } = useLanguage();
   const { name, birthYear, deathYear, poem, bottomText, topText } = ad;
 
   return (
@@ -29,7 +31,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
               src={cross.src}
               h={50}
               w="auto"
-              alt="cross"
+              alt={t("card.crossAlt")}
               fetchPriority="high"
             />
             <Text fs="italic" style={{ whiteSpace: "pre-wrap" }}>

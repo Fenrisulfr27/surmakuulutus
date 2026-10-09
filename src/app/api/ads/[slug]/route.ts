@@ -5,10 +5,11 @@ export const runtime = "nodejs";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
-    const ad = await getAdBySlug(params.slug);
+    const { slug } = await params;
+    const ad = await getAdBySlug(slug);
 
     if (!ad) {
       return NextResponse.json(

@@ -6,7 +6,7 @@ import { getAdBySlug, type Ad } from "../../../lib/ads";
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 async function getAd(slug: string): Promise<Ad | null> {
@@ -16,7 +16,8 @@ async function getAd(slug: string): Promise<Ad | null> {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const ad = await getAd(params.slug);
+  const { slug } = await params;
+  const ad = await getAd(slug);
 
   return {
     title: ad
@@ -26,7 +27,8 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: PageProps) {
-  const ad = await getAd(params.slug);
+  const { slug } = await params;
+  const ad = await getAd(slug);
 
   if (!ad) {
     notFound();

@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import type { Ad } from "../context/AdsContext";
 import AdCard from "../components/AdCard";
 import type { AdsPageData } from "../lib/ads";
+import { useLanguage } from "../context/language";
 
 interface HomePageProps {
   initialPage: number;
@@ -27,6 +28,7 @@ interface HomePageProps {
 
 export default function HomePage({ initialPage, initialData }: HomePageProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [page, setPage] = useState(initialPage);
 
   const limit = 12;
@@ -52,7 +54,7 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
           error?: string;
         } | null;
 
-        throw new Error(payload?.error ?? "Andmete laadimine ebaõnnestus");
+        throw new Error(payload?.error ?? t("home.loadError"));
       }
       return res.json();
     },
@@ -77,8 +79,8 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
     return (
       <Text>
         {data
-          ? "Kuulutuste laadimine ebaõnnestus."
-          : "Kuulutuste laadimine ebaõnnestus. Kontrolli, et MONGO_URI on .env.local failis olemas."}
+          ? t("home.loadError")
+          : t("home.loadConfigError")}
       </Text>
     );
   }
@@ -103,13 +105,13 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
           display: "inline-block",
         }}
       >
-        Surmakuulutused
+        {t("home.title")}
       </h1>
 
       <Stack>
         <Group justify="center">
           {data?.data.length === 0 && (
-            <Text ta="center">Kuulutusi pole veel lisatud.</Text>
+            <Text ta="center">{t("home.empty")}</Text>
           )}
 
           {data?.data.map((ad) => (
@@ -166,7 +168,7 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
                 lineHeight: 1.2,
               }}
             >
-              Lisa kuulutus
+              {t("home.addAdHeading")}
             </Text>
             <Divider color="rgba(255,255,255,0.14)" w={60} visibleFrom="sm" />
           </Group>
@@ -188,7 +190,7 @@ export default function HomePage({ initialPage, initialData }: HomePageProps) {
               },
             }}
           >
-            Lisama
+            {t("home.addAdCta")}
           </Button>
         </Stack>
       </Box>

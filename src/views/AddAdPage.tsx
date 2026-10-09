@@ -5,9 +5,11 @@ import AddAdForm from "../components/AddAdForm";
 import React from "react";
 import { useRouter } from "next/navigation";
 import type { AdFormValues } from "../lib/adValidation";
+import { useLanguage } from "../context/language";
 
 export default function AddAdPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const [adValues, setAdValues] = React.useState<AdFormValues>({
@@ -34,7 +36,7 @@ export default function AddAdPage() {
         const payload = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
-        const message = payload?.error ?? "Midagi läks valesti";
+        const message = payload?.error ?? t("form.serverFallback");
 
         console.error("Server error:", message);
         throw new Error(message);
@@ -46,7 +48,7 @@ export default function AddAdPage() {
       alert(
         err instanceof Error
           ? err.message
-          : "Midagi läks valesti! Proovi uuesti.",
+          : t("form.genericError"),
       );
     } finally {
       setIsSubmitting(false);

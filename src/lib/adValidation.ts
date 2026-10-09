@@ -1,4 +1,34 @@
 import { z } from "zod";
+import type { Language } from "../context/language";
+
+const validationMessages = {
+  et: {
+    nameRequired: "Nimi on kohustuslik",
+    nameMax: "Nimi võib olla kuni 100 tähemärki",
+    emailInvalid: "Sisesta kehtiv e-mail",
+    emailMax: "E-mail võib olla kuni 254 tähemärki",
+    poemMax: "Luuletus võib olla kuni 300 tähemärki",
+    topTextMax: "Tekst enne lahkunu nime võib olla kuni 100 tähemärki",
+    bottomTextMax: "Leinajad võivad olla kuni 100 tähemärki",
+    birthDateInvalid: "Sisesta kehtiv sünniaeg",
+    deathDateInvalid: "Sisesta kehtiv surmaaeg",
+    deathBeforeBirth: "Surmaaeg peab olema hilisem kui sünniaeg",
+    generic: "Andmed ei ole õiged",
+  },
+  en: {
+    nameRequired: "Name is required",
+    nameMax: "Name can be up to 100 characters",
+    emailInvalid: "Enter a valid email",
+    emailMax: "Email can be up to 254 characters",
+    poemMax: "Poem can be up to 300 characters",
+    topTextMax: "Text before the deceased's name can be up to 100 characters",
+    bottomTextMax: "Mourners can be up to 100 characters",
+    birthDateInvalid: "Enter a valid date of birth",
+    deathDateInvalid: "Enter a valid date of death",
+    deathBeforeBirth: "Date of death must be after date of birth",
+    generic: "The data is invalid",
+  },
+} as const;
 
 const optionalDateLike = z.preprocess(
   (value) => {
@@ -11,29 +41,32 @@ const optionalDateLike = z.preprocess(
   z.union([z.string(), z.date()]).optional(),
 );
 
-export const adFormSchema = z
+export function createAdFormSchema(language: Language = "et") {
+  const messages = validationMessages[language];
+
+  return z
   .object({
     name: z
       .string()
       .trim()
-      .min(1, "Nimi on kohustuslik")
-      .max(100, "Nimi võib olla kuni 100 tähemärki"),
+      .min(1, messages.nameRequired)
+      .max(100, messages.nameMax),
     email: z
       .string()
       .trim()
-      .email("Sisesta kehtiv e-mail")
-      .max(254, "E-mail võib olla kuni 254 tähemärki"),
+      .email(messages.emailInvalid)
+      .max(254, messages.emailMax),
     poem: z
       .string()
-      .max(300, "Luuletus võib olla kuni 300 tähemärki")
+      .max(300, messages.poemMax)
       .default(""),
     topText: z
       .string()
-      .max(100, "Tekst enne lahkunu nime võib olla kuni 100 tähemärki")
+      .max(100, messages.topTextMax)
       .default(""),
     bottomText: z
       .string()
-      .max(100, "Leinajad võivad olla kuni 100 tähemärki")
+      .max(100, messages.bottomTextMax)
       .default(""),
     birthYear: optionalDateLike,
     deathYear: optionalDateLike,
@@ -56,7 +89,7 @@ export const adFormSchema = z
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["birthYear"],
-        message: "Sisesta kehtiv sünniaeg",
+        message: messages.birthDateInvalid,
       });
     }
 
@@ -64,7 +97,7 @@ export const adFormSchema = z
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["deathYear"],
-        message: "Sisesta kehtiv surmaaeg",
+        message: messages.deathDateInvalid,
       });
     }
 
@@ -72,17 +105,20 @@ export const adFormSchema = z
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["deathYear"],
-        message: "Surmaaeg peab olema hilisem kui sünniaeg",
+        message: messages.deathBeforeBirth,
       });
     }
   });
+}
+
+export const adFormSchema = createAdFormSchema();
 
 export type AdFormValues = z.infer<typeof adFormSchema>;
 
 export type AdFieldErrors = Partial<Record<keyof AdFormValues, string>>;
 
-export function validateAdForm(values: unknown) {
-  const result = adFormSchema.safeParse(values);
+export function validateAdForm(values: unknown, language: Language = "et") {
+  const result = createAdFormSchema(language).safeParse(values);
 
   if (result.success) {
     return { success: true as const, data: result.data };
@@ -96,6 +132,7 @@ export function validateAdForm(values: unknown) {
   return {
     success: false as const,
     fieldErrors,
-    errorMessage: result.error.issues[0]?.message ?? "Andmed ei ole õiged",
+    errorMessage:
+      result.error.issues[0]?.message ?? validationMessages[language].generic,
   };
 }

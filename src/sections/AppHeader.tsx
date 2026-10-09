@@ -2,8 +2,11 @@
 
 import { Box, Button, Group } from "@mantine/core";
 import Link from "next/link";
+import { useLanguage } from "../context/language";
 
 export function AppHeader() {
+  const { language, setLanguage, t } = useLanguage();
+
   return (
     <Box component="header" className="app-header-section">
       <Group justify="space-between" align="center" p="lg">
@@ -23,14 +26,20 @@ export function AppHeader() {
             },
           }}
         >
-          Avaleht
+          {t("nav.home")}
         </Button>
         <Group wrap="wrap">
           <Button component={Link} href="/" size="md">
-            Surmakuulutused
+            {t("nav.ads")}
           </Button>
           <Button component={Link} href="/lisa-kuulutus" size="md">
-            Lisa kuulutus
+            {t("nav.addAd")}
+          </Button>
+          <Button
+            size="md"
+            onClick={() => setLanguage(language === "et" ? "en" : "et")}
+          >
+            {language === "et" ? "ENG" : "EST"}
           </Button>
         </Group>
       </Group>
