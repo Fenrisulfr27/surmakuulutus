@@ -51,7 +51,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     () => ({
       language,
       setLanguage,
-      t: (key: TranslationKey) => translations[language][key],
+      t: (key: TranslationKey) => translations[key][language],
     }),
     [language],
   );

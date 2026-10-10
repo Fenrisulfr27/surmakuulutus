@@ -11,22 +11,33 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.netlify.app",
   ),
-  title: "Surmakuulutused – Avaleht",
+  title: {
+    default: "Surmakuulutused – mälestuskuulutused Eestis",
+    template: "%s",
+  },
   description:
-    "Surmakuulutused – avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus.",
+    "Avalda ja leia surmakuulutusi nime järgi. Rahulik veebileht lahkunute mälestuseks.",
+  keywords: ["surmakuulutused", "mälestuskuulutus", "obituaries", "leinakuulutus"],
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Surmakuulutused",
+    title: "Surmakuulutused – mälestuskuulutused Eestis",
     description:
-      "Avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus.",
+      "Avalda ja leia surmakuulutusi nime järgi.",
     images: ["/og-preview.webp"],
     siteName: "Surmakuulutused",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Surmakuulutused",
+    title: "Surmakuulutused – mälestuskuulutused Eestis",
     description:
-      "Avalda lahkunute mälestuseks kuulutusi ja hoia mälestusi elus.",
+      "Avalda ja leia surmakuulutusi nime järgi.",
     images: ["/og-preview.webp"],
   },
 };

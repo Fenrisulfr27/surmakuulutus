@@ -5,6 +5,8 @@ const validationMessages = {
   et: {
     nameRequired: "Nimi on kohustuslik",
     nameMax: "Nimi võib olla kuni 100 tähemärki",
+    topTextRequired: "Tekst enne lahkunu nime on kohustuslik",
+    bottomTextRequired: "Leinajad on kohustuslikud",
     emailInvalid: "Sisesta kehtiv e-mail",
     emailMax: "E-mail võib olla kuni 254 tähemärki",
     poemMax: "Luuletus võib olla kuni 300 tähemärki",
@@ -18,6 +20,8 @@ const validationMessages = {
   en: {
     nameRequired: "Name is required",
     nameMax: "Name can be up to 100 characters",
+    topTextRequired: "Text before the deceased's name is required",
+    bottomTextRequired: "Mourners are required",
     emailInvalid: "Enter a valid email",
     emailMax: "Email can be up to 254 characters",
     poemMax: "Poem can be up to 300 characters",
@@ -62,10 +66,14 @@ export function createAdFormSchema(language: Language = "et") {
       .default(""),
     topText: z
       .string()
+      .trim()
+      .min(1, messages.topTextRequired)
       .max(100, messages.topTextMax)
       .default(""),
     bottomText: z
       .string()
+      .trim()
+      .min(1, messages.bottomTextRequired)
       .max(100, messages.bottomTextMax)
       .default(""),
     birthYear: optionalDateLike,

@@ -24,6 +24,11 @@ export interface AdsPageData {
   totalAds: number;
 }
 
+export interface AdSitemapEntry {
+  slug: string;
+  createdAt?: string | Date;
+}
+
 export type AdsSortOrder = "newest" | "oldest";
 
 export interface ListAdsOptions {
@@ -107,6 +112,21 @@ export async function getAdBySlug(slug: string) {
   await connectToDatabase();
   const ad = await AdModel.findOne({ slug });
   return ad ? toPublicAd(ad) : null;
+}
+
+export async function listAdSitemapEntries(): Promise<AdSitemapEntry[]> {
+  await connectToDatabase();
+
+  const ads = await AdModel.find({}, { slug: 1, createdAt: 1 })
+    .sort({ createdAt: -1, _id: -1 })
+    .lean();
+
+  return ads
+    .filter((ad) => typeof ad.slug === "string" && ad.slug.length > 0)
+    .map((ad) => ({
+      slug: ad.slug,
+      createdAt: ad.createdAt,
+    }));
 }
 
 export async function createAd(payload: AdFormValues) {

@@ -19,7 +19,17 @@ function getSiteUrl() {
 }
 
 function getShareDescription(ad: Ad) {
-  return `Vaata mälestuskuulutust: ${ad.name}`;
+  return `${ad.name} mälestuskuulutus. ${ad.topText ?? ""} ${ad.bottomText ?? ""}`.trim();
+}
+
+function getDateValue(value: Ad["birthYear"] | Ad["deathYear"]) {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString().slice(0, 10);
 }
 
 export async function generateMetadata({
@@ -38,6 +48,10 @@ export async function generateMetadata({
   return {
     title,
     description,
+    robots: {
+      index: Boolean(ad),
+      follow: true,
+    },
     alternates: {
       canonical: new URL(url, getSiteUrl()).toString(),
     },
@@ -67,5 +81,30 @@ export default async function Page({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  return <AdDetailsPage ad={ad} from={query.from} />;
+  const adUrl = new URL(`/ads/${slug}`, getSiteUrl()).toString();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `${ad.name} – Surmakuulutused`,
+    name: ad.name,
+    description: getShareDescription(ad),
+    url: adUrl,
+    datePublished: ad.createdAt,
+    mainEntity: {
+      "@type": "Person",
+      name: ad.name,
+      birthDate: getDateValue(ad.birthYear),
+      deathDate: getDateValue(ad.deathYear),
+    },
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <AdDetailsPage ad={ad} from={query.from} />
+    </>
+  );
 }

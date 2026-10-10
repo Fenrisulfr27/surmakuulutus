@@ -1,218 +1,268 @@
 import { createContext, useContext } from "react";
 
-export type Language = "et" | "en";
+export const languages = ["et", "en"] as const;
 
-export type TranslationKey =
-  | "nav.home"
-  | "nav.ads"
-  | "nav.addAd"
-  | "nav.lightMode"
-  | "nav.darkMode"
-  | "home.title"
-  | "home.empty"
-  | "home.loadError"
-  | "home.loadConfigError"
-  | "home.addAdHeading"
-  | "home.addAdCta"
-  | "home.addAdIntro"
-  | "home.searchPlaceholder"
-  | "home.searchLabel"
-  | "home.sortLabel"
-  | "home.sortNewest"
-  | "home.sortOldest"
-  | "home.resultCount"
-  | "home.noSearchResults"
-  | "home.clearSearch"
-  | "home.sectionHeading"
-  | "detail.backToList"
-  | "share.button"
-  | "share.copied"
-  | "share.copyFailed"
-  | "form.pageTitle"
-  | "form.pageIntro"
-  | "form.previewTitle"
-  | "form.requiredNote"
-  | "form.optional"
-  | "form.emailHelp"
-  | "form.successTitle"
-  | "form.successMessage"
-  | "form.viewAd"
-  | "form.createAnother"
-  | "form.poem"
-  | "form.poemPlaceholder"
-  | "form.topText"
-  | "form.topTextPlaceholder"
-  | "form.name"
-  | "form.namePlaceholder"
-  | "form.birthDate"
-  | "form.birthDatePlaceholder"
-  | "form.deathDate"
-  | "form.deathDatePlaceholder"
-  | "form.mourners"
-  | "form.mournersPlaceholder"
-  | "form.email"
-  | "form.emailPlaceholder"
-  | "form.save"
-  | "form.serverFallback"
-  | "form.genericError"
-  | "card.crossAlt"
-  | "validation.nameRequired"
-  | "validation.nameMax"
-  | "validation.emailInvalid"
-  | "validation.emailMax"
-  | "validation.poemMax"
-  | "validation.topTextMax"
-  | "validation.bottomTextMax"
-  | "validation.birthDateInvalid"
-  | "validation.deathDateInvalid"
-  | "validation.deathBeforeBirth"
-  | "validation.generic";
+export type Language = (typeof languages)[number];
 
-export const translations: Record<Language, Record<TranslationKey, string>> = {
-  et: {
-    "nav.home": "Avaleht",
-    "nav.ads": "Surmakuulutused",
-    "nav.addAd": "Lisa kuulutus",
-    "nav.lightMode": "Hele",
-    "nav.darkMode": "Tume",
-    "home.title": "Surmakuulutused",
-    "home.empty": "Kuulutusi pole veel lisatud.",
-    "home.loadError": "Kuulutuste laadimine ebaõnnestus.",
-    "home.loadConfigError":
-      "Kuulutuste laadimine ebaõnnestus. Kontrolli, et MONGO_URI on .env.local failis olemas.",
-    "home.addAdHeading": "Lisa kuulutus",
-    "home.addAdCta": "Lisa kuulutus",
-    "home.addAdIntro": "Avalda mälestuskuulutus väärikas ja rahulikus vormis.",
-    "home.searchPlaceholder": "Otsi nime järgi",
-    "home.searchLabel": "Otsi nime järgi",
-    "home.sortLabel": "Sorteeri kuulutusi",
-    "home.sortNewest": "Uuemad",
-    "home.sortOldest": "Vanemad",
-    "home.resultCount": "kuulutust",
-    "home.noSearchResults": "Selle nimega kuulutusi ei leitud.",
-    "home.clearSearch": "Tühjenda otsing",
-    "home.sectionHeading": "Viimased kuulutused",
-    "detail.backToList": "Tagasi kuulutuste juurde",
-    "share.button": "Kopeeri kuulutuse link",
-    "share.copied": "Link kopeeritud",
-    "share.copyFailed": "Linki ei õnnestunud kopeerida",
-    "form.pageTitle": "Lisa surmakuulutus",
-    "form.pageIntro": "Koosta mälestuskuulutus rahulikus ajalehevormis.",
-    "form.previewTitle": "Eelvaade",
+export const translations = {
+  "nav.home": {
+    et: "Avaleht",
+    en: "Home",
+  },
+  "nav.ads": {
+    et: "Surmakuulutused",
+    en: "Obituaries",
+  },
+  "nav.addAd": {
+    et: "Lisa kuulutus",
+    en: "Add obituary",
+  },
+  "nav.lightMode": {
+    et: "Hele",
+    en: "Light",
+  },
+  "nav.darkMode": {
+    et: "Tume",
+    en: "Dark",
+  },
+  "home.title": {
+    et: "Surmakuulutused",
+    en: "Obituaries",
+  },
+  "home.empty": {
+    et: "Kuulutusi pole veel lisatud.",
+    en: "No obituaries have been added yet.",
+  },
+  "home.loadError": {
+    et: "Kuulutuste laadimine ebaõnnestus.",
+    en: "Failed to load obituaries.",
+  },
+  "home.loadConfigError": {
+    et: "Kuulutuste laadimine ebaõnnestus",
+    en: "Failed to load obituaries.",
+  },
+  "home.addAdHeading": {
+    et: "Lisa kuulutus",
+    en: "Add obituary",
+  },
+  "home.addAdCta": {
+    et: "Lisa kuulutus",
+    en: "Add obituary",
+  },
+  "home.addAdIntro": {
+    et: "Avalda mälestuskuulutus väärikas vormis",
+    en: "Publish a memorial notice in a quiet, dignified form.",
+  },
+  "home.searchPlaceholder": {
+    et: "Otsi nime järgi",
+    en: "Search by name",
+  },
+  "home.searchLabel": {
+    et: "Otsi nime järgi",
+    en: "Search by name",
+  },
+  "home.sortLabel": {
+    et: "Sorteeri kuulutusi",
+    en: "Sort obituaries",
+  },
+  "home.sortNewest": {
+    et: "Uuemad",
+    en: "Newest",
+  },
+  "home.sortOldest": {
+    et: "Vanemad",
+    en: "Oldest",
+  },
+  "home.resultCount": {
+    et: "kuulutust",
+    en: "obituaries",
+  },
+  "home.noSearchResults": {
+    et: "Selle nimega kuulutusi ei leitud.",
+    en: "No obituaries match that name.",
+  },
+  "home.clearSearch": {
+    et: "Tühjenda otsing",
+    en: "Clear search",
+  },
+  "home.sectionHeading": {
+    et: "Viimased kuulutused",
+    en: "Latest notices",
+  },
+  "detail.backToList": {
+    et: "Tagasi kuulutuste juurde",
+    en: "Back to notices",
+  },
+  "share.button": {
+    et: "Kopeeri kuulutuse link",
+    en: "Copy obituary link",
+  },
+  "share.copied": {
+    et: "Link kopeeritud",
+    en: "Link copied",
+  },
+  "share.copyFailed": {
+    et: "Linki ei õnnestunud kopeerida",
+    en: "Failed to copy link",
+  },
+  "form.pageTitle": {
+    et: "Lisa surmakuulutus",
+    en: "Add obituary",
+  },
+  "form.pageIntro": {
+    et: "Koosta mälestuskuulutus väärikas vormis.",
+    en: "Create a memorial notice in a calm and dignified form.",
+  },
+  "form.previewTitle": {
+    et: "Eelvaade",
+    en: "Preview",
+  },
+  "form.requiredNote": {
+    et: "Tärniga väljad on kohustuslikud.",
+    en: "Fields marked with an asterisk are required.",
+  },
 
-    "form.optional": "valikuline",
-    "form.emailHelp": "E-maili ei kuvata avalikus kuulutuses.",
-    "form.successTitle": "Kuulutus avaldatud",
-    "form.successMessage": "Mälestuskuulutus on lisatud.",
-    "form.viewAd": "Vaata kuulutust",
-    "form.createAnother": "Lisa uus kuulutus",
-    "form.poem": "Luuletus",
-    "form.poemPlaceholder": `Mälestusteks tuhmunud me aeg.
+  "form.successTitle": {
+    et: "Kuulutus avaldatud",
+    en: "Obituary published",
+  },
+  "form.successMessage": {
+    et: "Mälestuskuulutus on lisatud.",
+    en: "The memorial notice has been added.",
+  },
+  "form.viewAd": {
+    et: "Vaata kuulutust",
+    en: "View obituary",
+  },
+  "form.createAnother": {
+    et: "Lisa uus kuulutus",
+    en: "Create another",
+  },
+  "form.poem": {
+    et: "Luuletus",
+    en: "Poem",
+  },
+  "form.poemPlaceholder": {
+    et: `Mälestusteks tuhmunud me aeg.
 Pisarateks Sinu kaunis naer.
 Tühjuseks on roogitud mu hing.
 Ja südames vaid igatsen ma Sind.`,
-    "form.topText": "Tekst enne lahkunu nime",
-    "form.topTextPlaceholder": "Teatame kurbusega, et lahkus meie kallis",
-    "form.name": "Nimi",
-    "form.namePlaceholder": "ema",
-    "form.birthDate": "Sünniaeg",
-    "form.birthDatePlaceholder": "19.01.1992",
-    "form.deathDate": "Surmaaeg",
-    "form.deathDatePlaceholder": "23.03.2026",
-    "form.mourners": "Leinajad",
-    "form.mournersPlaceholder": "Leinab Rein perega",
-    "form.email": "Kuulutuse lisaja e-mail",
-    "form.emailPlaceholder": "nimi@gmail.com",
-    "form.save": "Avalda kuulutus",
-    "form.serverFallback": "Midagi läks valesti",
-    "form.genericError": "Midagi läks valesti! Proovi uuesti.",
-    "card.crossAlt": "rist",
-    "validation.nameRequired": "Nimi on kohustuslik",
-    "validation.nameMax": "Nimi võib olla kuni 100 tähemärki",
-    "validation.emailInvalid": "Sisesta kehtiv e-mail",
-    "validation.emailMax": "E-mail võib olla kuni 254 tähemärki",
-    "validation.poemMax": "Luuletus võib olla kuni 300 tähemärki",
-    "validation.topTextMax":
-      "Tekst enne lahkunu nime võib olla kuni 100 tähemärki",
-    "validation.bottomTextMax": "Leinajad võivad olla kuni 100 tähemärki",
-    "validation.birthDateInvalid": "Sisesta kehtiv sünniaeg",
-    "validation.deathDateInvalid": "Sisesta kehtiv surmaaeg",
-    "validation.deathBeforeBirth": "Surmaaeg peab olema hilisem kui sünniaeg",
-    "validation.generic": "Andmed ei ole õiged",
-  },
-  en: {
-    "nav.home": "Home",
-    "nav.ads": "Obituaries",
-    "nav.addAd": "Add obituary",
-    "nav.lightMode": "Light",
-    "nav.darkMode": "Dark",
-    "home.title": "Obituaries",
-    "home.empty": "No obituaries have been added yet.",
-    "home.loadError": "Failed to load obituaries.",
-    "home.loadConfigError":
-      "Failed to load obituaries. Check that MONGO_URI exists in .env.local.",
-    "home.addAdHeading": "Add obituary",
-    "home.addAdCta": "Add obituary",
-    "home.addAdIntro": "Publish a memorial notice in a quiet, dignified form.",
-    "home.searchPlaceholder": "Search by name",
-    "home.searchLabel": "Search by name",
-    "home.sortLabel": "Sort obituaries",
-    "home.sortNewest": "Newest",
-    "home.sortOldest": "Oldest",
-    "home.resultCount": "obituaries",
-    "home.noSearchResults": "No obituaries match that name.",
-    "home.clearSearch": "Clear search",
-    "home.sectionHeading": "Latest notices",
-    "detail.backToList": "Back to notices",
-    "share.button": "Copy obituary link",
-    "share.copied": "Link copied!",
-    "share.copyFailed": "Failed to copy link",
-    "form.pageTitle": "Add obituary",
-    "form.pageIntro": "Create a memorial notice in a calm newspaper form.",
-    "form.previewTitle": "Preview",
-
-    "form.optional": "optional",
-    "form.emailHelp": "The email address is not shown publicly.",
-    "form.successTitle": "Obituary published",
-    "form.successMessage": "The memorial notice has been added.",
-    "form.viewAd": "View obituary",
-    "form.createAnother": "Create another",
-    "form.poem": "Poem",
-    "form.poemPlaceholder": `Time faded into memories.
+    en: `Time faded into memories.
 Your beautiful laugh into tears.
 My soul has emptied into silence.
 My heart still longs for you.`,
-    "form.topText": "Text before the deceased's name",
-    "form.topTextPlaceholder":
-      "With sadness we announce the passing of our dear",
-    "form.name": "Name",
-    "form.namePlaceholder": "mother",
-    "form.birthDate": "Date of birth",
-    "form.birthDatePlaceholder": "19.01.1992",
-    "form.deathDate": "Date of death",
-    "form.deathDatePlaceholder": "23.03.2026",
-    "form.mourners": "Mourners",
-    "form.mournersPlaceholder": "Mourned by Rein and family",
-    "form.email": "Submitter email",
-    "form.emailPlaceholder": "name@gmail.com",
-    "form.save": "Publish obituary",
-    "form.serverFallback": "Something went wrong",
-    "form.genericError": "Something went wrong! Try again.",
-    "card.crossAlt": "cross",
-    "validation.nameRequired": "Name is required",
-    "validation.nameMax": "Name can be up to 100 characters",
-    "validation.emailInvalid": "Enter a valid email",
-    "validation.emailMax": "Email can be up to 254 characters",
-    "validation.poemMax": "Poem can be up to 300 characters",
-    "validation.topTextMax":
-      "Text before the deceased's name can be up to 100 characters",
-    "validation.bottomTextMax": "Mourners can be up to 100 characters",
-    "validation.birthDateInvalid": "Enter a valid date of birth",
-    "validation.deathDateInvalid": "Enter a valid date of death",
-    "validation.deathBeforeBirth": "Date of death must be after date of birth",
-    "validation.generic": "The data is invalid",
   },
-};
+  "form.topText": {
+    et: "Tekst enne lahkunu nime",
+    en: "Text before the deceased's name",
+  },
+  "form.topTextPlaceholder": {
+    et: "Teatame kurbusega, et lahkus meie kallis",
+    en: "With sadness we announce the passing of our dear",
+  },
+  "form.name": {
+    et: "Lahkunu Nimi",
+    en: "Name of the deceased",
+  },
+  "form.namePlaceholder": {
+    et: "ema",
+    en: "mother",
+  },
+  "form.birthDate": {
+    et: "Sünniaeg",
+    en: "Date of birth",
+  },
+  "form.birthDatePlaceholder": {
+    et: "19.01.1992",
+    en: "19.01.1992",
+  },
+  "form.deathDate": {
+    et: "Surmaaeg",
+    en: "Date of death",
+  },
+  "form.deathDatePlaceholder": {
+    et: "23.03.2026",
+    en: "23.03.2026",
+  },
+  "form.mourners": {
+    et: "Leinajad",
+    en: "Mourners",
+  },
+  "form.mournersPlaceholder": {
+    et: "Leinab Rein perega",
+    en: "Mourned by Rein and family",
+  },
+  "form.email": {
+    et: "Kuulutuse lisaja e-mail",
+    en: "Submitter email",
+  },
+  "form.emailPlaceholder": {
+    et: "nimi@gmail.com",
+    en: "name@gmail.com",
+  },
+  "form.save": {
+    et: "Avalda kuulutus",
+    en: "Publish obituary",
+  },
+  "form.serverFallback": {
+    et: "Midagi läks valesti",
+    en: "Something went wrong",
+  },
+  "form.genericError": {
+    et: "Midagi läks valesti! Proovi uuesti.",
+    en: "Something went wrong! Try again.",
+  },
+  "card.crossAlt": {
+    et: "rist",
+    en: "cross",
+  },
+  "validation.nameRequired": {
+    et: "Nimi on kohustuslik",
+    en: "Name is required",
+  },
+  "validation.nameMax": {
+    et: "Nimi võib olla kuni 100 tähemärki",
+    en: "Name can be up to 100 characters",
+  },
+  "validation.emailInvalid": {
+    et: "Sisesta kehtiv e-mail",
+    en: "Enter a valid email",
+  },
+  "validation.emailMax": {
+    et: "E-mail võib olla kuni 254 tähemärki",
+    en: "Email can be up to 254 characters",
+  },
+  "validation.poemMax": {
+    et: "Luuletus võib olla kuni 300 tähemärki",
+    en: "Poem can be up to 300 characters",
+  },
+  "validation.topTextMax": {
+    et: "Tekst enne lahkunu nime võib olla kuni 100 tähemärki",
+    en: "Text before the deceased's name can be up to 100 characters",
+  },
+  "validation.bottomTextMax": {
+    et: "Leinajad võivad olla kuni 100 tähemärki",
+    en: "Mourners can be up to 100 characters",
+  },
+  "validation.birthDateInvalid": {
+    et: "Sisesta kehtiv sünniaeg",
+    en: "Enter a valid date of birth",
+  },
+  "validation.deathDateInvalid": {
+    et: "Sisesta kehtiv surmaaeg",
+    en: "Enter a valid date of death",
+  },
+  "validation.deathBeforeBirth": {
+    et: "Surmaaeg peab olema hilisem kui sünniaeg",
+    en: "Date of death must be after date of birth",
+  },
+  "validation.generic": {
+    et: "Andmed ei ole õiged",
+    en: "The data is invalid",
+  },
+} as const satisfies Record<string, Record<Language, string>>;
+
+export type TranslationKey = keyof typeof translations;
 
 export interface LanguageContextValue {
   language: Language;

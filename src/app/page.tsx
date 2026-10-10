@@ -3,7 +3,12 @@ import HomePage from "../views/HomePage";
 import { listAds, type AdsSortOrder } from "../lib/ads";
 
 export const metadata: Metadata = {
-  title: "Surmakuulutused – Avaleht",
+  title: "Surmakuulutused – leia mälestuskuulutus nime järgi",
+  description:
+    "Surmakuulutused Eestis. Otsi lahkunu nime järgi või lisa mälestuskuulutus.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 interface PageProps {

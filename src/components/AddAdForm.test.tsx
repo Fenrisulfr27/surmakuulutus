@@ -48,9 +48,13 @@ describe("AddAdForm", () => {
   it("shows required field errors and does not submit empty form", async () => {
     const { onSubmit } = renderForm();
 
-    fireEvent.click(screen.getByRole("button", { name: "Salvesta" }));
+    fireEvent.click(screen.getByRole("button", { name: "Avalda kuulutus" }));
 
     expect(await screen.findByText("Nimi on kohustuslik")).toBeDefined();
+    expect(
+      screen.getByText("Tekst enne lahkunu nime on kohustuslik"),
+    ).toBeDefined();
+    expect(screen.getByText("Leinajad on kohustuslikud")).toBeDefined();
     expect(screen.getByText("Sisesta kehtiv e-mail")).toBeDefined();
     expect(onSubmit).not.toHaveBeenCalled();
   });
@@ -61,12 +65,14 @@ describe("AddAdForm", () => {
         ...emptyValues,
         name: "Mari Mets",
         email: "mari@example.com",
+        topText: "Teatame kurbusega",
+        bottomText: "Leinavad lapsed",
         birthYear: new Date("2026-01-02"),
         deathYear: new Date("2026-01-01"),
       },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Salvesta" }));
+    fireEvent.click(screen.getByRole("button", { name: "Avalda kuulutus" }));
 
     expect(
       await screen.findByText("Surmaaeg peab olema hilisem kui sünniaeg"),
@@ -87,7 +93,7 @@ describe("AddAdForm", () => {
       },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Salvesta" }));
+    fireEvent.click(screen.getByRole("button", { name: "Avalda kuulutus" }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     expect(onSubmit).toHaveBeenCalledWith({
