@@ -130,12 +130,13 @@ a:hover {
 .newspaper-masthead h1 {
   margin: 0.1rem 0 0;
   color: var(--paper-ink);
-  font-size: clamp(48px, 9vw, 112px) !important;
+  font-size: clamp(32px, 8vw, 112px) !important;
   font-weight: 500;
   letter-spacing: 0 !important;
   line-height: 0.86 !important;
   text-transform: none !important;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .newspaper-date,

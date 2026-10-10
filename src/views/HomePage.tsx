@@ -219,7 +219,7 @@ export default function HomePage({
             <Anchor
               component={Link}
               href={{
-                pathname: `/kuulutus/${ad.slug}`,
+                pathname: `/kuulutused/${ad.slug}`,
                 query: listingQuery ? { from: currentListingHref } : undefined,
               }}
               key={ad.slug}

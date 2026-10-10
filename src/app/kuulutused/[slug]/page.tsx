@@ -40,7 +40,7 @@ export async function generateMetadata({
   const title = ad
     ? `${ad.name} - mälestuskuulutus`
     : "Kuulutust ei leitud";
-  const url = `/kuulutus/${slug}`;
+  const url = `/kuulutused/${slug}`;
   const description = ad
     ? getShareDescription(ad)
     : "Kuulutust ei leitud.";
@@ -95,7 +95,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const adUrl = new URL(`/kuulutus/${slug}`, getSiteUrl()).toString();
+  const adUrl = new URL(`/kuulutused/${slug}`, getSiteUrl()).toString();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",

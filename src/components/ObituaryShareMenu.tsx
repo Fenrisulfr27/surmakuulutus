@@ -30,10 +30,10 @@ export default function ObituaryShareMenu({ ad }: ObituaryShareMenuProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   const shareUrl = useMemo(() => {
     if (typeof window === "undefined") {
-      return ad.slug ? `/kuulutus/${ad.slug}` : "";
+      return ad.slug ? `/kuulutused/${ad.slug}` : "";
     }
 
-    const path = ad.slug ? `/kuulutus/${ad.slug}` : window.location.pathname;
+    const path = ad.slug ? `/kuulutused/${ad.slug}` : window.location.pathname;
     return new URL(path, window.location.origin).toString();
   }, [ad.slug]);
 
