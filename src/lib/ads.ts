@@ -74,6 +74,10 @@ adSchema.index({ name: 1 });
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 
 export function toPublicAd(ad: unknown): PublicAd {
+  if (!ad) {
+    throw new Error("Ad not found");
+  }
+
   const plain = JSON.parse(JSON.stringify(ad)) as Ad;
   const publicAd = Object.fromEntries(
     publicAdFields
@@ -170,7 +174,5 @@ export async function createAd(payload: AdFormValues) {
 
   await ad.save();
 
-  const publicAd = await AdModel.findById(ad._id).select(publicAdProjection);
-
-  return toPublicAd(publicAd);
+  return toPublicAd(ad);
 }

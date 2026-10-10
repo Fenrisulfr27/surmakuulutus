@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Group, Stack, Text } from "@mantine/core";
+import { Button, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 import AdCard from "../components/AdCard";
 import AddAdForm from "../components/AddAdForm";
@@ -8,10 +8,16 @@ import React from "react";
 import type { AdFormValues } from "../lib/adValidation";
 import { useLanguage } from "../context/language";
 
+interface CreatedAdSummary {
+  name: string;
+  slug: string;
+  createdAt?: string | Date;
+}
+
 export default function AddAdPage() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [createdSlug, setCreatedSlug] = React.useState<string>();
+  const [createdAd, setCreatedAd] = React.useState<CreatedAdSummary>();
   const [formKey, setFormKey] = React.useState(0);
 
   const [adValues, setAdValues] = React.useState<AdFormValues>({
@@ -30,6 +36,7 @@ export default function AddAdPage() {
     }
 
     setIsSubmitting(true);
+    setCreatedAd(undefined);
 
     try {
       const res = await fetch("/api/ads", {
@@ -48,8 +55,18 @@ export default function AddAdPage() {
         throw new Error(message);
       }
 
-      const createdAd = (await res.json()) as { slug?: string };
-      setCreatedSlug(createdAd.slug);
+      const createdAd = (await res.json()) as CreatedAdSummary;
+      setCreatedAd(createdAd);
+      setAdValues({
+        name: "",
+        email: "",
+        birthYear: "",
+        deathYear: "",
+        poem: "",
+        bottomText: "",
+        topText: "",
+      });
+      setFormKey((value) => value + 1);
     } catch (err) {
       console.error(err);
       alert(
@@ -70,50 +87,51 @@ export default function AddAdPage() {
         <Text className="create-page-intro">{t("form.pageIntro")}</Text>
       </div>
 
-      {createdSlug && (
+      {createdAd ? (
         <div className="newspaper-success" role="status">
+          <div className="success-ornament" aria-hidden="true">
+            <span />
+            <i />
+            <span />
+          </div>
           <Text className="newspaper-success-title">{t("form.successTitle")}</Text>
-          <Text>{t("form.successMessage")}</Text>
-          <Group gap="sm" mt="md">
-            <Button component={Link} href={`/ads/${createdSlug}`} prefetch={false}>
+          <Text className="newspaper-success-copy">{t("form.successMessage")}</Text>
+          <Stack gap="xs" align="center">
+            <Text className="newspaper-success-kicker">{t("form.publishedAd")}</Text>
+            <Text className="newspaper-success-name">{createdAd.name}</Text>
+            {createdAd.createdAt && (
+              <Text className="newspaper-success-date">
+                {new Intl.DateTimeFormat(language).format(new Date(createdAd.createdAt))}
+              </Text>
+            )}
+          </Stack>
+          <Stack gap="sm" mt="lg">
+            <Button component={Link} href={`/ads/${createdAd.slug}`} prefetch={false}>
               {t("form.viewAd")}
             </Button>
-            <Button
-              onClick={() => {
-                setCreatedSlug(undefined);
-                setAdValues({
-                  name: "",
-                  email: "",
-                  birthYear: "",
-                  deathYear: "",
-                  poem: "",
-                  bottomText: "",
-                  topText: "",
-                });
-                setFormKey((value) => value + 1);
-              }}
-            >
-              {t("form.createAnother")}
+            <Button component={Link} href="/" variant="outline">
+              {t("form.backHome")}
             </Button>
-          </Group>
+          </Stack>
+          <Text className="newspaper-success-thanks">{t("form.thankYou")}</Text>
+        </div>
+      ) : (
+        <div className="create-layout">
+          <div className="create-panel">
+            <AddAdForm
+              key={formKey}
+              values={adValues}
+              onSubmit={handleSubmit}
+              onChange={setAdValues}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+          <Stack className="create-preview" gap="sm">
+            <Text className="create-preview-title">{t("form.previewTitle")}</Text>
+            <AdCard ad={adValues} />
+          </Stack>
         </div>
       )}
-
-      <div className="create-layout">
-        <div className="create-panel">
-          <AddAdForm
-            key={formKey}
-            values={adValues}
-            onSubmit={handleSubmit}
-            onChange={setAdValues}
-            isSubmitting={isSubmitting}
-          />
-        </div>
-        <Stack className="create-preview" gap="sm">
-          <Text className="create-preview-title">{t("form.previewTitle")}</Text>
-          <AdCard ad={adValues} />
-        </Stack>
-      </div>
     </section>
   );
 }

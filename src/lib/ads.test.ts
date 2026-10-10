@@ -33,4 +33,20 @@ describe("toPublicAd", () => {
     expect(publicAd).not.toHaveProperty("adminNote");
     expect(publicAd).not.toHaveProperty("managementToken");
   });
+
+  it("keeps created obituary slug in public response", () => {
+    const publicAd = toPublicAd({
+      _id: "ad-id",
+      name: "Mari Mets",
+      slug: "mari-mets",
+      email: "mari@example.com",
+    });
+
+    expect(publicAd).toMatchObject({
+      _id: "ad-id",
+      name: "Mari Mets",
+      slug: "mari-mets",
+    });
+    expect(publicAd).not.toHaveProperty("email");
+  });
 });

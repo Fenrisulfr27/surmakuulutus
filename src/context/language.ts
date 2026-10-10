@@ -123,16 +123,28 @@ export const translations = {
   },
 
   "form.successTitle": {
-    et: "Kuulutus avaldatud",
+    et: "Kuulutus on avaldatud",
     en: "Obituary published",
   },
   "form.successMessage": {
-    et: "Mälestuskuulutus on lisatud.",
-    en: "The memorial notice has been added.",
+    et: "Teie mälestuskuulutus on edukalt lisatud ja nüüd kõigile nähtav.",
+    en: "Your memorial notice has been added and is now visible.",
   },
   "form.viewAd": {
     et: "Vaata kuulutust",
     en: "View obituary",
+  },
+  "form.backHome": {
+    et: "Tagasi avalehele",
+    en: "Back to home",
+  },
+  "form.publishedAd": {
+    et: "Avaldatud mälestuskuulutus",
+    en: "Published memorial notice",
+  },
+  "form.thankYou": {
+    et: "Täname, et jagasite mälestust.",
+    en: "Thank you for sharing a memory.",
   },
   "form.createAnother": {
     et: "Lisa uus kuulutus",
