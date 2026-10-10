@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useCallback, useDeferredValue, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdCard from "../components/AdCard";
 import type { AdsPageData, AdsSortOrder } from "../lib/ads";
@@ -38,8 +38,8 @@ export default function HomePage({
   const { language, t } = useLanguage();
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [sortOrder, setSortOrder] = useState<AdsSortOrder>(initialSort);
-  const deferredSearch = useDeferredValue(search);
 
   const limit = 12;
 
@@ -67,20 +67,20 @@ export default function HomePage({
     router.push(query ? `/?${query}` : "/");
   }, [buildSearchParams, router]);
 
-  const listingQuery = buildSearchParams(page, search, sortOrder);
+  const listingQuery = buildSearchParams(page, debouncedSearch, sortOrder);
   const currentListingHref = listingQuery ? `/?${listingQuery}` : "/";
 
   const { data, isLoading, isError } = useQuery<AdsPageData, Error>({
-    queryKey: ["ads", page, deferredSearch.trim(), sortOrder],
+    queryKey: ["ads", page, debouncedSearch.trim(), sortOrder],
     initialData:
       page === initialPage &&
-      deferredSearch === initialSearch &&
+      debouncedSearch === initialSearch &&
       sortOrder === initialSort
         ? initialData
         : undefined,
     staleTime: 60_000,
     queryFn: async () => {
-      const query = buildSearchParams(page, deferredSearch, sortOrder);
+      const query = buildSearchParams(page, debouncedSearch, sortOrder);
       const separator = query ? `&${query}` : "";
       const res = await fetch(`/api/ads?limit=${limit}${separator}`);
       if (!res.ok) {
@@ -108,6 +108,7 @@ export default function HomePage({
 
   const handleClearSearch = () => {
     setSearch("");
+    setDebouncedSearch("");
     setPage(1);
     router.replace(sortOrder === "newest" ? "/" : `/?sort=${sortOrder}`);
   };
@@ -121,12 +122,16 @@ export default function HomePage({
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const query = buildSearchParams(1, deferredSearch, sortOrder);
-      router.replace(query ? `/?${query}` : "/");
+      setDebouncedSearch(search);
     }, 350);
 
     return () => window.clearTimeout(timeout);
-  }, [buildSearchParams, deferredSearch, router, sortOrder]);
+  }, [search]);
+
+  useEffect(() => {
+    const query = buildSearchParams(1, debouncedSearch, sortOrder);
+      router.replace(query ? `/?${query}` : "/");
+  }, [buildSearchParams, debouncedSearch, router, sortOrder]);
 
   if (isLoading) {
     return (
