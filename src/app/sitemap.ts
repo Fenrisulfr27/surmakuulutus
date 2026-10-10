@@ -4,7 +4,7 @@ import { listAdSitemapEntries } from "../lib/ads";
 export const dynamic = "force-dynamic";
 
 function getSiteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.netlify.app";
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.ee";
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

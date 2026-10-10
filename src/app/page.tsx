@@ -3,11 +3,23 @@ import HomePage from "../views/HomePage";
 import { listAds, type AdsSortOrder } from "../lib/ads";
 
 export const metadata: Metadata = {
-  title: "Surmakuulutused – leia mälestuskuulutus nime järgi",
+  title: "Surmakuulutused ja mälestuskuulutused Eestis",
   description:
-    "Surmakuulutused Eestis. Otsi lahkunu nime järgi või lisa mälestuskuulutus.",
+    "Otsi surmakuulutusi ja mälestuskuulutusi lahkunu nime järgi. Vaata leinakuulutusi Eestis või lisa uus surmakuulutus.",
+  keywords: [
+    "surmakuulutused",
+    "surmakuulutus",
+    "leinakuulutused",
+    "mälestuskuulutused",
+  ],
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "Surmakuulutused ja mälestuskuulutused Eestis",
+    description:
+      "Otsi surmakuulutusi ja mälestuskuulutusi lahkunu nime järgi või lisa uus surmakuulutus.",
+    url: "/",
   },
 };
 
@@ -23,7 +35,8 @@ export default async function Page({ searchParams }: PageProps) {
   const params = (await searchParams) ?? {};
   const initialPage = Number(params.page) || 1;
   const initialSearch = params.search ?? "";
-  const initialSort: AdsSortOrder = params.sort === "oldest" ? "oldest" : "newest";
+  const initialSort: AdsSortOrder =
+    params.sort === "oldest" ? "oldest" : "newest";
   const initialData = await listAds({
     page: initialPage,
     limit: 12,

@@ -7,37 +7,79 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "../style.css";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.netlify.app",
-  ),
-  title: {
-    default: "Surmakuulutused – mälestuskuulutused Eestis",
-    template: "%s",
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://surmakuulutus.ee";
+
+const siteName = "Surmakuulutus.ee";
+
+const siteDescription =
+  "Leia surmakuulutusi, leinakuulutusi ja mälestuskuulutusi üle Eesti. Avalda lähedase surmakuulutus ning hoia tema mälestust.";
+
+const siteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  url: siteUrl,
+  inLanguage: "et-EE",
+  description: siteDescription,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteUrl}/?search={search_term_string}`,
+    "query-input": "required name=search_term_string",
   },
-  description:
-    "Avalda ja leia surmakuulutusi nime järgi. Rahulik veebileht lahkunute mälestuseks.",
-  keywords: ["surmakuulutused", "mälestuskuulutus", "obituaries", "leinakuulutus"],
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+
+  applicationName: siteName,
+
+  title: {
+    default: "Surmakuulutused Eestis",
+    template: "%s | Surmakuulutus.ee",
+  },
+
+  description: siteDescription,
+  keywords: [
+    "surmakuulutused",
+    "surmakuulutus",
+    "leinakuulutused",
+    "leinakuulutus",
+    "mälestuskuulutused",
+    "mälestuskuulutus",
+  ],
+
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
-  alternates: {
-    canonical: "/",
-  },
+
   openGraph: {
-    title: "Surmakuulutused – mälestuskuulutused Eestis",
-    description:
-      "Avalda ja leia surmakuulutusi nime järgi.",
-    images: ["/og-preview.webp"],
-    siteName: "Surmakuulutused",
     type: "website",
+    locale: "et_EE",
+    siteName,
+    title: "Surmakuulutused Eestis | Surmakuulutus.ee",
+    description: siteDescription,
+    images: [
+      {
+        url: "/og-preview.webp",
+        width: 1200,
+        height: 630,
+        alt: "Surmakuulutus.ee – surmakuulutused Eestis",
+      },
+    ],
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Surmakuulutused – mälestuskuulutused Eestis",
-    description:
-      "Avalda ja leia surmakuulutusi nime järgi.",
+    title: "Surmakuulutused Eestis | Surmakuulutus.ee",
+    description: siteDescription,
     images: ["/og-preview.webp"],
   },
 };
@@ -50,6 +92,10 @@ export default function RootLayout({
   return (
     <html lang="et">
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+        />
         <Providers>
           <Container size="xl">
             <AppHeader />

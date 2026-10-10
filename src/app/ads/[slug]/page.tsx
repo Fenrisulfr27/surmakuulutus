@@ -15,7 +15,7 @@ async function getAd(slug: string): Promise<Ad | null> {
 }
 
 function getSiteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.netlify.app";
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.ee";
 }
 
 function getShareDescription(ad: Ad) {
@@ -38,16 +38,29 @@ export async function generateMetadata({
   const { slug } = await params;
   const ad = await getAd(slug);
   const title = ad
-    ? `${ad.name} – Surmakuulutused`
-    : "Kuulutust ei leitud – Surmakuulutused";
+    ? `${ad.name} – mälestuskuulutus`
+    : "Kuulutust ei leitud";
   const url = `/ads/${slug}`;
   const description = ad
     ? getShareDescription(ad)
     : "Kuulutust ei leitud.";
 
   return {
-    title,
+    title: {
+      absolute: ad ? `${title} | Surmakuulutus.ee` : "Kuulutust ei leitud",
+    },
     description,
+    keywords: ad
+      ? [
+          ad.name,
+          "surmakuulutus",
+          "surmakuulutused",
+          "leinakuulutus",
+          "leinakuulutused",
+          "mälestuskuulutus",
+          "mälestuskuulutused",
+        ]
+      : undefined,
     robots: {
       index: Boolean(ad),
       follow: true,
@@ -56,11 +69,12 @@ export async function generateMetadata({
       canonical: new URL(url, getSiteUrl()).toString(),
     },
     openGraph: {
-      title,
+      title: ad ? `${title} | Surmakuulutus.ee` : title,
       description,
       url,
       type: "article",
-      siteName: "Surmakuulutused",
+      locale: "et_EE",
+      siteName: "Surmakuulutused.ee",
       images: ["/og-preview.webp"],
     },
     twitter: {
