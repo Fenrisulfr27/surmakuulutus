@@ -1,3 +1,2 @@
 /ads/* /kuulutused/:splat 301
 /kuulutus/* /kuulutused/:splat 301
-/* /index.html 200
