@@ -32,7 +32,7 @@ function subscribeToLanguageChange(onStoreChange: () => void) {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const language = useSyncExternalStore(
+  const language = useSyncExternalStore<Language>(
     subscribeToLanguageChange,
     getSavedLanguage,
     () => "et",

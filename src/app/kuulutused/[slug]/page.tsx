@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AdDetailsPage from "../../../views/AdDetailsPage";
-import { getAdBySlug, type Ad } from "../../../lib/ads";
+import { getAdBySlug, type PublicAd } from "../../../lib/ads";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ interface PageProps {
   searchParams?: Promise<{ from?: string }>;
 }
 
-async function getAd(slug: string): Promise<Ad | null> {
+async function getAd(slug: string): Promise<PublicAd | null> {
   return getAdBySlug(slug);
 }
 
@@ -18,11 +18,11 @@ function getSiteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.ee";
 }
 
-function getShareDescription(ad: Ad) {
+function getShareDescription(ad: PublicAd) {
   return `${ad.name} mälestuskuulutus. ${ad.topText ?? ""} ${ad.bottomText ?? ""}`.trim();
 }
 
-function getDateValue(value: Ad["birthYear"] | Ad["deathYear"]) {
+function getDateValue(value: PublicAd["birthYear"] | PublicAd["deathYear"]) {
   if (!value) {
     return undefined;
   }

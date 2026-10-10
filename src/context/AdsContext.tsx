@@ -22,7 +22,6 @@ export function AdsProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAds() {
   const context = useContext(AdsContext);
   if (!context) throw new Error("useAds must be used inside AdsProvider");
