@@ -4,6 +4,8 @@ import { Box, Button, Group, useMantineColorScheme } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "../context/language";
+import moonButton from "../assets/kuu_button.svg";
+import sunButton from "../assets/paike_button.svg";
 
 export function AppHeader() {
   const { language, setLanguage, t } = useLanguage();
@@ -50,17 +52,35 @@ export function AppHeader() {
           >
             {t("nav.addAd")}
           </Button>
+          <div className="language-switch" aria-label="Language">
+            <button
+              type="button"
+              className={language === "et" ? "language-switch-active" : undefined}
+              onClick={() => setLanguage("et")}
+            >
+              ET
+            </button>
+            <span aria-hidden="true" />
+            <button
+              type="button"
+              className={language === "en" ? "language-switch-active" : undefined}
+              onClick={() => setLanguage("en")}
+            >
+              EN
+            </button>
+          </div>
           <Button
             size="compact-sm"
-            onClick={() => setLanguage(language === "et" ? "en" : "et")}
-          >
-            {language === "et" ? "ENG" : "EST"}
-          </Button>
-          <Button
-            size="compact-sm"
+            aria-label={nextColorScheme === "dark" ? t("nav.darkMode") : t("nav.lightMode")}
+            title={nextColorScheme === "dark" ? t("nav.darkMode") : t("nav.lightMode")}
+            className="theme-image-button"
             onClick={() => setColorScheme(nextColorScheme)}
           >
-            {nextColorScheme === "dark" ? t("nav.darkMode") : t("nav.lightMode")}
+            <img
+              src={nextColorScheme === "dark" ? moonButton.src : sunButton.src}
+              alt=""
+              aria-hidden="true"
+            />
           </Button>
         </Group>
       </Group>

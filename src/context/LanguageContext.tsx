@@ -9,13 +9,14 @@ import {
 } from "./language";
 
 const languageChangeEvent = "languagechange";
+const languageStorageKey = "language";
 
 function getSavedLanguage(): Language {
   if (typeof window === "undefined") {
     return "et";
   }
 
-  const savedLanguage = window.localStorage.getItem("language");
+  const savedLanguage = window.sessionStorage.getItem(languageStorageKey);
 
   return savedLanguage === "en" ? "en" : "et";
 }
@@ -38,7 +39,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 
   const setLanguage = (nextLanguage: Language) => {
-    window.localStorage.setItem("language", nextLanguage);
+    window.sessionStorage.setItem(languageStorageKey, nextLanguage);
     document.documentElement.lang = nextLanguage;
     window.dispatchEvent(new Event(languageChangeEvent));
   };

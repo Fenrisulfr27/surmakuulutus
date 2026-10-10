@@ -118,6 +118,62 @@ a:hover {
   padding-inline: 0.75rem !important;
 }
 
+.theme-image-button {
+  background: transparent !important;
+  border: 0 !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+}
+
+.theme-image-button .mantine-Button-inner,
+.theme-image-button .mantine-Button-label {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-image-button img {
+  display: block;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 32px;
+  padding-inline: 0.25rem;
+  color: var(--paper-rule-strong);
+  font-family: "Cinzel", "Cormorant Garamond", Georgia, serif;
+}
+
+.language-switch button {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--paper-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.language-switch button:hover,
+.language-switch button:focus-visible,
+.language-switch-active {
+  color: var(--paper-accent) !important;
+}
+
+.language-switch span {
+  width: 1px;
+  height: 22px;
+  background: var(--paper-rule-strong);
+}
+
 .newspaper-masthead {
   margin-bottom: 1rem;
   padding: 0.9rem 0.75rem 1rem;
@@ -588,6 +644,14 @@ a:hover {
 .nav-button-active {
   background: color-mix(in srgb, var(--paper-accent) 18%, transparent) !important;
   border-color: var(--paper-accent) !important;
+}
+
+.theme-image-button.mantine-Button-root,
+.theme-image-button.mantine-Button-root:hover,
+.theme-image-button.nav-button-active {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-width: 0 !important;
 }
 
 .mantine-Loader-root {
