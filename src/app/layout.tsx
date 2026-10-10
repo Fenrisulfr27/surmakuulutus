@@ -30,7 +30,9 @@ const siteJsonLd = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-
+  verification: {
+    google: "jAnisTClD8md6uUGRqTFdwhEnBshshYv7Gkv2kql7pE",
+  },
   applicationName: siteName,
 
   title: {
