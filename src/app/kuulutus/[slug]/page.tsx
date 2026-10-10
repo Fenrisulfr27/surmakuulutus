@@ -38,9 +38,9 @@ export async function generateMetadata({
   const { slug } = await params;
   const ad = await getAd(slug);
   const title = ad
-    ? `${ad.name} – mälestuskuulutus`
+    ? `${ad.name} - mälestuskuulutus`
     : "Kuulutust ei leitud";
-  const url = `/ads/${slug}`;
+  const url = `/kuulutus/${slug}`;
   const description = ad
     ? getShareDescription(ad)
     : "Kuulutust ei leitud.";
@@ -95,11 +95,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const adUrl = new URL(`/ads/${slug}`, getSiteUrl()).toString();
+  const adUrl = new URL(`/kuulutus/${slug}`, getSiteUrl()).toString();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: `${ad.name} – Surmakuulutused`,
+    headline: `${ad.name} - Surmakuulutused`,
     name: ad.name,
     description: getShareDescription(ad),
     url: adUrl,

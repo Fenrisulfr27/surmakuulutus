@@ -106,7 +106,7 @@ export default function AddAdPage() {
             )}
           </Stack>
           <Stack gap="sm" mt="lg">
-            <Button component={Link} href={`/ads/${createdAd.slug}`} prefetch={false}>
+            <Button component={Link} href={`/kuulutus/${createdAd.slug}`} prefetch={false}>
               {t("form.viewAd")}
             </Button>
             <Button component={Link} href="/" variant="outline">

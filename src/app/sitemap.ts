@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     },
     ...ads.map((ad) => ({
-      url: `${siteUrl}/ads/${ad.slug}`,
+      url: `${siteUrl}/kuulutus/${ad.slug}`,
       lastModified: ad.createdAt,
       changeFrequency: "yearly" as const,
       priority: 0.8,
