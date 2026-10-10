@@ -17,6 +17,22 @@ export interface Ad {
 
 export type PublicAd = Omit<Ad, "email">;
 
+type PublicAdField = keyof PublicAd;
+
+const publicAdFields = [
+  "_id",
+  "poem",
+  "slug",
+  "name",
+  "birthYear",
+  "deathYear",
+  "bottomText",
+  "topText",
+  "createdAt",
+] as const satisfies readonly PublicAdField[];
+
+const publicAdProjection = publicAdFields.join(" ");
+
 export interface AdsPageData {
   data: PublicAd[];
   totalPages: number;
@@ -42,7 +58,7 @@ const adSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, unique: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, select: false },
     birthYear: String,
     deathYear: String,
     poem: String,
@@ -57,10 +73,15 @@ adSchema.index({ name: 1 });
 
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 
-function toPublicAd(ad: unknown): PublicAd {
+export function toPublicAd(ad: unknown): PublicAd {
   const plain = JSON.parse(JSON.stringify(ad)) as Ad;
-  delete (plain as Partial<Ad>).email;
-  return plain as PublicAd;
+  const publicAd = Object.fromEntries(
+    publicAdFields
+      .filter((field) => plain[field] !== undefined)
+      .map((field) => [field, plain[field]]),
+  );
+
+  return publicAd as PublicAd;
 }
 
 export const slugify = (text: string) => {
@@ -96,6 +117,7 @@ export async function listAds(options: ListAdsOptions = {}): Promise<AdsPageData
   const skip = (currentPage - 1) * limit;
 
   const ads = await AdModel.find(filter)
+    .select(publicAdProjection)
     .sort({ createdAt: sortOrder, _id: sortOrder })
     .skip(skip)
     .limit(limit);
@@ -110,7 +132,7 @@ export async function listAds(options: ListAdsOptions = {}): Promise<AdsPageData
 
 export async function getAdBySlug(slug: string) {
   await connectToDatabase();
-  const ad = await AdModel.findOne({ slug });
+  const ad = await AdModel.findOne({ slug }).select(publicAdProjection);
   return ad ? toPublicAd(ad) : null;
 }
 
@@ -148,5 +170,7 @@ export async function createAd(payload: AdFormValues) {
 
   await ad.save();
 
-  return toPublicAd(ad);
+  const publicAd = await AdModel.findById(ad._id).select(publicAdProjection);
+
+  return toPublicAd(publicAd);
 }

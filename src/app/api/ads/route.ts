@@ -4,6 +4,13 @@ import { validateAdForm } from "../../../lib/adValidation";
 
 export const runtime = "nodejs";
 
+function publicErrorResponse(error: unknown, fallbackStatus = 500) {
+  const message = error instanceof Error ? error.message : "Server error";
+  const status = message.includes("MONGO_URI is not defined") ? 503 : fallbackStatus;
+
+  return NextResponse.json({ error: "Server error" }, { status });
+}
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
@@ -15,10 +22,7 @@ export async function GET(request: Request) {
     const result = await listAds({ page, limit, search, sort });
     return NextResponse.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Server error";
-    const status = message.includes("MONGO_URI is not defined") ? 503 : 500;
-
-    return NextResponse.json({ error: message }, { status });
+    return publicErrorResponse(error);
   }
 }
 
@@ -40,7 +44,6 @@ export async function POST(request: Request) {
     const ad = await createAd(parsed.data);
     return NextResponse.json(ad, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Server error";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return publicErrorResponse(error, 400);
   }
 }

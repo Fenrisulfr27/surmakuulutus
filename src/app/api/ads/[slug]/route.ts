@@ -3,6 +3,13 @@ import { getAdBySlug } from "../../../../lib/ads";
 
 export const runtime = "nodejs";
 
+function publicErrorResponse(error: unknown) {
+  const message = error instanceof Error ? error.message : "Viga päringus";
+  const status = message.includes("MONGO_URI is not defined") ? 503 : 400;
+
+  return NextResponse.json({ error: "Viga päringus" }, { status });
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string }> },
@@ -20,9 +27,6 @@ export async function GET(
 
     return NextResponse.json(ad);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Viga päringus";
-    const status = message.includes("MONGO_URI is not defined") ? 503 : 400;
-
-    return NextResponse.json({ error: message }, { status });
+    return publicErrorResponse(error);
   }
 }
