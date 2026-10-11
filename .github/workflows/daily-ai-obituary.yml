@@ -1,0 +1,24 @@
+name: Daily AI obituary
+
+on:
+  schedule:
+    - cron: "0 6,7 * * *"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Estonia hour
+        id: estonia-time
+        run: echo "hour=$(TZ=Europe/Tallinn date +%H)" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger generator
+        if: github.event_name == 'workflow_dispatch' || steps.estonia-time.outputs.hour == '09'
+        run: |
+          curl --fail --show-error --silent --request POST \
+            --header "Authorization: Bearer $AI_GENERATION_SECRET" \
+            "$SITE_URL/api/ai-obituary"
+        env:
+          AI_GENERATION_SECRET: ${{ secrets.AI_GENERATION_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL }}

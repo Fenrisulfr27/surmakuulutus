@@ -13,6 +13,8 @@ export interface Ad {
   bottomText?: string;
   topText?: string;
   createdAt?: string | Date;
+  aiGenerated?: boolean;
+  aiGeneratedDate?: string;
 }
 
 export type PublicAd = Omit<Ad, "email">;
@@ -64,12 +66,24 @@ const adSchema = new mongoose.Schema(
     poem: String,
     bottomText: String,
     topText: String,
+    aiGenerated: { type: Boolean, default: false, select: false },
+    aiGeneratedDate: { type: String, select: false },
   },
   { timestamps: true },
 );
 
 adSchema.index({ createdAt: -1 });
 adSchema.index({ name: 1 });
+adSchema.index(
+  { aiGeneratedDate: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      aiGenerated: true,
+      aiGeneratedDate: { $exists: true },
+    },
+  },
+);
 
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 
@@ -85,7 +99,7 @@ export function toPublicAd(ad: unknown): PublicAd {
       .map((field) => [field, plain[field]]),
   );
 
-  return publicAd as PublicAd;
+  return publicAd as unknown as PublicAd;
 }
 
 export const slugify = (text: string) => {
@@ -158,7 +172,7 @@ export async function listAdSitemapEntries(): Promise<AdSitemapEntry[]> {
 export async function createAd(payload: AdFormValues) {
   await connectToDatabase();
 
-  const baseSlug = slugify(payload.name);
+  const baseSlug = slugify(payload.name) || "kuulutus";
   let slug = baseSlug;
   let counter = 1;
 
@@ -175,4 +189,42 @@ export async function createAd(payload: AdFormValues) {
   await ad.save();
 
   return toPublicAd(ad);
+}
+
+export async function createAiGeneratedAd(payload: AdFormValues, runDate: string) {
+  await connectToDatabase();
+
+  const slugSuffix = runDate.replaceAll("-", "");
+  const baseSlug = `${slugify(payload.name) || "kuulutus"}-${slugSuffix}`;
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await AdModel.findOne({ slug })) {
+    counter += 1;
+    slug = `${baseSlug}-${counter}`;
+  }
+
+  try {
+    const ad = new AdModel({
+      ...payload,
+      slug,
+      aiGenerated: true,
+      aiGeneratedDate: runDate,
+    });
+
+    await ad.save();
+
+    return { created: true as const, ad: toPublicAd(ad) };
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    ) {
+      return { created: false as const, ad: null };
+    }
+
+    throw error;
+  }
 }

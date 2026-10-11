@@ -16,6 +16,8 @@ describe("toPublicAd", () => {
       topText: "Teatame kurbusega",
       bottomText: "Leinavad lapsed",
       createdAt: "2026-01-02T00:00:00.000Z",
+      aiGenerated: true,
+      aiGeneratedDate: "2026-10-11",
     });
 
     expect(publicAd).toEqual({
@@ -30,6 +32,8 @@ describe("toPublicAd", () => {
       createdAt: "2026-01-02T00:00:00.000Z",
     });
     expect(publicAd).not.toHaveProperty("email");
+    expect(publicAd).not.toHaveProperty("aiGenerated");
+    expect(publicAd).not.toHaveProperty("aiGeneratedDate");
     expect(publicAd).not.toHaveProperty("adminNote");
     expect(publicAd).not.toHaveProperty("managementToken");
   });
