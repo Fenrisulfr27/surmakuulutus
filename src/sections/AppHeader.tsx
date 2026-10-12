@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Group,
-  useComputedColorScheme,
-  useMantineColorScheme,
-} from "@mantine/core";
+import { Box, Button, Group, useMantineColorScheme } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "../context/language";
@@ -15,10 +9,9 @@ import sunButton from "../assets/paike_button.svg";
 
 export function AppHeader() {
   const { language, setLanguage, t } = useLanguage();
-  const { setColorScheme } = useMantineColorScheme();
-  const colorScheme = useComputedColorScheme("dark", { getInitialValueInEffect: false });
+  const { toggleColorScheme } = useMantineColorScheme();
   const pathname = usePathname();
-  const nextColorScheme = colorScheme === "dark" ? "light" : "dark";
+  const themeLabel = `${t("nav.darkMode")} / ${t("nav.lightMode")}`;
 
   return (
     <Box component="header" className="app-header-section">
@@ -78,16 +71,13 @@ export function AppHeader() {
           </div>
           <Button
             size="compact-sm"
-            aria-label={nextColorScheme === "dark" ? t("nav.darkMode") : t("nav.lightMode")}
-            title={nextColorScheme === "dark" ? t("nav.darkMode") : t("nav.lightMode")}
+            aria-label={themeLabel}
+            title={themeLabel}
             className="theme-image-button"
-            onClick={() => setColorScheme(nextColorScheme)}
+            onClick={toggleColorScheme}
           >
-            <img
-              src={nextColorScheme === "dark" ? moonButton.src : sunButton.src}
-              alt=""
-              aria-hidden="true"
-            />
+            <img src={moonButton.src} alt="" aria-hidden="true" className="theme-icon-dark" />
+            <img src={sunButton.src} alt="" aria-hidden="true" className="theme-icon-light" />
           </Button>
         </Group>
       </Group>

@@ -134,10 +134,19 @@ a:hover {
 }
 
 .theme-image-button img {
-  display: block;
   width: 30px;
   height: 30px;
   object-fit: contain;
+}
+
+[data-mantine-color-scheme="light"] .theme-icon-light,
+[data-mantine-color-scheme="dark"] .theme-icon-dark {
+  display: none;
+}
+
+[data-mantine-color-scheme="light"] .theme-icon-dark,
+[data-mantine-color-scheme="dark"] .theme-icon-light {
+  display: block;
 }
 
 .language-switch {
