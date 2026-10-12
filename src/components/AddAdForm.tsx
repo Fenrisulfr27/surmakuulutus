@@ -72,7 +72,7 @@ export default function AddAdForm({
   isSubmitting = false,
 }: AddAdFormProps) {
   const { language, t } = useLanguage();
-  const configuredTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const configuredTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
   const isDevelopment = process.env.NODE_ENV === "development";
   const turnstileSiteKey = isDevelopment ? undefined : configuredTurnstileSiteKey;
   const turnstileRef = React.useRef<HTMLDivElement>(null);
@@ -149,7 +149,7 @@ export default function AddAdForm({
 
     turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
       sitekey: turnstileSiteKey,
-      appearance: "interaction-only",
+      appearance: "always",
       action: TURNSTILE_ACTION,
       callback: (token) => {
         setTurnstileToken(token);
