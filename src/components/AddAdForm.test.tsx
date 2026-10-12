@@ -104,6 +104,8 @@ describe("AddAdForm", () => {
       poem: "",
       topText: "Teatame kurbusega",
       bottomText: "Leinavad lapsed",
+      turnstileToken: "",
+      website: "",
     });
   });
 });

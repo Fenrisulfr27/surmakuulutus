@@ -635,6 +635,19 @@ a:hover {
   color: #d9a79b;
 }
 
+.submission-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.turnstile-field {
+  min-height: 65px;
+}
+
 .mantine-Button-root {
   background: transparent !important;
   border: 1px solid var(--paper-rule) !important;

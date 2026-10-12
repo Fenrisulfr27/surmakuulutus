@@ -3,7 +3,7 @@
 import { Button, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 import AdCard from "../components/AdCard";
-import AddAdForm from "../components/AddAdForm";
+import AddAdForm, { type AdSubmissionValues } from "../components/AddAdForm";
 import React from "react";
 import type { AdFormValues } from "../lib/adValidation";
 import { useLanguage } from "../context/language";
@@ -30,7 +30,7 @@ export default function AddAdPage() {
     topText: "",
   });
 
-  const handleSubmit = async (values: AdFormValues) => {
+  const handleSubmit = async (values: AdSubmissionValues) => {
     if (isSubmitting) {
       return;
     }

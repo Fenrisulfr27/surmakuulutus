@@ -3,6 +3,7 @@
 import { useForm } from "@mantine/form";
 import { Button, Group, Stack, Text, TextInput, Textarea } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import Script from "next/script";
 import React from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -30,11 +31,33 @@ const requiredLabelStyles = {
   },
 } as const;
 
+export type AdSubmissionValues = AdFormValues & {
+  turnstileToken?: string;
+  website?: string;
+};
+
 interface AddAdFormProps {
-  onSubmit: (values: AdFormValues) => Promise<void>;
+  onSubmit: (values: AdSubmissionValues) => Promise<void>;
   onChange: (values: AdFormValues) => void;
   values: AdFormValues;
   isSubmitting?: boolean;
+}
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        element: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+          "expired-callback": () => void;
+          "error-callback": () => void;
+        },
+      ) => string;
+      reset: (widgetId?: string) => void;
+    };
+  }
 }
 
 export default function AddAdForm({
@@ -44,11 +67,17 @@ export default function AddAdForm({
   isSubmitting = false,
 }: AddAdFormProps) {
   const { language, t } = useLanguage();
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const turnstileRef = React.useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = React.useRef<string | undefined>(undefined);
   const form = useForm({
     mode: "controlled",
     initialValues: values,
   });
   const [submitAttempted, setSubmitAttempted] = React.useState(false);
+  const [turnstileLoaded, setTurnstileLoaded] = React.useState(false);
+  const [turnstileToken, setTurnstileToken] = React.useState("");
+  const [website, setWebsite] = React.useState("");
 
   const getFieldErrors = (currentValues: AdFormValues): AdFieldErrors => {
     const validation = validateAdForm(currentValues, language);
@@ -67,11 +96,37 @@ export default function AddAdForm({
       return;
     }
 
-    await onSubmit(validation.data);
+    await onSubmit({
+      ...validation.data,
+      turnstileToken,
+      website,
+    });
+
+    window.turnstile?.reset(turnstileWidgetId.current);
+    setTurnstileToken("");
   };
   React.useEffect(() => {
     onChange(form.values);
   }, [form.values, onChange]);
+
+  React.useEffect(() => {
+    if (
+      !turnstileLoaded ||
+      !turnstileSiteKey ||
+      !turnstileRef.current ||
+      !window.turnstile ||
+      turnstileWidgetId.current
+    ) {
+      return;
+    }
+
+    turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+      sitekey: turnstileSiteKey,
+      callback: setTurnstileToken,
+      "expired-callback": () => setTurnstileToken(""),
+      "error-callback": () => setTurnstileToken(""),
+    });
+  }, [turnstileLoaded, turnstileSiteKey]);
 
   const renderLabel = (
     label: string,
@@ -93,7 +148,22 @@ export default function AddAdForm({
 
   return (
     <form className="newspaper-form" onSubmit={handleSubmit} noValidate>
+      {turnstileSiteKey && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+          strategy="afterInteractive"
+          onLoad={() => setTurnstileLoaded(true)}
+        />
+      )}
       <Stack gap="lg">
+        <input
+          className="submission-honeypot"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(event) => setWebsite(event.currentTarget.value)}
+        />
         <Text className="newspaper-form-note">{t("form.requiredNote")}</Text>
         <Textarea
           className="newspaper-input"
@@ -191,6 +261,10 @@ export default function AddAdForm({
           {...form.getInputProps("email")}
           error={fieldErrors.email}
         />
+
+        {turnstileSiteKey && (
+          <div className="turnstile-field" ref={turnstileRef} aria-label="Verification" />
+        )}
 
         <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
           {t("form.save")}

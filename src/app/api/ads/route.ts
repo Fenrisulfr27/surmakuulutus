@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createAd, listAds } from "../../../lib/ads";
 import { validateAdForm } from "../../../lib/adValidation";
+import {
+  getSecurityFields,
+  protectObituarySubmission,
+  stripSecurityFields,
+} from "../../../lib/submissionSecurity";
 
 export const runtime = "nodejs";
 
@@ -29,7 +34,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const parsed = validateAdForm(body);
+    const parsed = validateAdForm(stripSecurityFields(body));
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -38,6 +43,19 @@ export async function POST(request: Request) {
           fieldErrors: parsed.fieldErrors,
         },
         { status: 400 },
+      );
+    }
+
+    const protection = await protectObituarySubmission(
+      request,
+      parsed.data,
+      getSecurityFields(body),
+    );
+
+    if (!protection.allowed) {
+      return NextResponse.json(
+        { error: protection.message },
+        { status: protection.status },
       );
     }
 
