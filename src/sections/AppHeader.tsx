@@ -47,6 +47,7 @@ export function AppHeader() {
           <Button
             component={Link}
             href="/lisa-kuulutus"
+            prefetch={false}
             size="compact-sm"
             className={pathname === "/lisa-kuulutus" ? "nav-button-active" : undefined}
           >

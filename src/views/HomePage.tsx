@@ -16,7 +16,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import AdCard from "../components/AdCard";
 import type { AdsPageData, AdsSortOrder } from "../lib/ads";
 import { useLanguage } from "../context/language";
@@ -34,7 +33,6 @@ export default function HomePage({
   initialSearch,
   initialSort,
 }: HomePageProps) {
-  const router = useRouter();
   const { language, t } = useLanguage();
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState(initialSearch);
@@ -62,10 +60,20 @@ export default function HomePage({
     return params.toString();
   }, []);
 
-  const navigateHome = useCallback((nextPage: number, nextSearch: string, nextSort: AdsSortOrder) => {
+  const updateUrl = useCallback((nextPage: number, nextSearch: string, nextSort: AdsSortOrder, mode: "push" | "replace") => {
     const query = buildSearchParams(nextPage, nextSearch, nextSort);
-    router.push(query ? `/?${query}` : "/");
-  }, [buildSearchParams, router]);
+    const nextUrl = query ? `/?${query}` : "/";
+
+    if (window.location.pathname + window.location.search === nextUrl) {
+      return;
+    }
+
+    if (mode === "replace") {
+      window.history.replaceState(null, "", nextUrl);
+    } else {
+      window.history.pushState(null, "", nextUrl);
+    }
+  }, [buildSearchParams]);
 
   const listingQuery = buildSearchParams(page, debouncedSearch, sortOrder);
   const currentListingHref = listingQuery ? `/?${listingQuery}` : "/";
@@ -79,10 +87,10 @@ export default function HomePage({
         ? initialData
         : undefined,
     staleTime: 60_000,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const query = buildSearchParams(page, debouncedSearch, sortOrder);
       const separator = query ? `&${query}` : "";
-      const res = await fetch(`/api/ads?limit=${limit}${separator}`);
+      const res = await fetch(`/api/ads?limit=${limit}${separator}`, { signal });
       if (!res.ok) {
         const payload = (await res.json().catch(() => null)) as {
           error?: string;
@@ -98,7 +106,7 @@ export default function HomePage({
 
   const handlePageChange = (value: number) => {
     setPage(value);
-    navigateHome(value, search, sortOrder);
+    updateUrl(value, debouncedSearch, sortOrder, "push");
   };
 
   const handleSearchChange = (value: string) => {
@@ -110,14 +118,14 @@ export default function HomePage({
     setSearch("");
     setDebouncedSearch("");
     setPage(1);
-    router.replace(sortOrder === "newest" ? "/" : `/?sort=${sortOrder}`);
+    updateUrl(1, "", sortOrder, "replace");
   };
 
   const handleSortChange = (value: string) => {
     const nextSort = value === "oldest" ? "oldest" : "newest";
     setSortOrder(nextSort);
     setPage(1);
-    navigateHome(1, search, nextSort);
+    updateUrl(1, debouncedSearch, nextSort, "push");
   };
 
   useEffect(() => {
@@ -129,9 +137,25 @@ export default function HomePage({
   }, [search]);
 
   useEffect(() => {
-    const query = buildSearchParams(1, debouncedSearch, sortOrder);
-      router.replace(query ? `/?${query}` : "/");
-  }, [buildSearchParams, debouncedSearch, router, sortOrder]);
+    updateUrl(1, debouncedSearch, sortOrder, "replace");
+  }, [debouncedSearch, sortOrder, updateUrl]);
+
+  useEffect(() => {
+    const syncFromLocation = () => {
+      const params = new URLSearchParams(window.location.search);
+      const nextPage = Math.max(Number(params.get("page")) || 1, 1);
+      const nextSearch = params.get("search") ?? "";
+      const nextSort = params.get("sort") === "oldest" ? "oldest" : "newest";
+
+      setPage(nextPage);
+      setSearch(nextSearch);
+      setDebouncedSearch(nextSearch);
+      setSortOrder(nextSort);
+    };
+
+    window.addEventListener("popstate", syncFromLocation);
+    return () => window.removeEventListener("popstate", syncFromLocation);
+  }, []);
 
   if (isLoading) {
     return (
@@ -273,6 +297,7 @@ export default function HomePage({
           <Button
             component={Link}
             href="/lisa-kuulutus"
+            prefetch={false}
             size="md"
           >
             {t("home.addAdCta")}
