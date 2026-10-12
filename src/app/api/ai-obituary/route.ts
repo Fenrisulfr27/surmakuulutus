@@ -4,8 +4,8 @@ import { generateDailyAiObituary } from "../../../lib/aiObituary";
 export const runtime = "nodejs";
 
 function isAuthorized(request: Request) {
-  const secret = process.env.AI_GENERATION_SECRET;
-  const authHeader = request.headers.get("authorization");
+  const secret = process.env.AI_GENERATION_SECRET?.trim();
+  const authHeader = request.headers.get("authorization")?.trim();
 
   return Boolean(secret && authHeader === `Bearer ${secret}`);
 }

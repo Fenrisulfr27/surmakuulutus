@@ -48,4 +48,14 @@ describe("POST /api/ai-obituary", () => {
     expect(response.status).toBe(201);
     expect(generateDailyAiObituary).toHaveBeenCalledTimes(1);
   });
+
+  it("ignores accidental whitespace around configured secret", async () => {
+    process.env.AI_GENERATION_SECRET = " cron-secret \n";
+
+    const { POST } = await import("./route");
+    const response = await POST(postRequest("cron-secret"));
+
+    expect(response.status).toBe(201);
+    expect(generateDailyAiObituary).toHaveBeenCalledTimes(1);
+  });
 });

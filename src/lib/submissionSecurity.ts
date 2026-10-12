@@ -124,7 +124,7 @@ function getTurnstileSecret() {
     return TURNSTILE_TEST_SECRET_KEY;
   }
 
-  return process.env.TURNSTILE_SECRET_KEY;
+  return process.env.TURNSTILE_SECRET_KEY?.trim();
 }
 
 export async function verifyTurnstileToken(

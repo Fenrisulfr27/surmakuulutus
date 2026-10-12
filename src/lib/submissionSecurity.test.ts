@@ -24,7 +24,7 @@ describe("verifyTurnstileToken", () => {
   });
 
   it("accepts valid Turnstile tokens", async () => {
-    process.env.TURNSTILE_SECRET_KEY = "secret";
+    process.env.TURNSTILE_SECRET_KEY = " secret \n";
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ success: true }),
@@ -40,6 +40,8 @@ describe("verifyTurnstileToken", () => {
         body: expect.any(URLSearchParams),
       }),
     );
+    const body = fetchImpl.mock.calls[0][1].body as URLSearchParams;
+    expect(body.get("secret")).toBe("secret");
   });
 
   it("rejects invalid, expired, or reused Turnstile tokens", async () => {
