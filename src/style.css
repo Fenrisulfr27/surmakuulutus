@@ -645,7 +645,13 @@ a:hover {
 }
 
 .turnstile-field {
-  min-height: 65px;
+  min-height: 0;
+}
+
+.turnstile-error {
+  color: #d9a79b !important;
+  font-size: 0.9rem !important;
+  margin-top: -0.5rem;
 }
 
 .mantine-Button-root {

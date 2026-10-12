@@ -53,6 +53,7 @@ declare global {
           callback: (token: string) => void;
           "expired-callback": () => void;
           "error-callback": () => void;
+          appearance?: "always" | "execute" | "interaction-only";
         },
       ) => string;
       reset: (widgetId?: string) => void;
@@ -77,6 +78,7 @@ export default function AddAdForm({
   const [submitAttempted, setSubmitAttempted] = React.useState(false);
   const [turnstileLoaded, setTurnstileLoaded] = React.useState(false);
   const [turnstileToken, setTurnstileToken] = React.useState("");
+  const [turnstileError, setTurnstileError] = React.useState("");
   const [website, setWebsite] = React.useState("");
 
   const getFieldErrors = (currentValues: AdFormValues): AdFieldErrors => {
@@ -87,6 +89,17 @@ export default function AddAdForm({
 
   const fieldErrors = submitAttempted ? getFieldErrors(form.values) : {};
 
+  const submitWithToken = React.useCallback(async (values: AdFormValues, token: string) => {
+    await onSubmit({
+      ...values,
+      turnstileToken: token,
+      website,
+    });
+
+    window.turnstile?.reset(turnstileWidgetId.current);
+    setTurnstileToken("");
+  }, [onSubmit, website]);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitAttempted(true);
@@ -96,14 +109,17 @@ export default function AddAdForm({
       return;
     }
 
-    await onSubmit({
-      ...validation.data,
-      turnstileToken,
-      website,
-    });
+    if (turnstileSiteKey) {
+      if (!turnstileToken) {
+        setTurnstileError(t("form.verificationRequired"));
+        return;
+      }
 
-    window.turnstile?.reset(turnstileWidgetId.current);
-    setTurnstileToken("");
+      await submitWithToken(validation.data, turnstileToken);
+      return;
+    }
+
+    await submitWithToken(validation.data, "");
   };
   React.useEffect(() => {
     onChange(form.values);
@@ -122,11 +138,21 @@ export default function AddAdForm({
 
     turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
       sitekey: turnstileSiteKey,
-      callback: setTurnstileToken,
-      "expired-callback": () => setTurnstileToken(""),
-      "error-callback": () => setTurnstileToken(""),
+      appearance: "interaction-only",
+      callback: (token) => {
+        setTurnstileToken(token);
+        setTurnstileError("");
+      },
+      "expired-callback": () => {
+        setTurnstileToken("");
+        setTurnstileError(t("form.verificationExpired"));
+      },
+      "error-callback": () => {
+        setTurnstileToken("");
+        setTurnstileError(t("form.verificationFailed"));
+      },
     });
-  }, [turnstileLoaded, turnstileSiteKey]);
+  }, [t, turnstileLoaded, turnstileSiteKey]);
 
   const renderLabel = (
     label: string,
@@ -263,7 +289,14 @@ export default function AddAdForm({
         />
 
         {turnstileSiteKey && (
-          <div className="turnstile-field" ref={turnstileRef} aria-label="Verification" />
+          <>
+            <div className="turnstile-field" ref={turnstileRef} aria-label="Verification" />
+            {turnstileError && (
+              <Text className="turnstile-error" role="alert">
+                {turnstileError}
+              </Text>
+            )}
+          </>
         )}
 
         <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>

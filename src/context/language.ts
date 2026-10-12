@@ -224,6 +224,18 @@ My heart still longs for you.`,
     et: "Midagi läks valesti! Proovi uuesti.",
     en: "Something went wrong! Try again.",
   },
+  "form.verificationRequired": {
+    et: "Kontroll ei ole veel valmis. Proovi uuesti.",
+    en: "Verification is not ready yet. Try again.",
+  },
+  "form.verificationExpired": {
+    et: "Kontroll aegus. Proovi uuesti.",
+    en: "Verification expired. Try again.",
+  },
+  "form.verificationFailed": {
+    et: "Kontroll ebaõnnestus. Proovi uuesti.",
+    en: "Verification failed. Try again.",
+  },
   "card.crossAlt": {
     et: "rist",
     en: "cross",
