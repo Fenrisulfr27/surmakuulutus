@@ -1,14 +1,49 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { verifyTurnstileToken } from "./submissionSecurity";
+import { isAllowedSubmissionOrigin, verifyTurnstileToken } from "./submissionSecurity";
 
 const originalSecret = process.env.TURNSTILE_SECRET_KEY;
 const originalAllowedHostnames = process.env.TURNSTILE_ALLOWED_HOSTNAMES;
+const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 afterEach(() => {
   process.env.TURNSTILE_SECRET_KEY = originalSecret;
   process.env.TURNSTILE_ALLOWED_HOSTNAMES = originalAllowedHostnames;
+  process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
+});
+
+describe("isAllowedSubmissionOrigin", () => {
+  it("rejects direct production API calls without an Origin header", () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    expect(isAllowedSubmissionOrigin(
+      new Request("https://surmakuulutus.ee/api/ads", { method: "POST" }),
+    )).toBe(false);
+  });
+
+  it("rejects cross-site production browser submissions", () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    expect(isAllowedSubmissionOrigin(
+      new Request("https://surmakuulutus.ee/api/ads", {
+        method: "POST",
+        headers: { origin: "https://evil.example" },
+      }),
+    )).toBe(false);
+  });
+
+  it("accepts configured production site origins", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    process.env.NEXT_PUBLIC_SITE_URL = "https://surmakuulutus.ee";
+
+    expect(isAllowedSubmissionOrigin(
+      new Request("https://surmakuulutus.ee/api/ads", {
+        method: "POST",
+        headers: { origin: "https://surmakuulutus.ee" },
+      }),
+    )).toBe(true);
+  });
 });
 
 describe("verifyTurnstileToken", () => {

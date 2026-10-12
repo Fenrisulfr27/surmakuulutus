@@ -18,6 +18,7 @@ export interface SubmissionSecurityFields {
 }
 
 type SecurityEvent =
+  | "origin_rejected"
   | "honeypot_rejected"
   | "rate_limit_rejected"
   | "turnstile_rejected"
@@ -84,6 +85,38 @@ function isDuplicateKeyError(error: unknown) {
     "code" in error &&
     (error as MongoError).code === 11000
   );
+}
+
+function getAllowedOrigins() {
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://surmakuulutus.ee";
+  const origins = new Set<string>();
+
+  for (const value of [
+    configuredSiteUrl,
+    "https://surmakuulutus.ee",
+    "https://www.surmakuulutus.ee",
+  ]) {
+    try {
+      origins.add(new URL(value).origin);
+    } catch {
+      // Ignore invalid optional configuration and keep built-in production origins.
+    }
+  }
+
+  return origins;
+}
+
+export function isAllowedSubmissionOrigin(request: Request) {
+  if (process.env.NODE_ENV !== "production") {
+    return true;
+  }
+
+  const origin = request.headers.get("origin");
+  if (!origin) {
+    return false;
+  }
+
+  return getAllowedOrigins().has(origin);
 }
 
 export function getClientIp(request: Request) {
@@ -273,6 +306,11 @@ export async function protectObituarySubmission(
 ) {
   const ip = getClientIp(request);
   const honeypotValue = typeof fields.website === "string" ? fields.website.trim() : "";
+
+  if (!isAllowedSubmissionOrigin(request)) {
+    logSecurityEvent("origin_rejected", request);
+    return { allowed: false as const, status: 403, message: "Server error" };
+  }
 
   if (honeypotValue) {
     logSecurityEvent("honeypot_rejected", request);

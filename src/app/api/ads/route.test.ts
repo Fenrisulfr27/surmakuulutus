@@ -41,6 +41,14 @@ function postRequest(body: unknown) {
   });
 }
 
+function request(body: unknown, headers: HeadersInit) {
+  return new Request("https://surmakuulutus.ee/api/ads", {
+    method: "POST",
+    headers,
+    body: typeof body === "string" ? body : JSON.stringify(body),
+  });
+}
+
 describe("POST /api/ads", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -64,6 +72,18 @@ describe("POST /api/ads", () => {
         website: expect.anything(),
       }),
     );
+  });
+
+  it("rejects non-json API posts before saving", async () => {
+    const { POST } = await import("./route");
+    const response = await POST(request("name=Mari", {
+      "content-type": "application/x-www-form-urlencoded",
+      origin: "https://surmakuulutus.ee",
+    }));
+
+    expect(response.status).toBe(415);
+    expect(protectObituarySubmission).not.toHaveBeenCalled();
+    expect(createAd).not.toHaveBeenCalled();
   });
 
   it("rejects honeypot spam before saving", async () => {

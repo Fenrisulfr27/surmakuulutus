@@ -33,6 +33,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const contentType = request.headers.get("content-type") ?? "";
+    if (!contentType.toLowerCase().includes("application/json")) {
+      return NextResponse.json({ error: "Server error" }, { status: 415 });
+    }
+
     const body = await request.json();
     const parsed = validateAdForm(stripSecurityFields(body));
 
