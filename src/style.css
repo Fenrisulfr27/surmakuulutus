@@ -645,7 +645,7 @@ a:hover {
 }
 
 .turnstile-field {
-  min-height: 0;
+  min-height: 72px;
 }
 
 .turnstile-error {

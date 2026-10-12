@@ -55,7 +55,7 @@ declare global {
           sitekey: string;
           callback: (token: string) => void;
           "expired-callback": () => void;
-          "error-callback": () => void;
+          "error-callback": (code?: string) => void;
           action?: string;
           appearance?: "always" | "execute" | "interaction-only";
         },
@@ -147,23 +147,32 @@ export default function AddAdForm({
       return;
     }
 
-    turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
-      sitekey: turnstileSiteKey,
-      appearance: "always",
-      action: TURNSTILE_ACTION,
-      callback: (token) => {
-        setTurnstileToken(token);
-        setTurnstileError("");
-      },
-      "expired-callback": () => {
-        setTurnstileToken("");
-        setTurnstileError(t("form.verificationExpired"));
-      },
-      "error-callback": () => {
-        setTurnstileToken("");
-        setTurnstileError(t("form.verificationFailed"));
-      },
-    });
+    try {
+      turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: turnstileSiteKey,
+        appearance: "always",
+        action: TURNSTILE_ACTION,
+        callback: (token) => {
+          setTurnstileToken(token);
+          setTurnstileError("");
+        },
+        "expired-callback": () => {
+          setTurnstileToken("");
+          setTurnstileError(t("form.verificationExpired"));
+        },
+        "error-callback": (code?: string) => {
+          setTurnstileToken("");
+          setTurnstileError(
+            code
+              ? `${t("form.verificationFailed")} (${code})`
+              : t("form.verificationFailed"),
+          );
+        },
+      });
+    } catch (error) {
+      console.error("Failed to render Turnstile", error);
+      setTurnstileError(t("form.verificationFailed"));
+    }
   }, [t, turnstileLoaded, turnstileSiteKey]);
 
   const renderLabel = (
@@ -190,7 +199,8 @@ export default function AddAdForm({
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
           strategy="afterInteractive"
-          onLoad={() => setTurnstileLoaded(true)}
+          onReady={() => setTurnstileLoaded(true)}
+          onError={() => setTurnstileError(t("form.verificationFailed"))}
         />
       )}
       <Stack gap="lg">
