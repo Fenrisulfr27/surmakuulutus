@@ -19,6 +19,9 @@ const LIMITS = {
   bottomText: 100,
 } as const;
 
+const TURNSTILE_DEV_TOKEN = "dev-turnstile-token";
+const TURNSTILE_ACTION = "publish-obituary";
+
 const requiredLabelStyles = {
   label: {
     display: "flex",
@@ -53,6 +56,7 @@ declare global {
           callback: (token: string) => void;
           "expired-callback": () => void;
           "error-callback": () => void;
+          action?: string;
           appearance?: "always" | "execute" | "interaction-only";
         },
       ) => string;
@@ -68,7 +72,9 @@ export default function AddAdForm({
   isSubmitting = false,
 }: AddAdFormProps) {
   const { language, t } = useLanguage();
-  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const configuredTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const turnstileSiteKey = isDevelopment ? undefined : configuredTurnstileSiteKey;
   const turnstileRef = React.useRef<HTMLDivElement>(null);
   const turnstileWidgetId = React.useRef<string | undefined>(undefined);
   const form = useForm({
@@ -109,6 +115,11 @@ export default function AddAdForm({
       return;
     }
 
+    if (isDevelopment) {
+      await submitWithToken(validation.data, TURNSTILE_DEV_TOKEN);
+      return;
+    }
+
     if (turnstileSiteKey) {
       if (!turnstileToken) {
         setTurnstileError(t("form.verificationRequired"));
@@ -139,6 +150,7 @@ export default function AddAdForm({
     turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
       sitekey: turnstileSiteKey,
       appearance: "interaction-only",
+      action: TURNSTILE_ACTION,
       callback: (token) => {
         setTurnstileToken(token);
         setTurnstileError("");

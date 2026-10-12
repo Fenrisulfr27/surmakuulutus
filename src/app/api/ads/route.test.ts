@@ -105,6 +105,24 @@ describe("POST /api/ads", () => {
     expect(createAd).not.toHaveBeenCalled();
   });
 
+  it("rejects direct requests without Turnstile tokens before saving", async () => {
+    protectObituarySubmission.mockResolvedValue({
+      allowed: false,
+      status: 400,
+      message: "Verification failed",
+    });
+    const { POST } = await import("./route");
+    const response = await POST(postRequest({ ...validBody, turnstileToken: undefined }));
+
+    expect(response.status).toBe(400);
+    expect(protectObituarySubmission).toHaveBeenCalledWith(
+      expect.any(Request),
+      expect.objectContaining({ name: "Mari Mets" }),
+      { turnstileToken: undefined, website: "" },
+    );
+    expect(createAd).not.toHaveBeenCalled();
+  });
+
   it("rejects duplicate submissions before saving", async () => {
     protectObituarySubmission.mockResolvedValue({
       allowed: false,

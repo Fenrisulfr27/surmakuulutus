@@ -4,6 +4,9 @@ import { connectToDatabase } from "./mongodb";
 import type { AdFormValues } from "./adValidation";
 
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const TURNSTILE_TEST_SECRET_KEY = "1x0000000000000000000000000000000AA";
+const TURNSTILE_DEV_TOKEN = "dev-turnstile-token";
+const TURNSTILE_EXPECTED_ACTION = "publish-obituary";
 const RATE_LIMIT_MAX = 3;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
@@ -109,8 +112,32 @@ export function stripSecurityFields(body: Record<string, unknown>) {
   return adPayload;
 }
 
-export async function verifyTurnstileToken(token: string, ip: string, fetchImpl = fetch) {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
+function getExpectedHostnames() {
+  return (process.env.TURNSTILE_ALLOWED_HOSTNAMES ?? "surmakuulutus.ee,www.surmakuulutus.ee")
+    .split(",")
+    .map((hostname) => hostname.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function getTurnstileSecret() {
+  if (process.env.NODE_ENV === "development") {
+    return TURNSTILE_TEST_SECRET_KEY;
+  }
+
+  return process.env.TURNSTILE_SECRET_KEY;
+}
+
+export async function verifyTurnstileToken(
+  token: string,
+  ip: string,
+  _requestHostname: string,
+  fetchImpl = fetch,
+) {
+  if (process.env.NODE_ENV === "development" && token === TURNSTILE_DEV_TOKEN) {
+    return { success: true as const };
+  }
+
+  const secret = getTurnstileSecret();
 
   if (!secret) {
     return { success: false as const, reason: "not_configured" as const };
@@ -122,6 +149,7 @@ export async function verifyTurnstileToken(token: string, ip: string, fetchImpl 
       secret,
       response: token,
       remoteip: ip,
+      idempotency_key: crypto.randomUUID(),
     }),
   });
 
@@ -129,15 +157,41 @@ export async function verifyTurnstileToken(token: string, ip: string, fetchImpl 
     return { success: false as const, reason: "request_failed" as const };
   }
 
-  const payload = (await response.json()) as { success?: boolean; "error-codes"?: string[] };
+  const payload = (await response.json()) as {
+    success?: boolean;
+    "error-codes"?: string[];
+    action?: string;
+    hostname?: string;
+  };
 
-  return payload.success
-    ? { success: true as const }
-    : {
+  if (!payload.success) {
+    return {
+      success: false as const,
+      reason: "invalid" as const,
+      errorCodes: payload["error-codes"] ?? [],
+    };
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    if (payload.action !== TURNSTILE_EXPECTED_ACTION) {
+      return {
         success: false as const,
-        reason: "invalid" as const,
-        errorCodes: payload["error-codes"] ?? [],
+        reason: "invalid_action" as const,
+        action: payload.action,
       };
+    }
+
+    const hostname = payload.hostname?.toLowerCase();
+    if (!hostname || !getExpectedHostnames().includes(hostname)) {
+      return {
+        success: false as const,
+        reason: "invalid_hostname" as const,
+        hostname: payload.hostname,
+      };
+    }
+  }
+
+  return { success: true as const };
 }
 
 export async function reserveTurnstileToken(token: string) {
@@ -230,7 +284,8 @@ export async function protectObituarySubmission(
     return { allowed: false as const, status: 400, message: "Verification failed" };
   }
 
-  const turnstileResult = await verifyTurnstileToken(fields.turnstileToken, ip);
+  const requestHostname = new URL(request.url).hostname;
+  const turnstileResult = await verifyTurnstileToken(fields.turnstileToken, ip, requestHostname);
   if (!turnstileResult.success) {
     logSecurityEvent(
       turnstileResult.reason === "not_configured"
