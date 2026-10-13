@@ -1,5 +1,5 @@
 import { validateAdForm, type AdFormValues } from "./adValidation";
-import { createAiGeneratedAd } from "./ads";
+import { createAiGeneratedAd, findAiGeneratedAdByKey } from "./ads";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const MODEL = "gpt-4.1-mini";
@@ -121,9 +121,20 @@ async function generateAdValues() {
   return parseGeneratedAd(outputText);
 }
 
-export async function generateDailyAiObituary() {
+function generationKey(runDate: string, runId?: string) {
+  return `${runDate}:${runId?.trim() || "manual"}`;
+}
+
+export async function generateDailyAiObituary(runId?: string) {
   const runDate = todayKey();
+  const aiGenerationKey = generationKey(runDate, runId);
+  const existingAd = await findAiGeneratedAdByKey(aiGenerationKey);
+
+  if (existingAd) {
+    return { created: false as const, ad: existingAd };
+  }
+
   const values = await generateAdValues();
 
-  return createAiGeneratedAd(values, runDate);
+  return createAiGeneratedAd(values, runDate, aiGenerationKey);
 }

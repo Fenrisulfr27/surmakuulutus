@@ -6,10 +6,15 @@ vi.mock("../../../lib/aiObituary", () => ({
   generateDailyAiObituary,
 }));
 
-function postRequest(secret?: string) {
+function postRequest(secret?: string, runId = "123456") {
   return new Request("https://surmakuulutus.ee/api/ai-obituary", {
     method: "POST",
-    headers: secret ? { authorization: `Bearer ${secret}` } : undefined,
+    headers: secret
+      ? {
+          authorization: `Bearer ${secret}`,
+          "x-github-run-id": runId,
+        }
+      : undefined,
   });
 }
 
@@ -46,7 +51,7 @@ describe("POST /api/ai-obituary", () => {
     const response = await POST(postRequest("cron-secret"));
 
     expect(response.status).toBe(201);
-    expect(generateDailyAiObituary).toHaveBeenCalledTimes(1);
+    expect(generateDailyAiObituary).toHaveBeenCalledWith("123456");
   });
 
   it("ignores accidental whitespace around configured secret", async () => {
@@ -57,5 +62,13 @@ describe("POST /api/ai-obituary", () => {
 
     expect(response.status).toBe(201);
     expect(generateDailyAiObituary).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps manual triggering working without a run id header", async () => {
+    const { POST } = await import("./route");
+    const response = await POST(postRequest("cron-secret", ""));
+
+    expect(response.status).toBe(201);
+    expect(generateDailyAiObituary).toHaveBeenCalledWith(undefined);
   });
 });

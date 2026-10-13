@@ -15,6 +15,7 @@ export interface Ad {
   createdAt?: string | Date;
   aiGenerated?: boolean;
   aiGeneratedDate?: string;
+  aiGenerationKey?: string;
 }
 
 export type PublicAd = Omit<Ad, "email">;
@@ -68,6 +69,7 @@ const adSchema = new mongoose.Schema(
     topText: String,
     aiGenerated: { type: Boolean, default: false, select: false },
     aiGeneratedDate: { type: String, select: false },
+    aiGenerationKey: { type: String, select: false },
   },
   { timestamps: true },
 );
@@ -75,17 +77,63 @@ const adSchema = new mongoose.Schema(
 adSchema.index({ createdAt: -1 });
 adSchema.index({ name: 1 });
 adSchema.index(
-  { aiGeneratedDate: 1 },
+  { aiGenerationKey: 1 },
   {
     unique: true,
     partialFilterExpression: {
       aiGenerated: true,
-      aiGeneratedDate: { $exists: true },
+      aiGenerationKey: { $exists: true },
     },
   },
 );
 
 const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
+let aiGenerationIndexReady: Promise<void> | null = null;
+
+function isMissingIndexError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "codeName" in error &&
+    error.codeName === "IndexNotFound"
+  );
+}
+
+async function ensureAiGenerationIndexes() {
+  aiGenerationIndexReady ??= (async () => {
+    const indexes = await AdModel.collection.indexes();
+    const legacyDailyIndex = indexes.find(
+      (index) =>
+        index.unique === true &&
+        index.key &&
+        Object.keys(index.key).length === 1 &&
+        index.key.aiGeneratedDate === 1,
+    );
+
+    if (legacyDailyIndex?.name) {
+      try {
+        await AdModel.collection.dropIndex(legacyDailyIndex.name);
+      } catch (error) {
+        if (!isMissingIndexError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    await AdModel.collection.createIndex(
+      { aiGenerationKey: 1 },
+      {
+        unique: true,
+        partialFilterExpression: {
+          aiGenerated: true,
+          aiGenerationKey: { $exists: true },
+        },
+      },
+    );
+  })();
+
+  await aiGenerationIndexReady;
+}
 
 export function toPublicAd(ad: unknown): PublicAd {
   if (!ad) {
@@ -191,10 +239,36 @@ export async function createAd(payload: AdFormValues) {
   return toPublicAd(ad);
 }
 
-export async function createAiGeneratedAd(payload: AdFormValues, runDate: string) {
+export async function findAiGeneratedAdByKey(aiGenerationKey: string) {
   await connectToDatabase();
+  await ensureAiGenerationIndexes();
 
-  const slugSuffix = runDate.replaceAll("-", "");
+  const ad = await AdModel.findOne({
+    aiGenerated: true,
+    aiGenerationKey,
+  }).select(publicAdProjection);
+
+  return ad ? toPublicAd(ad) : null;
+}
+
+export async function createAiGeneratedAd(
+  payload: AdFormValues,
+  runDate: string,
+  aiGenerationKey: string,
+) {
+  await connectToDatabase();
+  await ensureAiGenerationIndexes();
+
+  const dailyCount = await AdModel.countDocuments({
+    aiGenerated: true,
+    aiGeneratedDate: runDate,
+  });
+
+  if (dailyCount >= 2) {
+    return { created: false as const, ad: null };
+  }
+
+  const slugSuffix = aiGenerationKey.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "");
   const baseSlug = `${slugify(payload.name) || "kuulutus"}-${slugSuffix}`;
   let slug = baseSlug;
   let counter = 1;
@@ -210,6 +284,7 @@ export async function createAiGeneratedAd(payload: AdFormValues, runDate: string
       slug,
       aiGenerated: true,
       aiGeneratedDate: runDate,
+      aiGenerationKey,
     });
 
     await ad.save();

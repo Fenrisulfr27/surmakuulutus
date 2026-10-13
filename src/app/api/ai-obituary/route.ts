@@ -16,7 +16,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await generateDailyAiObituary();
+    const result = await generateDailyAiObituary(
+      request.headers.get("x-github-run-id")?.trim() || undefined,
+    );
     return NextResponse.json(result, { status: result.created ? 201 : 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Server error";
