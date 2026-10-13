@@ -186,6 +186,17 @@ async function postProductionAd(body) {
   };
 }
 
+async function postProductionAiObituary() {
+  const response = await fetch(new URL("/api/ai-obituary", BASE_URL), {
+    method: "POST",
+  });
+
+  return {
+    status: response.status,
+    body: await response.json().catch(() => null),
+  };
+}
+
 async function runProductionApiChecks() {
   const missing = await postProductionAd(validAdPayload(undefined));
   record("production API rejects missing Turnstile token", missing.status === 400, missing);
@@ -205,6 +216,9 @@ async function runProductionApiChecks() {
     reason:
       "Skipped because verifying token reuse requires a valid production Turnstile token and a first submit would create a real obituary.",
   });
+
+  const aiUnauthorized = await postProductionAiObituary();
+  record("production AI endpoint rejects unauthenticated requests", aiUnauthorized.status === 401, aiUnauthorized);
 }
 
 const options = new chrome.Options()

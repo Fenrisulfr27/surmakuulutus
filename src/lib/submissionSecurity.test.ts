@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { isAllowedSubmissionOrigin, verifyTurnstileToken } from "./submissionSecurity";
+import {
+  getClientIp,
+  isAllowedSubmissionOrigin,
+  verifyTurnstileToken,
+} from "./submissionSecurity";
 
 const originalSecret = process.env.TURNSTILE_SECRET_KEY;
 const originalAllowedHostnames = process.env.TURNSTILE_ALLOWED_HOSTNAMES;
@@ -43,6 +47,34 @@ describe("isAllowedSubmissionOrigin", () => {
         headers: { origin: "https://surmakuulutus.ee" },
       }),
     )).toBe(true);
+  });
+});
+
+describe("getClientIp", () => {
+  it("prefers Netlify's client IP header over spoofable proxy-style headers", () => {
+    const request = new Request("https://surmakuulutus.ee/api/ads", {
+      headers: {
+        "x-nf-client-connection-ip": "203.0.113.10",
+        "cf-connecting-ip": "198.51.100.20",
+        "x-forwarded-for": "198.51.100.30",
+        "x-real-ip": "198.51.100.40",
+      },
+    });
+
+    expect(getClientIp(request)).toBe("203.0.113.10");
+  });
+
+  it("falls back through proxy headers when Netlify's client IP header is unavailable", () => {
+    expect(getClientIp(
+      new Request("https://surmakuulutus.ee/api/ads", {
+        headers: { "cf-connecting-ip": "198.51.100.20" },
+      }),
+    )).toBe("198.51.100.20");
+    expect(getClientIp(
+      new Request("https://surmakuulutus.ee/api/ads", {
+        headers: { "x-forwarded-for": "198.51.100.30, 198.51.100.31" },
+      }),
+    )).toBe("198.51.100.30");
   });
 });
 

@@ -24,7 +24,8 @@ type SecurityEvent =
   | "turnstile_rejected"
   | "turnstile_not_configured"
   | "turnstile_token_reused"
-  | "duplicate_rejected";
+  | "duplicate_rejected"
+  | "submission_accepted";
 
 type MongoError = Error & { code?: number };
 
@@ -69,10 +70,40 @@ function hash(value: string) {
   return crypto.createHash("sha256").update(`${salt}:${value}`).digest("hex");
 }
 
+function getClientIpInfo(request: Request) {
+  const netlifyIp = request.headers.get("x-nf-client-connection-ip")?.trim();
+  const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const cloudflareIp = request.headers.get("cf-connecting-ip")?.trim();
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  const selected =
+    netlifyIp ??
+    cloudflareIp ??
+    forwardedFor ??
+    realIp ??
+    "unknown";
+  const source = netlifyIp
+    ? "x-nf-client-connection-ip"
+    : cloudflareIp
+      ? "cf-connecting-ip"
+      : forwardedFor
+        ? "x-forwarded-for"
+        : realIp
+          ? "x-real-ip"
+          : "unknown";
+
+  return { selected, source };
+}
+
 function logSecurityEvent(event: SecurityEvent, request: Request, details: Record<string, unknown> = {}) {
+  const ipInfo = getClientIpInfo(request);
+
   console.info("security.submission", {
+    timestamp: new Date().toISOString(),
     event,
-    ipHash: hash(getClientIp(request)),
+    endpoint: new URL(request.url).pathname,
+    source: "manual",
+    ipHash: hash(ipInfo.selected),
+    ipSource: ipInfo.source,
     path: new URL(request.url).pathname,
     ...details,
   });
@@ -120,14 +151,7 @@ export function isAllowedSubmissionOrigin(request: Request) {
 }
 
 export function getClientIp(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-
-  return (
-    request.headers.get("cf-connecting-ip") ??
-    forwardedFor ??
-    request.headers.get("x-real-ip") ??
-    "unknown"
-  );
+  return getClientIpInfo(request).selected;
 }
 
 export function getSecurityFields(body: Record<string, unknown>): SubmissionSecurityFields {
@@ -319,17 +343,26 @@ export async function protectObituarySubmission(
   const honeypotValue = typeof fields.website === "string" ? fields.website.trim() : "";
 
   if (!isAllowedSubmissionOrigin(request)) {
-    logSecurityEvent("origin_rejected", request);
+    logSecurityEvent("origin_rejected", request, {
+      verificationResult: "not_checked",
+      reason: "invalid_origin",
+    });
     return { allowed: false as const, status: 403, message: "Server error" };
   }
 
   if (honeypotValue) {
-    logSecurityEvent("honeypot_rejected", request);
+    logSecurityEvent("honeypot_rejected", request, {
+      verificationResult: "not_checked",
+      reason: "honeypot",
+    });
     return { allowed: false as const, status: 400, message: "Server error" };
   }
 
   if (typeof fields.turnstileToken !== "string" || fields.turnstileToken.length === 0) {
-    logSecurityEvent("turnstile_rejected", request, { reason: "missing" });
+    logSecurityEvent("turnstile_rejected", request, {
+      verificationResult: "rejected",
+      reason: "missing",
+    });
     return { allowed: false as const, status: 400, message: "Verification failed" };
   }
 
@@ -341,7 +374,7 @@ export async function protectObituarySubmission(
         ? "turnstile_not_configured"
         : "turnstile_rejected",
       request,
-      { reason: turnstileResult.reason },
+      { verificationResult: "rejected", reason: turnstileResult.reason },
     );
     return {
       allowed: false as const,
@@ -352,21 +385,35 @@ export async function protectObituarySubmission(
 
   const tokenReserved = await reserveTurnstileToken(fields.turnstileToken);
   if (!tokenReserved) {
-    logSecurityEvent("turnstile_token_reused", request);
+    logSecurityEvent("turnstile_token_reused", request, {
+      verificationResult: "rejected",
+      reason: "token_reused",
+    });
     return { allowed: false as const, status: 400, message: "Verification failed" };
   }
 
   const rateLimit = await checkSubmissionRateLimit(ip);
   if (!rateLimit.allowed) {
-    logSecurityEvent("rate_limit_rejected", request);
+    logSecurityEvent("rate_limit_rejected", request, {
+      verificationResult: "accepted",
+      reason: "rate_limited",
+    });
     return { allowed: false as const, status: 429, message: "Too many submissions" };
   }
 
   const duplicateReserved = await reserveSubmissionFingerprint(values, ip);
   if (!duplicateReserved) {
-    logSecurityEvent("duplicate_rejected", request);
+    logSecurityEvent("duplicate_rejected", request, {
+      verificationResult: "accepted",
+      reason: "duplicate_submission",
+    });
     return { allowed: false as const, status: 409, message: "Duplicate submission" };
   }
+
+  logSecurityEvent("submission_accepted", request, {
+    verificationResult: "accepted",
+    rateLimitRemaining: rateLimit.remaining,
+  });
 
   return { allowed: true as const };
 }
