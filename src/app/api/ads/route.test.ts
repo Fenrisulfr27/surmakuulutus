@@ -125,6 +125,19 @@ describe("POST /api/ads", () => {
     expect(createAd).not.toHaveBeenCalled();
   });
 
+  it("rejects reused Turnstile tokens before saving", async () => {
+    protectObituarySubmission.mockResolvedValue({
+      allowed: false,
+      status: 400,
+      message: "Verification failed",
+    });
+    const { POST } = await import("./route");
+    const response = await POST(postRequest({ ...validBody, turnstileToken: "reused-token" }));
+
+    expect(response.status).toBe(400);
+    expect(createAd).not.toHaveBeenCalled();
+  });
+
   it("rejects direct requests without Turnstile tokens before saving", async () => {
     protectObituarySubmission.mockResolvedValue({
       allowed: false,

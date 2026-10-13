@@ -152,8 +152,19 @@ function getExpectedHostnames() {
     .filter(Boolean);
 }
 
-function getTurnstileSecret() {
-  if (process.env.NODE_ENV === "development") {
+function isLocalDevelopmentHost(hostname: string) {
+  const normalized = hostname.toLowerCase();
+
+  return (
+    process.env.NODE_ENV === "development" &&
+    (normalized === "localhost" ||
+      normalized === "127.0.0.1" ||
+      normalized === "::1")
+  );
+}
+
+function getTurnstileSecret(requestHostname: string) {
+  if (isLocalDevelopmentHost(requestHostname)) {
     return TURNSTILE_TEST_SECRET_KEY;
   }
 
@@ -163,14 +174,14 @@ function getTurnstileSecret() {
 export async function verifyTurnstileToken(
   token: string,
   ip: string,
-  _requestHostname: string,
+  requestHostname: string,
   fetchImpl = fetch,
 ) {
-  if (process.env.NODE_ENV === "development" && token === TURNSTILE_DEV_TOKEN) {
+  if (isLocalDevelopmentHost(requestHostname) && token === TURNSTILE_DEV_TOKEN) {
     return { success: true as const };
   }
 
-  const secret = getTurnstileSecret();
+  const secret = getTurnstileSecret(requestHostname);
 
   if (!secret) {
     return { success: false as const, reason: "not_configured" as const };

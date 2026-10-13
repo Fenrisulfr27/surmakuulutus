@@ -114,6 +114,49 @@ describe("verifyTurnstileToken", () => {
     expect(body.get("secret")).toBe("1x0000000000000000000000000000000AA");
   });
 
+  it("accepts the fixed dev token only on localhost development requests", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+
+    await expect(
+      verifyTurnstileToken("dev-turnstile-token", "127.0.0.1", "localhost", vi.fn()),
+    ).resolves.toEqual({ success: true });
+  });
+
+  it("does not accept the fixed dev token on non-local hosts", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    process.env.TURNSTILE_SECRET_KEY = "secret";
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: false,
+        "error-codes": ["invalid-input-response"],
+      }),
+    });
+
+    await expect(
+      verifyTurnstileToken("dev-turnstile-token", "203.0.113.7", "surmakuulutus.ee", fetchImpl),
+    ).resolves.toEqual({
+      success: false,
+      reason: "invalid",
+      errorCodes: ["invalid-input-response"],
+    });
+
+    const body = fetchImpl.mock.calls[0][1].body as URLSearchParams;
+    expect(body.get("secret")).toBe("secret");
+  });
+
+  it("does not use the Cloudflare test secret on non-local hosts", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    delete process.env.TURNSTILE_SECRET_KEY;
+
+    await expect(
+      verifyTurnstileToken("invalid-token", "203.0.113.7", "surmakuulutus.ee", vi.fn()),
+    ).resolves.toEqual({
+      success: false,
+      reason: "not_configured",
+    });
+  });
+
   it("validates action and hostname in production", async () => {
     vi.stubEnv("NODE_ENV", "production");
     process.env.TURNSTILE_SECRET_KEY = "secret";
