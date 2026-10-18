@@ -1,5 +1,7 @@
 import { validateAdForm, type AdFormValues } from "./adValidation";
 import { createAiGeneratedAd, findAiGeneratedAdByKey } from "./ads";
+import victims from "../data/kommunismiohvrid.json";
+import { createHash } from "node:crypto";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const MODEL = "gpt-4.1-mini";
@@ -31,13 +33,25 @@ function getOutputText(payload: OpenAIResponse) {
     .trim();
 }
 
-function parseGeneratedAd(text: string): AdFormValues {
+type Victim = (typeof victims)[number];
+
+function toIsoDate(date: string) {
+  const [day, month, year] = date.split(".");
+  return `${year}-${month}-${day}`;
+}
+
+function selectVictim(key: string): Victim {
+  const index = createHash("sha256").update(key).digest().readUInt32BE(0) % victims.length;
+  return victims[index];
+}
+
+function parseGeneratedAd(text: string, victim: Victim): AdFormValues {
   const json = JSON.parse(text) as Partial<AdFormValues>;
   const parsed = validateAdForm({
-    name: json.name,
+    name: victim.name,
     email: GENERATED_EMAIL,
-    birthYear: json.birthYear,
-    deathYear: json.deathYear,
+    birthYear: toIsoDate(victim.birthDate),
+    deathYear: toIsoDate(victim.deathDate),
     poem: json.poem ?? "",
     topText: json.topText,
     bottomText: json.bottomText,
@@ -50,7 +64,7 @@ function parseGeneratedAd(text: string): AdFormValues {
   return parsed.data;
 }
 
-async function generateAdValues() {
+async function generateAdValues(victim: Victim) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
@@ -69,12 +83,12 @@ async function generateAdValues() {
         {
           role: "system",
           content:
-            "Kirjuta ainult korrektne JSON. Sisu peab olema eestikeelne, austav, loomulik ja väljamõeldud.",
+            "Kirjuta ainult korrektne JSON. Sisu peab olema eestikeelne, austav ja loomulik. Ära lisa kontrollimata eluloolisi või perekondlikke väiteid.",
         },
         {
           role: "user",
           content:
-            "Loo üks realistlik väljamõeldud Eesti surmakuulutus. Väljasta ainult JSON väljadega name, birthYear, deathYear, topText, poem, bottomText. birthYear ja deathYear peavad olema kujul YYYY-MM-DD. name kuni 100 märki, topText kuni 100 märki, poem kuni 300 märki, bottomText kuni 100 märki. Ära kasuta päris avaliku elu tegelasi.",
+            `Kirjuta austav mälestuskuulutuse tekst inimesele ${victim.name}. Väljasta ainult JSON väljadega topText, poem, bottomText. topText kuni 100 märki, poem kuni 300 märki, bottomText kuni 100 märki. Ära väida, et tekst pärineb omastelt.`,
         },
       ],
       text: {
@@ -84,18 +98,8 @@ async function generateAdValues() {
           schema: {
             type: "object",
             additionalProperties: false,
-            required: [
-              "name",
-              "birthYear",
-              "deathYear",
-              "topText",
-              "poem",
-              "bottomText",
-            ],
+            required: ["topText", "poem", "bottomText"],
             properties: {
-              name: { type: "string", maxLength: 100 },
-              birthYear: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
-              deathYear: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" },
               topText: { type: "string", maxLength: 100 },
               poem: { type: "string", maxLength: 300 },
               bottomText: { type: "string", maxLength: 100 },
@@ -118,7 +122,7 @@ async function generateAdValues() {
     throw new Error("OpenAI response did not include text output");
   }
 
-  return parseGeneratedAd(outputText);
+  return parseGeneratedAd(outputText, victim);
 }
 
 function generationKey(runDate: string, runId?: string) {
@@ -134,7 +138,7 @@ export async function generateDailyAiObituary(runId?: string) {
     return { created: false as const, ad: existingAd };
   }
 
-  const values = await generateAdValues();
+  const values = await generateAdValues(selectVictim(aiGenerationKey));
 
   return createAiGeneratedAd(values, runDate, aiGenerationKey);
 }

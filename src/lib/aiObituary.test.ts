@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import victims from "../data/kommunismiohvrid.json";
 
 const createAiGeneratedAd = vi.fn();
 const findAiGeneratedAdByKey = vi.fn();
@@ -9,9 +10,6 @@ vi.mock("./ads", () => ({
 }));
 
 const generatedPayload = {
-  name: "AI Kuulutus",
-  birthYear: "1930-01-01",
-  deathYear: "2026-01-01",
   topText: "Teatame kurbusega",
   poem: "Vaikne mälestus jääb.",
   bottomText: "Leinavad omaksed",
@@ -49,14 +47,14 @@ describe("generateDailyAiObituary", () => {
     await generateDailyAiObituary("987654");
 
     expect(findAiGeneratedAdByKey).toHaveBeenCalledWith("2026-10-13:987654");
-    expect(createAiGeneratedAd).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "AI Kuulutus",
-        email: "automaat@surmakuulutus.ee",
-      }),
-      "2026-10-13",
-      "2026-10-13:987654",
-    );
+    const [values, date, key] = createAiGeneratedAd.mock.calls[0];
+    const victim = victims.find((item) => item.name === values.name &&
+      `${item.birthDate.slice(6)}-${item.birthDate.slice(3, 5)}-${item.birthDate.slice(0, 2)}` === values.birthYear &&
+      `${item.deathDate.slice(6)}-${item.deathDate.slice(3, 5)}-${item.deathDate.slice(0, 2)}` === values.deathYear);
+    expect(victim).toBeDefined();
+    expect(values.email).toBe("automaat@surmakuulutus.ee");
+    expect(date).toBe("2026-10-13");
+    expect(key).toBe("2026-10-13:987654");
   });
 
   it("does not call OpenAI again when the same workflow run is retried", async () => {
