@@ -108,6 +108,167 @@ a:hover {
   padding-bottom: clamp(2rem, 5vw, 4rem);
 }
 
+.guides-page,
+.guide-page {
+  max-width: 780px;
+  margin-inline: auto;
+  padding-bottom: 2.5rem;
+}
+
+.guides-heading,
+.guide-heading {
+  margin-bottom: 0.75rem;
+  padding: 0.85rem 1rem;
+  text-align: center;
+  background: var(--paper-sheet);
+  border-top: 1px solid var(--paper-rule-strong);
+  border-bottom: 4px double var(--paper-rule-strong);
+}
+
+.guides-heading h1,
+.guide-heading h1 {
+  margin: 0.2rem 0 0.4rem;
+  color: var(--paper-ink);
+  font-size: clamp(30px, 4.5vw, 46px);
+  font-weight: 500;
+  line-height: 0.95;
+}
+
+.guides-heading > p:last-child,
+.guide-heading > p:last-child {
+  margin: 0;
+  color: var(--paper-muted);
+}
+
+.guides-list {
+  display: grid;
+  background: var(--paper-sheet);
+  border-top: 1px solid var(--paper-rule);
+}
+
+.guide-list-item,
+.guide-content {
+  display: block;
+  position: relative;
+  padding: 0.8rem 3rem 0.85rem 1rem;
+  color: var(--paper-ink);
+  background: var(--paper-sheet);
+  border: 0;
+  border-bottom: 1px solid var(--paper-rule);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.guide-list-item article {
+  position: relative;
+}
+
+.guide-list-item h2 {
+  margin: 0.15rem 0;
+  color: var(--paper-ink);
+  font-size: clamp(21px, 2.4vw, 29px);
+  font-weight: 500;
+}
+
+.guide-back-link {
+  color: var(--paper-ink);
+}
+
+.guide-list-item p:last-child,
+.guide-content p,
+.guide-content li {
+  color: var(--paper-muted);
+  line-height: 1.45;
+}
+
+.guide-list-item p:last-child {
+  margin: 0.15rem 0 0;
+}
+
+.guide-list-arrow {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  color: var(--paper-accent);
+  font-size: 1.4rem;
+  transform: translateY(-50%);
+}
+
+.guide-list-item:hover,
+.guide-list-item:focus-visible {
+  background: color-mix(in srgb, var(--paper-accent) 10%, var(--paper-sheet));
+}
+
+.guide-list-item:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: -2px;
+}
+
+.guide-back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-family: "Cinzel", "Cormorant Garamond", Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.guide-content h2 {
+  margin: 1.35rem 0 0.55rem;
+  color: var(--paper-ink);
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guide-content li + li {
+  margin-top: 0.45rem;
+}
+
+.guide-content {
+  max-width: 780px;
+  margin-inline: auto;
+  padding: 1.15rem clamp(1rem, 3vw, 1.5rem);
+  background: var(--paper-sheet);
+  border-top: 1px solid var(--paper-rule-strong);
+  border-bottom: 1px solid var(--paper-rule-strong);
+}
+
+.guide-content p {
+  max-width: 68ch;
+  margin: 0 0 0.9rem;
+}
+
+.guide-content p + p {
+  margin-top: 0.9rem;
+}
+
+.guide-content ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.guide-section-steps {
+  max-width: 68ch;
+}
+
+.guide-section-steps li + li {
+  margin-top: 0.8rem;
+}
+
+.guide-reviewed {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.guide-sources {
+  border-top: 1px solid var(--paper-rule);
+}
+
+.guide-sources a {
+  color: var(--paper-ink);
+}
+
+
 .newspaper-nav {
   min-height: 48px;
 }

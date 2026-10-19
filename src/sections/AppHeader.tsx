@@ -53,6 +53,14 @@ export function AppHeader() {
           >
             {t("nav.addAd")}
           </Button>
+          <Button
+            component={Link}
+            href="/juhendid"
+            size="compact-sm"
+            className={pathname.startsWith("/juhendid") ? "nav-button-active" : undefined}
+          >
+            Juhendid
+          </Button>
           <div className="language-switch" aria-label="Language">
             <button
               type="button"
