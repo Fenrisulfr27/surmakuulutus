@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import AdCard from "../components/AdCard";
 import type { AdsPageData, AdsSortOrder } from "../lib/ads";
 import { useLanguage } from "../context/language";
@@ -36,24 +36,6 @@ export default function HomePage({
   const { language, t } = useLanguage();
   const cardGridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const grid = cardGridRef.current;
-    if (!grid) return;
-
-    const rowHeight = 1;
-    const gap = 8;
-    const resizeCards = () => {
-      for (const card of grid.children) {
-        const span = Math.ceil((card.getBoundingClientRect().height + gap) / (rowHeight + gap));
-        (card as HTMLElement).style.setProperty("--masonry-row-span", String(span));
-      }
-    };
-
-    const observer = new ResizeObserver(resizeCards);
-    for (const card of grid.children) observer.observe(card);
-    resizeCards();
-    return () => observer.disconnect();
-  }, [initialData.data.length]);
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
@@ -123,6 +105,30 @@ export default function HomePage({
     placeholderData: (previousData) => previousData,
     retry: false,
   });
+  const cardDataKey = data?.data.map((ad) => ad.slug).join("|");
+
+  useLayoutEffect(() => {
+    const grid = cardGridRef.current;
+    if (!grid) return;
+
+    grid.style.visibility = "hidden";
+    const rowHeight = 1;
+    const gap = 8;
+    const resizeCards = () => {
+      for (const card of grid.children) {
+        const content = card.firstElementChild as HTMLElement | null;
+        if (!content) continue;
+        const span = Math.ceil((content.getBoundingClientRect().height + gap) / (rowHeight + gap));
+        (card as HTMLElement).style.setProperty("--masonry-row-span", String(span));
+      }
+      grid.style.visibility = "visible";
+    };
+
+    const observer = new ResizeObserver(resizeCards);
+    for (const card of grid.children) observer.observe(card);
+    resizeCards();
+    return () => observer.disconnect();
+  }, [cardDataKey]);
 
   const handlePageChange = (value: number) => {
     setPage(value);
@@ -157,8 +163,8 @@ export default function HomePage({
   }, [search]);
 
   useEffect(() => {
-    updateUrl(1, debouncedSearch, sortOrder, "replace");
-  }, [debouncedSearch, sortOrder, updateUrl]);
+    updateUrl(page, debouncedSearch, sortOrder, "replace");
+  }, [page, debouncedSearch, sortOrder, updateUrl]);
 
   useEffect(() => {
     const syncFromLocation = () => {

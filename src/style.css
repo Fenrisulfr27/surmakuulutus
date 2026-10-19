@@ -21,7 +21,6 @@ body {
   box-sizing: border-box;
 }
 
-:root,
 [data-mantine-color-scheme="light"] {
   --paper-bg: #e7e2dc;
   --paper-sheet: #f8f6f1;
@@ -40,6 +39,7 @@ body {
     url("./assets/hero.webp");
 }
 
+:root:not([data-mantine-color-scheme]),
 [data-mantine-color-scheme="dark"] {
   --paper-bg: #050403;
   --paper-sheet: #0d0c09;
@@ -332,6 +332,8 @@ a:hover {
   grid-row: span var(--masonry-row-span, 1);
   align-self: start;
   min-width: 0;
+  height: max-content;
+  overflow: visible;
 }
 
 .homepage-card {
@@ -351,6 +353,9 @@ a:hover {
 
 .homepage-card {
   min-height: 0;
+  height: max-content;
+  max-height: none;
+  overflow: visible !important;
 }
 
 .newspaper-card-compact {

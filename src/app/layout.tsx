@@ -93,6 +93,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="et">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+              const key = "mantine-color-scheme-value";
+              const saved = window.sessionStorage.getItem(key);
+              const scheme = saved === "light" || saved === "dark" ? saved : "dark";
+              document.documentElement.setAttribute("data-mantine-color-scheme", scheme);
+            })();`,
+          }}
+        />
+      </head>
       <body>
         <script
           type="application/ld+json"
