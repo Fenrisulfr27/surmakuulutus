@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AdCard from "../components/AdCard";
 import type { AdsPageData, AdsSortOrder } from "../lib/ads";
 import { useLanguage } from "../context/language";
@@ -34,6 +34,26 @@ export default function HomePage({
   initialSort,
 }: HomePageProps) {
   const { language, t } = useLanguage();
+  const cardGridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const grid = cardGridRef.current;
+    if (!grid) return;
+
+    const rowHeight = 1;
+    const gap = 8;
+    const resizeCards = () => {
+      for (const card of grid.children) {
+        const span = Math.ceil((card.getBoundingClientRect().height + gap) / (rowHeight + gap));
+        (card as HTMLElement).style.setProperty("--masonry-row-span", String(span));
+      }
+    };
+
+    const observer = new ResizeObserver(resizeCards);
+    for (const card of grid.children) observer.observe(card);
+    resizeCards();
+    return () => observer.disconnect();
+  }, [initialData.data.length]);
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
@@ -232,7 +252,7 @@ export default function HomePage({
 
         <Text className="newspaper-section-heading">{t("home.sectionHeading")}</Text>
 
-        <div className="home-card-grid">
+        <div className="home-card-grid" ref={cardGridRef}>
           {data?.data.length === 0 && (
             <Text className="newspaper-state" ta="center">
               {search ? t("home.noSearchResults") : t("home.empty")}

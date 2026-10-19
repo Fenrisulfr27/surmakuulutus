@@ -32,7 +32,11 @@ body {
   --paper-rule-strong: rgba(21, 21, 21, 0.72);
   --paper-accent: #111111;
   --paper-bg-image:
-    linear-gradient(180deg, rgba(247, 244, 238, 0.88), rgba(231, 226, 220, 0.92)),
+    linear-gradient(
+      180deg,
+      rgba(247, 244, 238, 0.88),
+      rgba(231, 226, 220, 0.92)
+    ),
     url("./assets/hero.webp");
 }
 
@@ -46,7 +50,12 @@ body {
   --paper-rule-strong: rgba(236, 229, 216, 0.48);
   --paper-accent: #c7a873;
   --paper-bg-image:
-    linear-gradient(180deg, rgba(5, 4, 3, 0.96), rgba(5, 4, 3, 0.92), rgba(5, 4, 3, 0.98)),
+    linear-gradient(
+      180deg,
+      rgba(5, 4, 3, 0.96),
+      rgba(5, 4, 3, 0.92),
+      rgba(5, 4, 3, 0.98)
+    ),
     url("./assets/hero.webp");
 }
 
@@ -281,7 +290,11 @@ a:hover {
 }
 
 .mantine-SegmentedControl-indicator {
-  background: color-mix(in srgb, var(--paper-accent) 28%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--paper-accent) 28%,
+    transparent
+  ) !important;
   border-radius: 0 !important;
 }
 
@@ -307,12 +320,18 @@ a:hover {
 .home-card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  column-gap: 1rem;
+  row-gap: 8px;
+  grid-auto-rows: 1px;
+  align-items: start;
 }
 
 .home-card-link {
   display: block;
   width: 100%;
+  grid-row: span var(--masonry-row-span, 1);
+  align-self: start;
+  min-width: 0;
 }
 
 .homepage-card {
@@ -325,7 +344,9 @@ a:hover {
   border-radius: 0 !important;
   color: var(--paper-ink);
   box-shadow: none !important;
-  transition: border-color 0.18s ease, background-color 0.18s ease;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease;
 }
 
 .homepage-card {
@@ -361,23 +382,6 @@ a:hover {
   color: var(--paper-muted) !important;
   font-size: 1rem !important;
   line-height: 1.35;
-}
-
-.homepage-card .newspaper-poem,
-.homepage-card .newspaper-kicker,
-.homepage-card .newspaper-footer {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-}
-
-.homepage-card .newspaper-poem {
-  -webkit-line-clamp: 5;
-}
-
-.homepage-card .newspaper-kicker,
-.homepage-card .newspaper-footer {
-  -webkit-line-clamp: 3;
 }
 
 .newspaper-kicker,
@@ -659,7 +663,9 @@ a:hover {
   border: 1px solid var(--paper-rule) !important;
   border-radius: 0 !important;
   color: var(--paper-ink) !important;
-  transition: background-color 0.18s ease, border-color 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .mantine-Button-label {
@@ -669,7 +675,11 @@ a:hover {
 
 .mantine-Button-root:hover,
 .nav-button-active {
-  background: color-mix(in srgb, var(--paper-accent) 18%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--paper-accent) 18%,
+    transparent
+  ) !important;
   border-color: var(--paper-accent) !important;
 }
 
