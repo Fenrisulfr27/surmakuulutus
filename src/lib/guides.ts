@@ -6,6 +6,7 @@ export interface Guide {
   paragraphs: string[];
   points: string[];
   sections?: { heading: string; paragraphs: string[] }[];
+  links?: { label: string; href: string }[];
   sources: { label: string; url: string }[];
 }
 
@@ -13,7 +14,7 @@ export const guides: Guide[] = [
   {
     slug: "lahedase-surm",
     title: "Mida teha lähedase surma korral?",
-    summary: "Rahulik tegevuskava esimestest toimingutest matuste, toetuste ja pärimiseni.",
+    summary: "Tegevuskava esimestest toimingutest matuste, toetuste ja pärimiseni.",
     reviewed: "19.10.2026",
     paragraphs: ["Tee esmased otsused ükshaaval. Hädaolukorras helista 112; muul juhul järgi haigla, hoolekandeasutuse või tervishoiuteenuse osutaja juhiseid. Seejärel korralda surmatõend, matused, vajalikud teavitused ning kontrolli toetuste ja pärimise võimalusi."],
     points: [],
@@ -60,6 +61,12 @@ export const guides: Guide[] = [
     reviewed: "19.10.2026",
     paragraphs: ["Matuste korraldamisel lepi perega kokku soovid, eelarve ja ajakava. Matusebüroo saab aidata transpordi, kirstu või urni, tseremoonia ning hauaplatsi korraldamisel.", "Küsi teenuste ja lisakulude kohta kirjalik hinnapakkumine. Tseremoonia võib olla ilmalik või usutalitusega ning matmine või tuhastamine sõltub lahkunu ja pere soovidest.", "Matusetoetus ei ole üks üleriigiliselt ühesugune toetus. Näiteks Tallinna matusetoetust saab taotleda matuse korraldaja, kes katab kulud, kuue kuu jooksul lahkunu surmapäevast; tingimused on Tallinna-põhised."],
     points: ["Pane kirja pere soovid, eelarve ja soovitud kuupäev.", "Vali matusebüroo ning küsi teenuste täpne loetelu.", "Lepi kokku tseremoonia, ärasaatmise ja hauaplatsi üksikasjad.", "Kui taotled Tallinna toetust, esita taotlus kuue kuu jooksul ja hoia alles kuludokumendid."],
+    sections: [
+      { heading: "Pärast surma kinnitamist", paragraphs: ["Küsi surmatõendit väljastavalt tervishoiuteenuse osutajalt, millal saab surnu üle anda matusebüroole. Matusebüroo korraldab tavaliselt transpordi, kuid lepi see enne tellimist kirjalikult kokku."] },
+      { heading: "Matusebüroo ja hinnapakkumine", paragraphs: ["Küsi kirjalikku pakkumist, kus on eraldi välja toodud transport, kirst või urn, riietamine, hoiustamine, tseremoonia, lilled ja muud teenused. Küsi ka lisatasude, maksetähtaja ja muutmistingimuste kohta."] },
+      { heading: "Matmine või tuhastamine", paragraphs: ["Matmine tähendab hauaplatsi kasutamist; tuhastamise korral tuleb eraldi kokku leppida urni üleandmine ja urnimatmine või muu tuha säilitamise viis. Kalmistu haldaja ütleb, milliseid dokumente ja kooskõlastusi konkreetne kalmistu nõuab."] },
+      { heading: "Tseremoonia ja kontrollnimekiri", paragraphs: ["Vali ärasaatmise aeg, koht ja vorm ning lepi kokku, kes korraldab teavitused. Enne kinnitamist kontrolli teenuste loetelu, lõpphinda, kalmistu tingimusi ja arve saajat."] },
+    ],
     sources: [
       { label: "Tallinn: matusetoetus", url: "https://www.tallinn.ee/et/teenused/matusetoetus" },
       { label: "Tallinn: matusetoetuse taotlemine", url: "https://taotlen.tallinn.ee/matusetoetus" },
@@ -72,6 +79,13 @@ export const guides: Guide[] = [
     reviewed: "19.10.2026",
     paragraphs: ["Surmakuulutus võiks olla selge, väärikas ja perega kooskõlastatud. Tavaliselt sisaldab see lahkunu nime, kuupäevi, teadet surmast ning lähedaste nimed või perekonna ühise hüvastijätu.", "Vali sõnastus, mis vastab pere soovile. Ärasaatmise aeg ja koht lisa ainult siis, kui pere soovib neid avaldada.", "Enne avaldamist loe kuulutus vähemalt üks kord rahulikult üle. Kontrolli nimesid, kuupäevi, kohti ja kontaktandmeid ning veendu, et avaldatud info ei rikuks kellegi privaatsust."],
     points: ["Alusta lühikese teatega ja lisa lahkunu nimi.", "Lisa soovi korral sünni- ja surmakuupäev.", "Lisa ärasaatmise info ainult pere nõusolekul.", "Lõpeta lähedaste nimede või ühise mälestuslausega."],
+    sections: [
+      { heading: "Põhiinfo", paragraphs: ["Lisa teade surmast, lahkunu nimi ning soovi korral sünni- ja surmakuupäev. Lähedaste nimed lisa perega kooskõlastatult."] },
+      { heading: "Sõnastus ja privaatsus", paragraphs: ["Hoia tekst lühike ja väärikas. Ära avalda aadressi, telefoninumbrit, isikukoodi ega ärasaatmise üksikasju, kui pere ei soovi neid jagada."] },
+      { heading: "Näited", paragraphs: ["Lühike: „Teatame kurbusega, et lahkus meie kallis [nimi]. Leinavad lähedased.“", "Traditsiooniline: „Meie hulgast on lahkunud [nimi] ([sünniaasta–surmaaasta]). Mälestavad perekond ja sõbrad.“", "Tseremooniaga: „Jätame [nimi] hüvasti [kuupäeval] kell [aeg] [kohas]. Oodatud on kõik, kes soovivad mälestust jagada.“ Kõik näited on väljamõeldud."] },
+      { heading: "Enne avaldamist", paragraphs: ["Kontrolli nimed, kuupäevad ja kohad. Surmakuulutuse avaldamiseks kasuta Surmakuulutus.ee vormi: /lisa-kuulutus."] },
+    ],
+    links: [{ label: "Ava surmakuulutuse vorm", href: "/lisa-kuulutus" }],
     sources: [],
   },
   {
@@ -81,6 +95,12 @@ export const guides: Guide[] = [
     reviewed: "19.10.2026",
     paragraphs: ["Matusetoetuse tingimused võivad sõltuda kohaliku omavalitsuse korrast ja taotleja olukorrast. Kõige täpsema vastuse annab lahkunu või taotleja elukohajärgne omavalitsus.", "Enne taotluse esitamist kontrolli ametlikust allikast toetuse saajad, tähtajad, summa ja nõutavad dokumendid. Ära eelda, et ühe omavalitsuse kord kehtib kogu Eestis.", "Küsi alati, kas taotlus tuleb esitada enne kulu tegemist või pärast seda ning millisel kujul tuleb esitada surmatõend ja kuludokumendid."],
     points: ["Võta ühendust kohaliku omavalitsuse sotsiaalosakonnaga.", "Küsi toetuse saaja, summa ja tähtaja kohta.", "Kontrolli, milliseid dokumente ja arveid tuleb esitada.", "Hoia alles esitatud taotlus ja vastus."],
+    sections: [
+      { heading: "Mis toetus see on?", paragraphs: ["Matusetoetus on kohaliku omavalitsuse toetus, mille tingimused, summa, tähtajad ja taotleja võivad omavalitsuseti erineda. Seda ei tohi segi ajada toitjakaotustoetuse või toitjakaotuspensioniga."] },
+      { heading: "Kuhu pöörduda?", paragraphs: ["Alusta omavalitsusest, kelle korras on lahkunu või taotlejaga seotud tingimus. Kontrolli ametlikku veebilehte või helista omavalitsuse sotsiaalosakonda; ära eelda, et alati vastutab taotleja praegune elukoht."] },
+      { heading: "Taotlemine", paragraphs: ["Küsi enne esitamist, kas taotlus esitatakse veebis, teeninduses või e-posti teel. Valmista tavaliselt ette isikut tõendav dokument, surmatõend ja matuse kuludokumendid, kuid täpse loetelu annab toetust menetlev omavalitsus."] },
+      { heading: "Kui infot ei leia", paragraphs: ["Võta ühendust omavalitsuse sotsiaalosakonnaga ja palu kirjalikku juhist taotleja, tähtaja, dokumentide ja esitamise viisi kohta. Vajadusel küsi abi kohaliku omavalitsuse teenindusest või sotsiaaltöötajalt."] },
+    ],
     sources: [
       { label: "Tallinn: matusetoetus", url: "https://www.tallinn.ee/et/teenused/matusetoetus" },
       { label: "Tallinn: matusetoetuse taotlemine", url: "https://taotlen.tallinn.ee/matusetoetus" },
@@ -95,6 +115,12 @@ export const guides: Guide[] = [
     reviewed: "19.10.2026",
     paragraphs: ["Pärimismenetluse algatamiseks tuleb notaribürooga ühendust võtta ja aeg broneerida. Avalduse võib esitada ükskõik millisele notarile; kui keegi teine on menetluse juba algatanud, ei pea kaaspärija uut avaldust esitama.", "Pärandist loobumise avaldus tuleb Notarite Koja juhendi järgi esitada kolme kuu jooksul hetkest, kui pärija sai teada või pidi teada saama oma pärimisõigusest. Pärimise vastuvõtmise või loobumise otsus vajab hoolikat kaalumist, sest pärandiga võivad kaasneda kohustused.", "Kogu kokku testament, sugulust tõendavad dokumendid, vara puudutav info ja teadaolevad kohustused. Notar selgitab menetluse käiku, kontrollib pärimisregistri andmeid ning piisavalt tõendatud pärimisõiguse korral koostab pärimistunnistuse."],
     points: ["Võta ühendust notaribürooga ja broneeri aeg.", "Kontrolli pärimisregistrist, kas menetlus on juba algatatud.", "Esita vajadusel koduse testamendi originaal ja muud vajalikud dokumendid.", "Kui loobud pärandist, esita avaldus kolme kuu jooksul pärimisõigusest teada saamisest."],
+    sections: [
+      { heading: "Mis on pärand?", paragraphs: ["Pärandisse võivad kuuluda lahkunu vara, õigused ja kohustused. Pärijad võivad olla seaduse või testamendi alusel; konkreetse olukorra selgitab notar."] },
+      { heading: "Menetluse algatamine", paragraphs: ["Võta ühendust ükskõik millise notariga. Üldist tähtaega pärimismenetluse algatamiseks ei ole, kuid kiire pöördumine aitab välja selgitada pärijad, testamendi ja kohustused."] },
+      { heading: "Vastuvõtmine, loobumine ja inventuur", paragraphs: ["Pärandiga võivad kaasneda võlad. Küsi notarilt inventuuri kohta, kui vara ja kohustuste ulatus ei ole teada; notar selgitab, milline otsus sobib sinu olukorda.", "Pärandist loobumise avaldus tuleb üldjuhul esitada kolme kuu jooksul hetkest, mil pärija sai või pidi saama teada nii surmast kui oma pärimisõigusest. Tähtaja hindab notar konkreetsete asjaolude põhjal."] },
+      { heading: "Mida notarile kaasa võtta?", paragraphs: ["Võta kaasa isikut tõendav dokument, info sugulussuhte kohta, testament või koduse testamendi originaal ning teadaolev info vara ja kohustuste kohta. Õiguslikult siduva nõu annab notar, mitte käesolev üldjuhend."] },
+    ],
     sources: [
       { label: "Notarite Koda: pärimise protsess", url: "https://parimine.notar.ee/parimine/parimise-protsess/" },
     ],

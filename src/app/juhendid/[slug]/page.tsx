@@ -51,6 +51,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <ol>{guide.points.map((point) => <li key={point}>{point}</li>)}</ol>
           </>
         )}
+        {guide.links?.map((link) => <p key={link.href}><Link href={link.href}>{link.label}</Link></p>)}
         <p className="guide-reviewed">Viimati üle vaadatud: {guide.reviewed}</p>
         {guide.sources.length > 0 && (
           <footer className="guide-sources">
