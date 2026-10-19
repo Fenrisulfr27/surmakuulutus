@@ -5,6 +5,19 @@ export const languages = ["et", "en"] as const;
 export type Language = (typeof languages)[number];
 
 export const translations = {
+  "nav.guides": { et: "Juhendid", en: "Guides" },
+  "nav.language": { et: "Keel", en: "Language" },
+  "guides.eyebrow": { et: "TEAVE JA ABI", en: "INFORMATION AND HELP" },
+  "guides.intro": {
+    et: "Praktiline teave lähedase kaotuse järel vajalike toimingute kohta.",
+    en: "Practical information on the steps to take after losing a loved one.",
+  },
+  "guides.guide": { et: "JUHEND", en: "GUIDE" },
+  "guides.back": { et: "Tagasi juhendite juurde", en: "Back to guides" },
+  "guides.brief": { et: "Lühidalt", en: "In brief" },
+  "guides.steps": { et: "Sammud", en: "Steps" },
+  "guides.reviewed": { et: "Viimati üle vaadatud:", en: "Last reviewed:" },
+  "guides.sources": { et: "Allikad", en: "Sources" },
   "nav.home": {
     et: "Avaleht",
     en: "Home",

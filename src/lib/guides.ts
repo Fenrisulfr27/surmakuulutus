@@ -1,3 +1,6 @@
+import type { Language } from "../context/language";
+import { englishGuides, englishSourceLabels } from "./guides.en";
+
 export interface Guide {
   slug: string;
   title: string;
@@ -127,6 +130,18 @@ export const guides: Guide[] = [
   },
 ];
 
-export function getGuide(slug: string) {
-  return guides.find((guide) => guide.slug === slug);
+export function getGuides(language: Language = "et"): Guide[] {
+  if (language === "et") return guides;
+  return guides.map((guide) => ({
+    ...guide,
+    ...englishGuides[guide.slug as keyof typeof englishGuides],
+    sources: guide.sources.map((source) => ({
+      ...source,
+      label: englishSourceLabels[source.label],
+    })),
+  }));
+}
+
+export function getGuide(slug: string, language: Language = "et") {
+  return getGuides(language).find((guide) => guide.slug === slug);
 }

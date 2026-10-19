@@ -59,9 +59,9 @@ export function AppHeader() {
             size="compact-sm"
             className={pathname.startsWith("/juhendid") ? "nav-button-active" : undefined}
           >
-            Juhendid
+            {t("nav.guides")}
           </Button>
-          <div className="language-switch" aria-label="Language">
+          <div className="language-switch" aria-label={t("nav.language")}>
             <button
               type="button"
               className={language === "et" ? "language-switch-active" : undefined}
