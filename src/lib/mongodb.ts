@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { configureMongoDns } from "./mongoDns.mjs";
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -11,7 +12,7 @@ declare global {
   var mongooseCache: MongooseCache | undefined;
 }
 
-const cached = globalThis.mongooseCache ?? { conn: null, promise: null };
+const cached = globalThis.mongooseCache ??= { conn: null, promise: null };
 
 export async function connectToDatabase() {
   if (!MONGO_URI) {
@@ -23,7 +24,11 @@ export async function connectToDatabase() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI);
+    configureMongoDns();
+    cached.promise = mongoose.connect(MONGO_URI).catch((error: unknown) => {
+      cached.promise = null;
+      throw error;
+    });
   }
 
   cached.conn = await cached.promise;

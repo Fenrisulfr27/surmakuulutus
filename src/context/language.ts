@@ -5,7 +5,13 @@ export const languages = ["et", "en"] as const;
 export type Language = (typeof languages)[number];
 
 export const translations = {
+  "form.saveChanges": { et: "Salvesta muudatused", en: "Save changes" },
+  "form.submittedForReview": {
+    et: "Kuulutus on saadetud ülevaatamiseks. See avaldatakse pärast kinnitamist.",
+    en: "Your obituary has been submitted for review. It will be published after approval.",
+  },
   "nav.guides": { et: "Juhendid", en: "Guides" },
+  "nav.admin": { et: "Admin", en: "Admin" },
   "nav.language": { et: "Keel", en: "Language" },
   "guides.eyebrow": { et: "TEAVE JA ABI", en: "INFORMATION AND HELP" },
   "guides.intro": {

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { connectToDatabase } from "./mongodb";
 import type { AdFormValues } from "./adValidation";
+import { obituaryStatuses, positiveInteger, publishedAdFilter, type ObituaryStatus } from "./moderation";
 
 export interface Ad {
   _id?: string;
@@ -16,6 +17,9 @@ export interface Ad {
   aiGenerated?: boolean;
   aiGeneratedDate?: string;
   aiGenerationKey?: string;
+  status?: ObituaryStatus;
+  updatedAt?: string | Date;
+  deletedAt?: string | Date | null;
 }
 
 export type PublicAd = Omit<Ad, "email">;
@@ -70,12 +74,16 @@ const adSchema = new mongoose.Schema(
     aiGenerated: { type: Boolean, default: false, select: false },
     aiGeneratedDate: { type: String, select: false },
     aiGenerationKey: { type: String, select: false },
+    status: { type: String, enum: obituaryStatuses, default: "pending" },
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );
 
 adSchema.index({ createdAt: -1 });
 adSchema.index({ name: 1 });
+adSchema.index({ deletedAt: 1, status: 1, createdAt: -1, _id: -1 });
+adSchema.index({ deletedAt: 1, aiGenerated: 1, createdAt: -1, _id: -1 });
 adSchema.index(
   { aiGenerationKey: 1 },
   {
@@ -87,7 +95,7 @@ adSchema.index(
   },
 );
 
-const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
+export const AdModel = mongoose.models.Ad ?? mongoose.model("Ad", adSchema);
 let aiGenerationIndexReady: Promise<void> | null = null;
 
 function isMissingIndexError(error: unknown) {
@@ -169,13 +177,14 @@ function escapeRegExp(value: string) {
 export async function listAds(options: ListAdsOptions = {}): Promise<AdsPageData> {
   await connectToDatabase();
 
-  const page = Math.max(options.page ?? 1, 1);
-  const limit = Math.min(Math.max(options.limit ?? 6, 1), 50);
+  const page = positiveInteger(options.page, 1);
+  const limit = positiveInteger(options.limit, 6, 50);
   const search = options.search?.trim();
   const sortOrder = options.sort === "oldest" ? 1 : -1;
-  const filter = search
-    ? { name: { $regex: escapeRegExp(search), $options: "i" } }
-    : {};
+  const filter = {
+    ...publishedAdFilter,
+    ...(search ? { name: { $regex: escapeRegExp(search), $options: "i" } } : {}),
+  };
 
   const totalAds = await AdModel.countDocuments(filter);
   const totalPages = Math.ceil(totalAds / limit);
@@ -198,14 +207,14 @@ export async function listAds(options: ListAdsOptions = {}): Promise<AdsPageData
 
 export async function getAdBySlug(slug: string) {
   await connectToDatabase();
-  const ad = await AdModel.findOne({ slug }).select(publicAdProjection);
+  const ad = await AdModel.findOne({ ...publishedAdFilter, slug }).select(publicAdProjection);
   return ad ? toPublicAd(ad) : null;
 }
 
 export async function listAdSitemapEntries(): Promise<AdSitemapEntry[]> {
   await connectToDatabase();
 
-  const ads = await AdModel.find({}, { slug: 1, createdAt: 1 })
+  const ads = await AdModel.find(publishedAdFilter, { slug: 1, createdAt: 1 })
     .sort({ createdAt: -1, _id: -1 })
     .lean();
 
@@ -232,6 +241,7 @@ export async function createAd(payload: AdFormValues) {
   const ad = new AdModel({
     ...payload,
     slug,
+    status: "pending",
   });
 
   await ad.save();
@@ -283,6 +293,7 @@ export async function createAiGeneratedAd(
       ...payload,
       slug,
       aiGenerated: true,
+      status: "published",
       aiGeneratedDate: runDate,
       aiGenerationKey,
     });

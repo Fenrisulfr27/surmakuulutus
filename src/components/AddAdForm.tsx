@@ -44,6 +44,7 @@ interface AddAdFormProps {
   onChange: (values: AdFormValues) => void;
   values: AdFormValues;
   isSubmitting?: boolean;
+  editing?: boolean;
 }
 
 declare global {
@@ -70,11 +71,12 @@ export default function AddAdForm({
   values,
   onChange,
   isSubmitting = false,
+  editing = false,
 }: AddAdFormProps) {
   const { language, t } = useLanguage();
   const configuredTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
   const isDevelopment = process.env.NODE_ENV === "development";
-  const turnstileSiteKey = isDevelopment ? undefined : configuredTurnstileSiteKey;
+  const turnstileSiteKey = editing || isDevelopment ? undefined : configuredTurnstileSiteKey;
   const turnstileRef = React.useRef<HTMLDivElement>(null);
   const turnstileWidgetId = React.useRef<string | undefined>(undefined);
   const form = useForm({
@@ -112,6 +114,11 @@ export default function AddAdForm({
 
     const validation = validateAdForm(form.values, language);
     if (!validation.success) {
+      return;
+    }
+
+    if (editing) {
+      await onSubmit(validation.data);
       return;
     }
 
@@ -322,7 +329,7 @@ export default function AddAdForm({
         )}
 
         <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
-          {t("form.save")}
+          {t(editing ? "form.saveChanges" : "form.save")}
         </Button>
       </Stack>
     </form>

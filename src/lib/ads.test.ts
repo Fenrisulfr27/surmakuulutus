@@ -18,6 +18,8 @@ describe("toPublicAd", () => {
       createdAt: "2026-01-02T00:00:00.000Z",
       aiGenerated: true,
       aiGeneratedDate: "2026-10-11",
+      status: "pending",
+      deletedAt: "2026-10-28",
     });
 
     expect(publicAd).toEqual({

@@ -1,7 +1,6 @@
 "use client";
 
 import { Stack, Text } from "@mantine/core";
-import { useRouter } from "next/navigation";
 import AdCard from "../components/AdCard";
 import AddAdForm, { type AdSubmissionValues } from "../components/AddAdForm";
 import React from "react";
@@ -10,7 +9,7 @@ import { useLanguage } from "../context/language";
 
 export default function AddAdPage() {
   const { t } = useLanguage();
-  const router = useRouter();
+  const [submitted, setSubmitted] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const [adValues, setAdValues] = React.useState<AdFormValues>({
@@ -48,7 +47,7 @@ export default function AddAdPage() {
       }
 
       await res.json();
-      router.push("/");
+      setSubmitted(true);
     } catch (err) {
       console.error(err);
       alert(
@@ -69,7 +68,9 @@ export default function AddAdPage() {
         <Text className="create-page-intro">{t("form.pageIntro")}</Text>
       </div>
 
-      <div className="create-layout">
+      {submitted ? (
+        <Text role="status">{t("form.submittedForReview")}</Text>
+      ) : <div className="create-layout">
           <div className="create-panel">
             <AddAdForm
               values={adValues}
@@ -82,7 +83,7 @@ export default function AddAdPage() {
             <Text className="create-preview-title">{t("form.previewTitle")}</Text>
             <AdCard ad={adValues} />
           </Stack>
-      </div>
+      </div>}
     </section>
   );
 }

@@ -3,6 +3,7 @@
 import { Box, Button, Group, useMantineColorScheme } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "../context/language";
 import moonButton from "../assets/kuu_button.svg";
 import sunButton from "../assets/paike_button.svg";
@@ -11,6 +12,14 @@ export function AppHeader() {
   const { language, setLanguage, t } = useLanguage();
   const { toggleColorScheme } = useMantineColorScheme();
   const pathname = usePathname();
+  const { data: session } = useQuery<{ authenticated: boolean }>({
+    queryKey: ["admin-session", pathname],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/session", { cache: "no-store" });
+      return response.ok ? response.json() : { authenticated: false };
+    },
+    retry: false,
+  });
   const themeLabel = `${t("nav.darkMode")} / ${t("nav.lightMode")}`;
 
   return (
@@ -61,6 +70,17 @@ export function AppHeader() {
           >
             {t("nav.guides")}
           </Button>
+          {session?.authenticated && (
+            <Button
+              component={Link}
+              href="/admin"
+              prefetch={false}
+              size="compact-sm"
+              className={pathname.startsWith("/admin") ? "nav-button-active" : undefined}
+            >
+              {t("nav.admin")}
+            </Button>
+          )}
           <div className="language-switch" aria-label={t("nav.language")}>
             <button
               type="button"

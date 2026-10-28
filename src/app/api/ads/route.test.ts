@@ -61,6 +61,7 @@ describe("POST /api/ads", () => {
     const response = await POST(postRequest(validBody));
 
     expect(response.status).toBe(201);
+    expect(await response.json()).toEqual({ status: "pending" });
     expect(protectObituarySubmission).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({ name: "Mari Mets", email: "mari@example.com" }),

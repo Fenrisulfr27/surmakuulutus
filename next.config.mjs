@@ -1,13 +1,26 @@
+import { fileURLToPath } from "node:url";
+
 const isDevelopment = process.env.NODE_ENV === "development";
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  turbopack: { root: fileURLToPath(new URL(".", import.meta.url)) },
   async headers() {
+    const adminHeaders = ["/admin/:path*", "/api/admin/:path*"].map((source) => ({
+      source,
+      headers: [
+        { key: "Cache-Control", value: "private, no-store" },
+        { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        { key: "Referrer-Policy", value: "same-origin" },
+        { key: "X-Frame-Options", value: "DENY" },
+      ],
+    }));
     if (!isDevelopment) {
-      return [];
+      return adminHeaders;
     }
 
     return [
+      ...adminHeaders,
       {
         source: "/:path*",
         headers: [

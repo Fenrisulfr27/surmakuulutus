@@ -64,8 +64,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const ad = await createAd(parsed.data);
-    return NextResponse.json(ad, { status: 201 });
+    await createAd(parsed.data);
+    return NextResponse.json({ status: "pending" }, { status: 201 });
   } catch (error) {
     return publicErrorResponse(error, 400);
   }
