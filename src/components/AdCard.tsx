@@ -71,7 +71,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
                 fetchPriority="high"
               />
               <Text className="newspaper-poem" fs="italic" style={{ whiteSpace: "pre-wrap" }}>
-                {poem}
+                {poem.replace(/\\n/g, "\n")}
               </Text>
             </Group>
           )}
