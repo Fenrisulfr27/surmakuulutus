@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const createAd = vi.fn();
 const listAds = vi.fn();
@@ -50,6 +50,7 @@ function request(body: unknown, headers: HeadersInit) {
 }
 
 describe("POST /api/ads", () => {
+  afterEach(() => vi.unstubAllEnvs());
   beforeEach(() => {
     vi.clearAllMocks();
     createAd.mockResolvedValue({ name: "Mari Mets", slug: "mari-mets" });
@@ -61,7 +62,7 @@ describe("POST /api/ads", () => {
     const response = await POST(postRequest(validBody));
 
     expect(response.status).toBe(201);
-    expect(await response.json()).toEqual({ status: "pending" });
+    expect(await response.json()).toEqual({ status: "published" });
     expect(protectObituarySubmission).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({ name: "Mari Mets", email: "mari@example.com" }),
@@ -72,6 +73,7 @@ describe("POST /api/ads", () => {
         turnstileToken: expect.anything(),
         website: expect.anything(),
       }),
+      undefined,
     );
   });
 
@@ -85,6 +87,17 @@ describe("POST /api/ads", () => {
     expect(response.status).toBe(415);
     expect(protectObituarySubmission).not.toHaveBeenCalled();
     expect(createAd).not.toHaveBeenCalled();
+  });
+
+  it("stores only a trusted proxy IP, ignoring any IP supplied in form data", async () => {
+    vi.stubEnv("NETLIFY", "true");
+    const { POST } = await import("./route");
+    const incoming = postRequest({ ...validBody, submitterIp: "198.51.100.99", viewedBy: ["attacker"] });
+    incoming.headers.set("x-nf-client-connection-ip", "203.0.113.8");
+    incoming.headers.set("x-forwarded-for", "198.51.100.7");
+    expect((await POST(incoming)).status).toBe(201);
+    expect(createAd).toHaveBeenCalledWith(expect.not.objectContaining({ submitterIp: expect.anything() }), "203.0.113.8");
+    expect(createAd.mock.calls[0][0]).not.toHaveProperty("viewedBy");
   });
 
   it("rejects honeypot spam before saving", async () => {

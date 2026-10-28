@@ -932,6 +932,20 @@ a:hover {
   padding-block: 2rem;
 }
 
+.admin-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-page a:hover {
+  color: var(--paper-accent);
+}
+
+.admin-page a:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: 3px;
+}
+
 .admin-nav {
   display: flex;
   flex-wrap: wrap;
@@ -944,4 +958,45 @@ a:hover {
 
 .admin-login {
   max-width: 28rem;
+}
+
+.admin-unviewed {
+  border-inline-start: 3px solid var(--mantine-color-yellow-6);
+}
+
+.admin-unviewed td:first-child {
+  font-weight: 600;
+}
+
+.admin-new-label {
+  margin-inline-start: 0.5rem;
+  color: var(--paper-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.admin-delete {
+  color: var(--paper-muted);
+  background-color: transparent;
+}
+
+.admin-delete:hover {
+  color: var(--paper-ink);
+  background-color: var(--paper-sheet-soft);
+}
+
+.admin-contact {
+  overflow-wrap: anywhere;
+  max-width: 15rem;
+}
+
+.admin-actions {
+  min-width: 18rem;
+}
+
+.admin-review-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
 }

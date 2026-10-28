@@ -2,6 +2,8 @@ import crypto from "node:crypto";
 import mongoose from "mongoose";
 import { connectToDatabase } from "./mongodb";
 import type { AdFormValues } from "./adValidation";
+import { normalizeSubmitterIp } from "./submitterIp.mjs";
+import { isIpBanned } from "./ipBans";
 
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TURNSTILE_TEST_SECRET_KEY = "1x0000000000000000000000000000000AA";
@@ -18,6 +20,7 @@ export interface SubmissionSecurityFields {
 }
 
 type SecurityEvent =
+  | "ip_ban_rejected"
   | "origin_rejected"
   | "honeypot_rejected"
   | "rate_limit_rejected"
@@ -71,27 +74,10 @@ function hash(value: string) {
 }
 
 function getClientIpInfo(request: Request) {
-  const netlifyIp = request.headers.get("x-nf-client-connection-ip")?.trim();
-  const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const cloudflareIp = request.headers.get("cf-connecting-ip")?.trim();
-  const realIp = request.headers.get("x-real-ip")?.trim();
-  const selected =
-    netlifyIp ??
-    cloudflareIp ??
-    forwardedFor ??
-    realIp ??
-    "unknown";
-  const source = netlifyIp
-    ? "x-nf-client-connection-ip"
-    : cloudflareIp
-      ? "cf-connecting-ip"
-      : forwardedFor
-        ? "x-forwarded-for"
-        : realIp
-          ? "x-real-ip"
-          : "unknown";
-
-  return { selected, source };
+  // Netlify overwrites this header at its ingress. Direct/self-hosted requests are not trusted.
+  const trusted = process.env.NETLIFY === "true" || process.env.TRUST_NETLIFY_PROXY === "true";
+  const ip = trusted ? normalizeSubmitterIp(request.headers.get("x-nf-client-connection-ip") ?? "") : undefined;
+  return { selected: ip ?? "unknown", source: ip ? "x-nf-client-connection-ip" : "unknown" };
 }
 
 function logSecurityEvent(event: SecurityEvent, request: Request, details: Record<string, unknown> = {}) {
@@ -216,7 +202,7 @@ export async function verifyTurnstileToken(
     body: new URLSearchParams({
       secret,
       response: token,
-      remoteip: ip,
+      ...(ip !== "unknown" ? { remoteip: ip } : {}),
       idempotency_key: crypto.randomUUID(),
     }),
   });
@@ -356,6 +342,11 @@ export async function protectObituarySubmission(
       reason: "honeypot",
     });
     return { allowed: false as const, status: 400, message: "Server error" };
+  }
+
+  if (ip !== "unknown" && await isIpBanned(ip)) {
+    logSecurityEvent("ip_ban_rejected", request, { verificationResult: "not_checked", reason: "ip_banned" });
+    return { allowed: false as const, status: 403, message: "Submission not allowed" };
   }
 
   if (typeof fields.turnstileToken !== "string" || fields.turnstileToken.length === 0) {

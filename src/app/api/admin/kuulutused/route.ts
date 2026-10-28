@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    await authorizeAdmin(request);
-    return adminJson(await listAdminAds(new URL(request.url).searchParams));
+    const administrator = await authorizeAdmin(request);
+    return adminJson(await listAdminAds(new URL(request.url).searchParams, administrator.id));
   } catch (error) { return adminErrorResponse(error); }
 }

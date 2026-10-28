@@ -12,11 +12,11 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.sessionStorage.clear(
 
 describe("manual submission acknowledgment", () => {
   it.each([
-    ["et", "Kuulutus on saadetud ülevaatamiseks. See avaldatakse pärast kinnitamist."],
-    ["en", "Your obituary has been submitted for review. It will be published after approval."],
-  ])("explains review in %s and replaces the form after success", async (language, message) => {
+    ["et", "Kuulutus on avaldatud."],
+    ["en", "Your obituary has been published."],
+  ])("confirms publication in %s and replaces the form after success", async (language, message) => {
     window.sessionStorage.setItem("language", language);
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: "pending" }) }));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: "published" }) }));
     render(<MantineProvider><LanguageProvider><AddAdPage /></LanguageProvider></MantineProvider>);
     fireEvent.click(screen.getByRole("button", { name: "Submit test form" }));
     expect((await screen.findByRole("status")).textContent).toBe(message);

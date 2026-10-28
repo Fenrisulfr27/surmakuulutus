@@ -10,11 +10,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 const ad: AdminAd = {
   _id: "000000000000000000000001", name: "Mari Mets", email: "mari@example.test",
   topText: "Teatame kurbusega", bottomText: "Leinavad lähedased", poem: "",
-  status: "pending", version: 0,
+  status: "pending", version: 0, unviewed: true, trashed: false,
 };
 
 beforeEach(() => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ ...ad, version: 1, deletedAt: "2026-10-28" }) }));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ ...ad, version: 1, deletedAt: "2026-10-28", trashed: true }) }));
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 

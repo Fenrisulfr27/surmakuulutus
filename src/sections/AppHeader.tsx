@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "../context/language";
 import moonButton from "../assets/kuu_button.svg";
 import sunButton from "../assets/paike_button.svg";
+import { AdminLogout } from "../components/admin/AdminAuthForms";
 
 export function AppHeader() {
   const { language, setLanguage, t } = useLanguage();
@@ -71,6 +72,7 @@ export function AppHeader() {
             {t("nav.guides")}
           </Button>
           {session?.authenticated && (
+            <>
             <Button
               component={Link}
               href="/admin"
@@ -80,6 +82,8 @@ export function AppHeader() {
             >
               {t("nav.admin")}
             </Button>
+            <AdminLogout />
+            </>
           )}
           <div className="language-switch" aria-label={t("nav.language")}>
             <button

@@ -5,10 +5,14 @@ export const languages = ["et", "en"] as const;
 export type Language = (typeof languages)[number];
 
 export const translations = {
+  "form.ipPrivacy": {
+    et: "Rämpsposti vältimiseks säilitame saatja IP-aadressi tähtajatult. Seda näeb ainult administraator.",
+    en: "To prevent spam, we retain the submitter’s IP address without automatic expiry. Only the administrator can see it.",
+  },
   "form.saveChanges": { et: "Salvesta muudatused", en: "Save changes" },
-  "form.submittedForReview": {
-    et: "Kuulutus on saadetud ülevaatamiseks. See avaldatakse pärast kinnitamist.",
-    en: "Your obituary has been submitted for review. It will be published after approval.",
+  "form.published": {
+    et: "Kuulutus on avaldatud.",
+    en: "Your obituary has been published.",
   },
   "nav.guides": { et: "Juhendid", en: "Guides" },
   "nav.admin": { et: "Admin", en: "Admin" },

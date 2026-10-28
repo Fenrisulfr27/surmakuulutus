@@ -61,6 +61,6 @@ export function AdminLogout() {
     } catch { setError("Väljalogimine ebaõnnestus."); }
     finally { setBusy(false); }
   }
-  return <div><Button variant="subtle" onClick={logout} loading={busy}>Logi välja</Button>
+  return <div><Button size="compact-sm" onClick={logout} loading={busy}>Logi välja</Button>
     {error && <Text role="alert" c="red">{error}</Text>}</div>;
 }

@@ -1,19 +1,23 @@
-export const obituaryStatuses = ["pending", "published", "rejected", "archived"] as const;
-export type ObituaryStatus = (typeof obituaryStatuses)[number];
+export const obituaryStatuses = ["pending", "published", "rejected"] as const;
+// Read compatibility only: legacy archived records now belong to the trash bin.
+export type ObituaryStatus = (typeof obituaryStatuses)[number] | "archived";
 
 export const statusLabels: Record<ObituaryStatus, string> = {
   pending: "Ootel",
   published: "Avaldatud",
   rejected: "Tagasi lükatud",
-  archived: "Arhiveeritud",
+  archived: "Prügikast",
 };
 
 export const statusTransitions: Record<ObituaryStatus, readonly ObituaryStatus[]> = {
   pending: ["published", "rejected"],
-  published: ["archived"],
+  published: [],
   rejected: ["pending"],
-  archived: ["published", "pending"],
+  archived: [],
 };
+
+export const activeAdminAdFilter = { deletedAt: null, status: { $ne: "archived" } };
+export const trashAdFilter = { $or: [{ deletedAt: { $ne: null } }, { status: "archived" }] };
 
 // Missing status belongs only to records created before moderation was introduced.
 export const publishedAdFilter = {

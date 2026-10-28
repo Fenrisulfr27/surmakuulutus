@@ -220,6 +220,7 @@ export default function AddAdForm({
           onChange={(event) => setWebsite(event.currentTarget.value)}
         />
         <Text className="newspaper-form-note">{t("form.requiredNote")}</Text>
+        {!editing && <Text size="sm" c="dimmed">{t("form.ipPrivacy")}</Text>}
         <Textarea
           className="newspaper-input"
           label={renderLabel(

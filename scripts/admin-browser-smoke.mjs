@@ -66,7 +66,7 @@ try {
   await driver.get(`${baseURL}/admin/kuulutused?search=Browser&status=pending&source=manual&sort=oldest`);
   await driver.wait(until.elementLocated(By.css("table tbody tr")), 20_000);
   assert.equal((await driver.findElements(By.css("table tbody tr"))).length, 1);
-  await driver.findElement(By.linkText("Halda")).click();
+  await driver.findElement(By.linkText("Muuda")).click();
   await driver.wait(until.elementLocated(By.css(".newspaper-form")), 20_000);
   await (await button("Avalda")).click();
   await waitText("Muudatused salvestatud.");
@@ -76,17 +76,15 @@ try {
   assert.equal(await poem.getText(), "Esimene rida\nTeine rida");
   await driver.get(`${baseURL}/admin/kuulutused/${id}`);
   await driver.wait(until.elementLocated(By.css(".newspaper-form")), 20_000);
-  await (await button("Arhiveeri")).click();
-  await waitText("Muudatused salvestatud.");
-  assert.equal((await fetch(`${baseURL}/api/ads/browser-pending`)).status, 404);
   await (await button("Kustuta")).click();
   await driver.wait(until.elementLocated(By.css("[role=dialog]")), 5000);
   await (await button("Kinnita kustutamine")).click();
-  await driver.wait(until.elementLocated(By.xpath("//button[normalize-space(.)='Taasta arhiivi']")), 10_000);
-  await (await button("Taasta arhiivi")).click();
+  await driver.wait(until.elementLocated(By.xpath("//button[normalize-space(.)='Taasta ja avalda']")), 10_000);
+  assert.equal((await fetch(`${baseURL}/api/ads/browser-pending`)).status, 404);
+  await (await button("Taasta ja avalda")).click();
   await driver.wait(until.elementLocated(By.css(".newspaper-form")), 10_000);
+  assert.equal((await fetch(`${baseURL}/api/ads/browser-pending`)).status, 200);
   await driver.get(`${baseURL}/admin/logi`);
-  await waitText("archive");
   await waitText("delete");
   await waitText("restore");
   await driver.findElement(By.css(".theme-image-button")).click();
@@ -100,7 +98,7 @@ try {
   await driver.wait(until.elementLocated(By.css("input[name=password]")), 10_000);
   await (await button("EN")).click();
   await driver.wait(async () => await driver.findElement(By.css("html")).getAttribute("lang") === "en", 5000);
-  console.log("PASS isolated browser smoke: access, login, dashboard, combined filters, approval, public detail, poem breaks, archive, confirmed deletion, recovery, audit log, logout, language, theme, mobile overflow.");
+  console.log("PASS isolated browser smoke: access, login, dashboard, combined filters, approval, public detail, poem breaks, confirmed trash deletion, recovery, audit log, logout, language, theme, mobile overflow.");
 } catch (error) {
   console.error(error);
   console.error(serverOutput);

@@ -20,6 +20,9 @@ describe("toPublicAd", () => {
       aiGeneratedDate: "2026-10-11",
       status: "pending",
       deletedAt: "2026-10-28",
+      submitterIp: "203.0.113.10",
+      submitterIpExpiresAt: "2026-11-28",
+      viewedBy: ["private-admin-id"],
     });
 
     expect(publicAd).toEqual({
@@ -34,6 +37,9 @@ describe("toPublicAd", () => {
       createdAt: "2026-01-02T00:00:00.000Z",
     });
     expect(publicAd).not.toHaveProperty("email");
+    expect(publicAd).not.toHaveProperty("submitterIp");
+    expect(publicAd).not.toHaveProperty("submitterIpExpiresAt");
+    expect(publicAd).not.toHaveProperty("viewedBy");
     expect(publicAd).not.toHaveProperty("aiGenerated");
     expect(publicAd).not.toHaveProperty("aiGeneratedDate");
     expect(publicAd).not.toHaveProperty("adminNote");

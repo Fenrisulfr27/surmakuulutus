@@ -3,6 +3,7 @@ import { createAd, listAds } from "../../../lib/ads";
 import { validateAdForm } from "../../../lib/adValidation";
 import {
   getSecurityFields,
+  getClientIp,
   protectObituarySubmission,
   stripSecurityFields,
 } from "../../../lib/submissionSecurity";
@@ -64,8 +65,9 @@ export async function POST(request: Request) {
       );
     }
 
-    await createAd(parsed.data);
-    return NextResponse.json({ status: "pending" }, { status: 201 });
+    const ip = getClientIp(request);
+    await createAd(parsed.data, ip === "unknown" ? undefined : ip);
+    return NextResponse.json({ status: "published" }, { status: 201 });
   } catch (error) {
     return publicErrorResponse(error, 400);
   }

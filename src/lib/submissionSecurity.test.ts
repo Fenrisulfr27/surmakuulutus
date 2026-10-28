@@ -52,6 +52,7 @@ describe("isAllowedSubmissionOrigin", () => {
 
 describe("getClientIp", () => {
   it("prefers Netlify's client IP header over spoofable proxy-style headers", () => {
+    vi.stubEnv("NETLIFY", "true");
     const request = new Request("https://surmakuulutus.ee/api/ads", {
       headers: {
         "x-nf-client-connection-ip": "203.0.113.10",
@@ -64,17 +65,33 @@ describe("getClientIp", () => {
     expect(getClientIp(request)).toBe("203.0.113.10");
   });
 
-  it("falls back through proxy headers when Netlify's client IP header is unavailable", () => {
+  it("ignores arbitrary proxy headers when Netlify's trusted IP header is unavailable", () => {
+    vi.stubEnv("NETLIFY", "true");
     expect(getClientIp(
       new Request("https://surmakuulutus.ee/api/ads", {
         headers: { "cf-connecting-ip": "198.51.100.20" },
       }),
-    )).toBe("198.51.100.20");
+    )).toBe("unknown");
     expect(getClientIp(
       new Request("https://surmakuulutus.ee/api/ads", {
         headers: { "x-forwarded-for": "198.51.100.30, 198.51.100.31" },
       }),
-    )).toBe("198.51.100.30");
+    )).toBe("unknown");
+  });
+
+  it("ignores even Netlify-style headers without a trusted Netlify deployment", () => {
+    vi.stubEnv("NETLIFY", "");
+    vi.stubEnv("TRUST_NETLIFY_PROXY", "");
+    expect(getClientIp(new Request("https://example.test", {
+      headers: { "x-nf-client-connection-ip": "203.0.113.10" },
+    }))).toBe("unknown");
+  });
+
+  it.each(["not-an-ip", "203.0.113.1, 198.51.100.1", "fe80::1%eth0"])("rejects malformed trusted IP headers (%s)", (ip) => {
+    vi.stubEnv("NETLIFY", "true");
+    expect(getClientIp(new Request("https://example.test", {
+      headers: { "x-nf-client-connection-ip": ip },
+    }))).toBe("unknown");
   });
 });
 

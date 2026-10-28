@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { connectToDatabase } from "./mongodb";
 import type { AdFormValues } from "./adValidation";
 import { obituaryStatuses, positiveInteger, publishedAdFilter, type ObituaryStatus } from "./moderation";
+import { normalizeSubmitterIp } from "./submitterIp.mjs";
 
 export interface Ad {
   _id?: string;
@@ -20,9 +21,13 @@ export interface Ad {
   status?: ObituaryStatus;
   updatedAt?: string | Date;
   deletedAt?: string | Date | null;
+  viewedBy?: string[];
+  submitterIp?: string;
+  /** Legacy metadata; ignored, private, and no longer written. */
+  submitterIpExpiresAt?: string | Date;
 }
 
-export type PublicAd = Omit<Ad, "email">;
+export type PublicAd = Omit<Ad, "email" | "viewedBy" | "submitterIp" | "submitterIpExpiresAt">;
 
 type PublicAdField = keyof PublicAd;
 
@@ -74,8 +79,10 @@ const adSchema = new mongoose.Schema(
     aiGenerated: { type: Boolean, default: false, select: false },
     aiGeneratedDate: { type: String, select: false },
     aiGenerationKey: { type: String, select: false },
-    status: { type: String, enum: obituaryStatuses, default: "pending" },
+    status: { type: String, enum: [...obituaryStatuses, "archived"], default: "published" },
     deletedAt: { type: Date, default: null },
+    viewedBy: { type: [String], default: [], select: false },
+    submitterIp: { type: String, select: false },
   },
   { timestamps: true },
 );
@@ -84,6 +91,7 @@ adSchema.index({ createdAt: -1 });
 adSchema.index({ name: 1 });
 adSchema.index({ deletedAt: 1, status: 1, createdAt: -1, _id: -1 });
 adSchema.index({ deletedAt: 1, aiGenerated: 1, createdAt: -1, _id: -1 });
+adSchema.index({ submitterIp: 1 });
 adSchema.index(
   { aiGenerationKey: 1 },
   {
@@ -226,7 +234,7 @@ export async function listAdSitemapEntries(): Promise<AdSitemapEntry[]> {
     }));
 }
 
-export async function createAd(payload: AdFormValues) {
+export async function createAd(payload: AdFormValues, submitterIp?: string) {
   await connectToDatabase();
 
   const baseSlug = slugify(payload.name) || "kuulutus";
@@ -238,10 +246,14 @@ export async function createAd(payload: AdFormValues) {
     slug = `${baseSlug}-${counter}`;
   }
 
+  const normalizedIp = submitterIp ? normalizeSubmitterIp(submitterIp) : undefined;
   const ad = new AdModel({
     ...payload,
     slug,
-    status: "pending",
+    status: "published",
+    ...(normalizedIp ? {
+      submitterIp: normalizedIp,
+    } : {}),
   });
 
   await ad.save();

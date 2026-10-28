@@ -7,8 +7,8 @@ type Context = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: Context) {
   try {
-    await authorizeAdmin(request);
-    const ad = await getAdminAd((await params).id);
+    const administrator = await authorizeAdmin(request);
+    const ad = await getAdminAd((await params).id, administrator.id);
     return ad ? adminJson(ad) : adminJson({ error: "Kuulutust ei leitud" }, 404);
   } catch (error) { return adminErrorResponse(error); }
 }

@@ -64,7 +64,7 @@ editing, moderation, recoverable deletion, and a paginated activity log. The int
 Mantine theme and typography. Search, status, source, sort, and deleted-record filters stay in the URL.
 
 New manual submissions pass the existing validation, Turnstile, origin, honeypot, token-reuse,
-rate-limit, and duplicate checks, then enter `pending`. The form acknowledges review in Estonian or English.
+rate-limit, duplicate, and IP-ban checks, then enter `published` automatically. The form confirms publication in Estonian or English.
 AI submissions continue to publish automatically with `aiGenerated: true`; their schedule and endpoint secret are unchanged.
 Only published, non-deleted records are returned by public listings, detail lookups, APIs, and the sitemap.
 Legacy records with **no status field** remain public until migrated. Explicit statuses are never inferred from payment data.
@@ -126,16 +126,18 @@ and creates the moderation indexes. It preserves contents, assigned statuses, AI
 It is safe to repeat. No migration or production operation runs automatically during installation, build, or tests.
 Public visibility already handles missing statuses, so migration can follow deployment without hiding legacy posts.
 
-The `Ad` schema adds `status` (`pending | published | rejected | archived`, default `pending`) and nullable
+The `Ad` schema adds `status` (`pending | published | rejected`, default `published`) and nullable
 `deletedAt`. AI creation explicitly assigns `published`. Indexes support status/source plus creation ordering.
 Search escapes regular-expression metacharacters; substring name search can still scan matching database records.
 Admin edits allow only existing validated form fields and preserve slug, source, status, and creation time.
 The existing `__v` field protects against stale or concurrent mutations. Dates can be cleared intentionally.
 
 Transitions are centralized in `src/lib/moderation.ts` and applied in `src/lib/adminAds.ts`:
-pending may be published/rejected; published may be archived; rejected may return to pending;
-archived may return to pending or published. Deletion records `deletedAt` without removing data.
-The deleted-record filter offers restoration into `archived`, requiring an explicit later publication action.
+pending may be published/rejected; rejected may return to pending. Deletion records `deletedAt` without removing data.
+The `Prügikast` navigation link and view filter list recoverable deleted records. Restoration clears `deletedAt`
+and sets `published`, making the restored obituary public immediately. Archive actions and new archive status
+assignments are disabled. Legacy `archived` records remain readable solely for compatibility and appear in the
+trash bin, where they can be explicitly restored and published without a database migration or data loss.
 Editing never implies approval. Publication status remains independent of future payment eligibility;
 future verification belongs before the centralized publication transition. No payment features are included.
 
@@ -172,6 +174,59 @@ delete confirmation, and translated submission acknowledgment.
 Next.js and Zod were patched within their existing release lines for reported security advisories.
 Compatible lockfile updates also patch `source-map-js`, `baseline-browser-mapping`, and `yaml`.
 Development-tool dependency audit findings remain; review `npm audit` separately before production rollout.
+
+#### Faster moderation and submitter privacy
+
+The dashboard shows eight recent activity entries and prioritizes pending submissions, then unviewed
+submissions, then creation time. Links open pending and unviewed queues immediately. The administrative
+navigation shows the current pending count; the separate full activity log remains available.
+
+Each obituary keeps a private `viewedBy` array of administrator IDs. `UUS` indicates it has not been opened
+by the signed-in administrator. Lists, filters, API reads and Next.js link prefetch do not mark it viewed.
+The detail screen makes an authorized, same-origin POST after mounting. That update is idempotent and
+does not change the obituary's content version or modification timestamp. Existing records with no view
+history are unviewed; no historical views or submitter IPs are invented. No data migration is needed.
+
+The management table displays sender email and retained IP, supports an exact-IP filter and an unviewed
+filter alongside existing filters, and offers publish/reject/edit/confirmed soft-delete actions. Birth and
+death years remain on the detail screen. Quick actions share the existing version checks, audit transaction,
+error handling and recoverable deletion behavior with the editor. The table scrolls within its container on mobile.
+
+**Netlify setup:** set `TRUST_NETLIFY_PROXY=true` in the Production **Functions** environment, then redeploy.
+It is not a secret. It is unnecessary if Netlify already provides `NETLIFY=true` at runtime. Enable this
+setting only when Netlify's ingress is the sole public entry point; never expose the underlying Next.js
+server directly with this setting. Only Netlify's overwritten `x-nf-client-connection-ip` header is accepted.
+IP values must validate as one IPv4 or IPv6 address and IPv6 values are normalized. `x-forwarded-for`,
+`cf-connecting-ip`, `x-real-ip`, and form-supplied IPs are ignored. Without a trusted header no raw IP is
+stored; the existing security mechanisms use the shared `unknown` bucket, never an attacker-chosen address.
+Existing security logs still contain only hashed IPs, and rate limits, Turnstile, token reuse, and duplicate
+protections remain active. Turnstile's optional remote IP parameter is omitted when no trusted address is known.
+
+Manual submissions store a private `submitterIp` field on the obituary.
+It is hidden by default in Mongoose, excluded from all public serializers/projections and available only
+through authorized, uncached administrative reads. Admin pages use `Referrer-Policy: no-referrer` so IP filters
+are not forwarded in referrer headers. IPs do not appear in activity logs. The public form explains retention
+in Estonian and English. Stored email addresses and IPs must stay out of analytics and exported public data.
+
+Raw IPs have **no automatic expiry**. The previous expiry field is no longer written or enforced, and the
+scheduled IP cleanup function has been removed. Redeploy to remove any previously deployed cleanup schedule.
+Existing retained IPs remain available regardless of old expiry metadata; previously purged IPs cannot be recovered.
+The form notice reflects indefinite retention. Never add a TTL index to the obituary collection: it would delete whole obituaries.
+
+`/admin/ip-keelud` lists active bans with exact-IP search and server-side pagination. Administrators can add
+an IP manually, ban a submitter from the obituary table/detail screen, or reverse a ban. Bans have no expiry
+and apply to future manual submissions, leaving existing obituaries and AI generation untouched. Only a
+validated address from the trusted Netlify header is checked; unknown or forged IP headers are not used.
+The ban check precedes Turnstile; all other existing protections still apply after an unban.
+
+The private `ip_bans` collection stores a unique normalized IP, its `blocked` state, and timestamps. Unbanning
+keeps an inactive record for audit identity. Ban/unban writes and their audit entries commit in one transaction;
+activity logs store the ban record's ID rather than the raw IP. All ban pages/APIs require the existing admin
+session, mutation Origin checks, validation, and private/no-store responses. No public API exposes ban data.
+
+New IP indexes support exact-IP filtering. Mongoose creates them on connection under
+the existing index permissions. The only new deployment setting is `TRUST_NETLIFY_PROXY`; no new dependency,
+payment feature, public account, or change to the AI schedule is included.
 
 Files created: the admin page/API/component directories and their tests; the six supporting library files above;
 `src/lib/admin.integration.test.ts`; `src/views/AddAdPage.test.tsx`; `.env.example`; and the three admin scripts

@@ -69,7 +69,7 @@ export default function AddAdPage() {
       </div>
 
       {submitted ? (
-        <Text role="status">{t("form.submittedForReview")}</Text>
+        <Text role="status">{t("form.published")}</Text>
       ) : <div className="create-layout">
           <div className="create-panel">
             <AddAdForm
