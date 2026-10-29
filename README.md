@@ -59,6 +59,52 @@ Leave it unset on hosts with working DNS. Failed connection attempts are cleared
 
 ### Administration and moderation
 
+#### Import from Surmakuulutused.ee
+
+`POST /api/import-obituaries` imports the public text archive at
+`https://www.surmakuulutused.ee/kuulutused/`. The current archive includes all notices in one HTML response;
+each run makes one upstream request. Names, dates, poems, introductory text and mourners are imported as
+plain text, preserving line breaks. Photos and decorative frames are not imported. Each run publishes
+at most one previously unimported notice, preferring the newest notice in the source archive. If there
+are no new notices, the next unpublished older notice is selected. If all notices have already been
+imported, nothing is published. The original URL is retained privately for duplicate detection and
+administration; it is excluded from public pages and APIs. Imported records have a separate source filter in `/admin`.
+No submitter email or IP is collected or invented. Imported texts retain their original length (up to
+10,000 characters per field); the manual submission form keeps its existing limits.
+
+Set a new random `OBITUARY_IMPORT_SECRET` in the hosting environment, then deploy. Keep it separate from
+the AI endpoint secret. To check the source without writing to MongoDB, call from a trusted terminal:
+
+```bash
+curl --fail --request POST \
+  --header "Authorization: Bearer $OBITUARY_IMPORT_SECRET" \
+  "$SITE_URL/api/import-obituaries?dryRun=true"
+```
+
+Set `SITE_URL` to your site's origin. To publish the imported notices, remove `?dryRun=true`.
+Preview returns `found` and `invalid` counts; publication returns `created`, `existing`, `remaining` and `invalid`.
+HTTP 207 indicates some source cards were invalid and skipped. An empty/unrecognizable archive fails
+without writing; upstream and database failures return a generic 502. Duplicate detection makes retrying
+the same notice safe. Requests have a 25-second upstream timeout, an 8 MiB
+response limit, and do not follow upstream redirects.
+
+The GitHub Actions workflow `.github/workflows/import-obituaries.yml` runs every 12 hours at **05:30 and 17:30 UTC**
+(07:30 and 19:30 Estonian winter time, 08:30 and 20:30 summer time). Configure repository variable `SITE_URL` and repository
+secret `OBITUARY_IMPORT_SECRET` with the same value as hosting. Manual workflow runs default to preview;
+turn off `dry_run` to publish. The workflow fails if any source cards were invalid. No import runs during
+installation, build or tests. Deployment and secret configuration are required to activate the schedule.
+
+A unique partial MongoDB index on `sourceUrl` prevents duplicates, including concurrent runs. The database
+account needs index-creation permission. Existing databases need no data migration. Repeat imports only
+insert missing source URLs: they never overwrite edits, change timestamps, republish rejected notices or
+restore deleted notices. Separate source URLs remain separate notices even when the deceased's name matches.
+Original source edits and removals are not synchronized. Creation time records the import time. Scheduling
+controls the 12-hour interval; an explicit manual publication run can publish an additional notice.
+
+Verification uses an isolated test MongoDB instance. To additionally check a previously downloaded live
+archive, set `IMPORT_LIVE_HTML` to its absolute HTML path and run
+`npx vitest run src/lib/obituaryImport.test.ts` (the live-HTML assertion is otherwise skipped).
+
 `/admin` provides a single-administrator login, statistics, recent submissions, a paginated obituary table,
 editing, moderation, recoverable deletion, and a paginated activity log. The interface uses the existing
 Mantine theme and typography. Search, status, source, sort, and deleted-record filters stay in the URL.

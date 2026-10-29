@@ -88,6 +88,26 @@ afterAll(async () => {
 }, 30_000);
 
 describe("administrator authentication", () => {
+  it("keeps imported records editable without inventing an email or truncating text", async () => {
+    const sourceUrl = "https://www.surmakuulutused.ee/kuulutused/mari-mets/";
+    const poem = "Pikem luuletus. ".repeat(40);
+    const record = await ads.AdModel.create({ name: "Mari Mets", sourceUrl, slug: "imported-mari", poem,
+      topText: "", bottomText: "", status: "published" });
+    const edited = await management.mutateAdminAd(String(record._id), {
+      action: "edit", version: 0, values: { name: "Mari Kask", email: "", poem, topText: "", bottomText: "" },
+    }, "test-admin");
+    expect(edited.name).toBe("Mari Kask");
+    expect(edited.poem).toBe(poem);
+    expect(edited.sourceUrl).toBe(sourceUrl);
+    expect(edited.email).toBe("");
+    const imported = await listAdminAds(new URLSearchParams("source=imported"));
+    expect(imported.total).toBe(1);
+    expect((await listAdminAds(new URLSearchParams("source=manual"))).total).toBe(0);
+    expect(() => management.parseAdminCommand({ action: "edit", version: 0,
+      values: { name: "Mari Kask", email: "", poem, topText: "", bottomText: "" },
+    })).toThrow();
+  });
+
   it("rejects anonymous APIs and all unauthorized changes", async () => {
     expect((await listRoute.GET(request("/api/admin/kuulutused"))).status).toBe(401);
     expect((await itemRoute.GET(request("/api/admin/kuulutused/invalid"), { params: Promise.resolve({ id: "invalid" }) })).status).toBe(401);

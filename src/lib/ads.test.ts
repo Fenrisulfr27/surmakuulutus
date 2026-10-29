@@ -8,6 +8,7 @@ describe("toPublicAd", () => {
       name: "Mari Mets",
       slug: "mari-mets",
       email: "mari@example.com",
+      sourceUrl: "https://www.surmakuulutused.ee/kuulutused/mari-mets/",
       adminNote: "private",
       managementToken: "secret",
       birthYear: "1930-01-01",
@@ -37,6 +38,7 @@ describe("toPublicAd", () => {
       createdAt: "2026-01-02T00:00:00.000Z",
     });
     expect(publicAd).not.toHaveProperty("email");
+    expect(publicAd).not.toHaveProperty("sourceUrl");
     expect(publicAd).not.toHaveProperty("submitterIp");
     expect(publicAd).not.toHaveProperty("submitterIpExpiresAt");
     expect(publicAd).not.toHaveProperty("viewedBy");

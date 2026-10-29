@@ -45,6 +45,7 @@ interface AddAdFormProps {
   values: AdFormValues;
   isSubmitting?: boolean;
   editing?: boolean;
+  imported?: boolean;
 }
 
 declare global {
@@ -72,8 +73,10 @@ export default function AddAdForm({
   onChange,
   isSubmitting = false,
   editing = false,
+  imported = false,
 }: AddAdFormProps) {
   const { language, t } = useLanguage();
+  const limits = editing && imported ? { poem: 10000, topText: 10000, bottomText: 10000 } : LIMITS;
   const configuredTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
   const isDevelopment = process.env.NODE_ENV === "development";
   const turnstileSiteKey = editing || isDevelopment ? undefined : configuredTurnstileSiteKey;
@@ -90,7 +93,7 @@ export default function AddAdForm({
   const [website, setWebsite] = React.useState("");
 
   const getFieldErrors = (currentValues: AdFormValues): AdFieldErrors => {
-    const validation = validateAdForm(currentValues, language);
+    const validation = validateAdForm(currentValues, language, editing && imported);
 
     return validation.success ? {} : validation.fieldErrors;
   };
@@ -112,7 +115,7 @@ export default function AddAdForm({
     event.preventDefault();
     setSubmitAttempted(true);
 
-    const validation = validateAdForm(form.values, language);
+    const validation = validateAdForm(form.values, language, editing && imported);
     if (!validation.success) {
       return;
     }
@@ -226,11 +229,11 @@ export default function AddAdForm({
           label={renderLabel(
             t("form.topText"),
             form.values.topText,
-            LIMITS.topText,
+            limits.topText,
           )}
           size="lg"
-          maxLength={LIMITS.topText}
-          withAsterisk
+          maxLength={limits.topText}
+          withAsterisk={!(editing && imported)}
           styles={requiredLabelStyles}
           autosize
           minRows={2}
@@ -282,11 +285,11 @@ export default function AddAdForm({
           label={renderLabel(
             `${t("form.poem")} `,
             form.values.poem,
-            LIMITS.poem,
+            limits.poem,
           )}
           placeholder={t("form.poemPlaceholder")}
           size="lg"
-          maxLength={LIMITS.poem}
+          maxLength={limits.poem}
           autosize
           minRows={4}
           {...form.getInputProps("poem")}
@@ -297,10 +300,10 @@ export default function AddAdForm({
           label={renderLabel(
             t("form.mourners"),
             form.values.bottomText,
-            LIMITS.bottomText,
+            limits.bottomText,
           )}
-          maxLength={LIMITS.bottomText}
-          withAsterisk
+          maxLength={limits.bottomText}
+          withAsterisk={!(editing && imported)}
           styles={requiredLabelStyles}
           placeholder={t("form.mournersPlaceholder")}
           autosize
@@ -313,7 +316,7 @@ export default function AddAdForm({
           placeholder={t("form.emailPlaceholder")}
           size="lg"
           label={t("form.email")}
-          withAsterisk
+          withAsterisk={!(editing && imported)}
           {...form.getInputProps("email")}
           error={fieldErrors.email}
         />

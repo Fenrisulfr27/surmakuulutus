@@ -10,6 +10,7 @@ export interface Ad {
   slug?: string;
   name: string;
   email: string;
+  sourceUrl?: string;
   birthYear?: string | Date | null;
   deathYear?: string | Date | null;
   bottomText?: string;
@@ -27,7 +28,7 @@ export interface Ad {
   submitterIpExpiresAt?: string | Date;
 }
 
-export type PublicAd = Omit<Ad, "email" | "viewedBy" | "submitterIp" | "submitterIpExpiresAt">;
+export type PublicAd = Omit<Ad, "email" | "sourceUrl" | "viewedBy" | "submitterIp" | "submitterIpExpiresAt">;
 
 type PublicAdField = keyof PublicAd;
 
@@ -70,7 +71,10 @@ const adSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, unique: true },
-    email: { type: String, required: true, select: false },
+    email: { type: String, required: function (this: { sourceUrl?: string } | mongoose.Query<unknown, unknown>): boolean {
+      return !(this instanceof mongoose.Query ? this.get("sourceUrl") ?? this.getFilter().sourceUrl : this.sourceUrl);
+    }, default: "", select: false },
+    sourceUrl: String,
     birthYear: String,
     deathYear: String,
     poem: String,
@@ -92,6 +96,7 @@ adSchema.index({ name: 1 });
 adSchema.index({ deletedAt: 1, status: 1, createdAt: -1, _id: -1 });
 adSchema.index({ deletedAt: 1, aiGenerated: 1, createdAt: -1, _id: -1 });
 adSchema.index({ submitterIp: 1 });
+adSchema.index({ sourceUrl: 1 }, { unique: true, partialFilterExpression: { sourceUrl: { $type: "string" } } });
 adSchema.index(
   { aiGenerationKey: 1 },
   {

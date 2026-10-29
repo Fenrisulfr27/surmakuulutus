@@ -45,7 +45,7 @@ const optionalDateLike = z.preprocess(
   z.union([z.string(), z.date()]).optional(),
 );
 
-export function createAdFormSchema(language: Language = "et") {
+export function createAdFormSchema(language: Language = "et", imported = false) {
   const messages = validationMessages[language];
 
   return z
@@ -55,26 +55,26 @@ export function createAdFormSchema(language: Language = "et") {
       .trim()
       .min(1, messages.nameRequired)
       .max(100, messages.nameMax),
-    email: z
+    email: imported ? z.union([z.literal(""), z.email().max(254)]).default("") : z
       .string()
       .trim()
       .email(messages.emailInvalid)
       .max(254, messages.emailMax),
     poem: z
       .string()
-      .max(300, messages.poemMax)
+      .max(imported ? 10000 : 300, messages.poemMax)
       .default(""),
     topText: z
       .string()
       .trim()
-      .min(1, messages.topTextRequired)
-      .max(100, messages.topTextMax)
+      .min(imported ? 0 : 1, messages.topTextRequired)
+      .max(imported ? 10000 : 100, messages.topTextMax)
       .default(""),
     bottomText: z
       .string()
       .trim()
-      .min(1, messages.bottomTextRequired)
-      .max(100, messages.bottomTextMax)
+      .min(imported ? 0 : 1, messages.bottomTextRequired)
+      .max(imported ? 10000 : 100, messages.bottomTextMax)
       .default(""),
     birthYear: optionalDateLike,
     deathYear: optionalDateLike,
@@ -125,8 +125,8 @@ export type AdFormValues = z.infer<typeof adFormSchema>;
 
 export type AdFieldErrors = Partial<Record<keyof AdFormValues, string>>;
 
-export function validateAdForm(values: unknown, language: Language = "et") {
-  const result = createAdFormSchema(language).safeParse(values);
+export function validateAdForm(values: unknown, language: Language = "et", imported = false) {
+  const result = createAdFormSchema(language, imported).safeParse(values);
 
   if (result.success) {
     return { success: true as const, data: result.data };

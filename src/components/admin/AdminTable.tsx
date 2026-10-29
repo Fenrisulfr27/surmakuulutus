@@ -64,7 +64,7 @@ export function AdminFilters({ query }: { query: string }) {
       <Select label="Olek" name="status" value={params.get("status") ?? ""} onChange={(value) => change("status", value)}
         data={[{ value: "", label: "Kõik olekud" }, ...obituaryStatuses.map((value) => ({ value, label: statusLabels[value] }))]} />
       <Select label="Allikas" name="source" value={params.get("source") ?? ""} onChange={(value) => change("source", value)}
-        data={[{ value: "", label: "Kõik" }, { value: "manual", label: "Käsitsi" }, { value: "ai", label: "AI" }]} />
+        data={[{ value: "", label: "Kõik" }, { value: "manual", label: "Käsitsi" }, { value: "ai", label: "AI" }, { value: "imported", label: "Surmakuulutused.ee" }]} />
       <Select label="Järjestus" name="sort" value={params.get("sort") === "oldest" ? "oldest" : "newest"}
         onChange={(value) => change("sort", value)}
         data={[{ value: "newest", label: "Uuemad enne" }, { value: "oldest", label: "Vanemad enne" }]} />
@@ -84,13 +84,13 @@ function AdminRow({ ad }: { ad: AdminAd }) {
   return <Table.Tr className={ad.unviewed ? "admin-unviewed" : undefined}>
     <Table.Td><Link href={`/admin/kuulutused/${ad._id}`} prefetch={false}>{current.name}</Link>
       {ad.unviewed && <span className="admin-new-label">UUS!</span>}</Table.Td>
-    <Table.Td className="admin-contact">{current.email}</Table.Td>
+    <Table.Td className="admin-contact">{current.email || "—"}</Table.Td>
     <Table.Td>{current.submitterIp ? <Link prefetch={false}
       href={`/admin/kuulutused?${new URLSearchParams({ ip: current.submitterIp })}`}>{current.submitterIp}</Link> : "—"}
       {current.submitterIp && <AdminIpBanButton ip={current.submitterIp} blocked={ad.ipBlocked} />}</Table.Td>
     <Table.Td>{adminDate(current.createdAt)}</Table.Td>
     <Table.Td>{current.trashed ? "Prügikast" : statusLabels[current.status]}</Table.Td>
-    <Table.Td>{current.aiGenerated ? "AI" : "Käsitsi"}</Table.Td>
+    <Table.Td>{current.sourceUrl ? "Surmakuulutused.ee" : current.aiGenerated ? "AI" : "Käsitsi"}</Table.Td>
     <Table.Td className="admin-actions"><AdminAdActions ad={current} busy={busy} mutate={mutate} editingLink />
       {message && <Text role="status" size="sm">{message}</Text>}
       {error && <Text role="alert" c="red" size="sm">{error}</Text>}</Table.Td>

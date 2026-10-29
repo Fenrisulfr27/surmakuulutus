@@ -37,7 +37,7 @@ export function adminListOptions(params: URLSearchParams) {
     page: positiveInteger(params.get("page"), 1),
     search: (params.get("search") ?? "").trim().slice(0, 100),
     status: obituaryStatuses.find((value) => value === status),
-    source: params.get("source") === "ai" ? "ai" : params.get("source") === "manual" ? "manual" : undefined,
+    source: ["ai", "manual", "imported"].includes(params.get("source") ?? "") ? params.get("source") : undefined,
     sort: params.get("sort") === "oldest" ? "oldest" : "newest",
     deleted: params.get("deleted") === "true",
     unviewed: params.get("unviewed") === "true",
@@ -50,7 +50,7 @@ export function adminAdFilter(options: ReturnType<typeof adminListOptions>, admi
     ...(options.status === "published" ? {
       $or: [{ status: "published" }, { status: { $exists: false } }],
     } : options.status ? { status: options.status } : {}),
-    ...(options.source === "ai" ? { aiGenerated: true } : options.source === "manual" ? { aiGenerated: { $ne: true } } : {}),
+    ...(options.source === "ai" ? { aiGenerated: true } : options.source === "manual" ? { aiGenerated: { $ne: true }, sourceUrl: { $exists: false } } : options.source === "imported" ? { sourceUrl: { $type: "string" } } : {}),
     ...(options.search ? { name: { $regex: options.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } } : {}),
     ...(options.unviewed ? { viewedBy: { $ne: administrator } } : {}),
     ...(options.ip ? { submitterIp: normalizeSubmitterIp(options.ip) ?? "invalid" } : {}),
@@ -126,12 +126,12 @@ const commandSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("restore"), version: z.number().int().nonnegative() }).strict(),
 ]);
 
-export function parseAdminCommand(body: unknown) {
+export function parseAdminCommand(body: unknown, imported = false) {
   const parsed = commandSchema.safeParse(body);
   if (!parsed.success) throw new AdminError("Vigane toiming", 400);
   const command = parsed.data;
   if (command.action === "edit") {
-    const values = validateAdForm(command.values);
+    const values = validateAdForm(command.values, "et", imported);
     if (!values.success) throw new AdminError(values.errorMessage, 400);
     return { ...command, values: values.data };
   }
@@ -143,17 +143,21 @@ export async function mutateAdminAd(id: string, body: unknown, administrator: st
   await connectToDatabase();
   let action = "invalid_command";
   try {
-    const command = parseAdminCommand(body);
-    action = command.action;
+    const parsed = commandSchema.safeParse(body);
+    if (!parsed.success) throw new AdminError("Vigane toiming", 400);
+    action = parsed.data.action;
     const updatedAd = await mongoose.connection.transaction(async (session) => {
       const ad = await AdModel.findById(id).select(managementProjection).session(session).lean();
       if (!ad) throw new AdminError("Kuulutust ei leitud", 404);
       const current = toAdminAd(ad, administrator);
+      // Source is immutable and comes from the database, never from the request.
+      const command = parseAdminCommand(parsed.data, Boolean(current.sourceUrl));
       if (current.version !== command.version) throw new AdminError("Kuulutust on muudetud. Laadi leht uuesti.", 409);
       if (current.trashed && command.action !== "restore") throw new AdminError("Kuulutus on prügikastis", 409);
       const changes: Record<string, unknown> = {};
       if (command.action === "edit") {
         Object.assign(changes, command.values, {
+          ...(current.sourceUrl ? { sourceUrl: current.sourceUrl } : {}),
           birthYear: command.values.birthYear || "",
           deathYear: command.values.deathYear || "",
         });
