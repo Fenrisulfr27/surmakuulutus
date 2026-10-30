@@ -49,15 +49,17 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
             </Text>
           )}
 
-          <Text className="newspaper-name" size="xl" fw={700}>
-            {name}
-          </Text>
-
-          {dateLabel && (
-            <Text className="newspaper-dates" component="span">
-              {dateLabel}
+          <div className="newspaper-identity">
+            <Text className="newspaper-name" size="xl" fw={700}>
+              {name}
             </Text>
-          )}
+
+            {dateLabel && (
+              <Text className="newspaper-dates" component="span">
+                {dateLabel}
+              </Text>
+            )}
+          </div>
 
           {(poem || bottomText) && <div className="newspaper-separator" />}
 
@@ -75,6 +77,8 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
               </Text>
             </Group>
           )}
+
+          {poem && bottomText && <div className="newspaper-text-divider" aria-hidden="true" />}
 
           {bottomText && (
             <Text className="newspaper-footer" style={{ whiteSpace: "pre-wrap" }}>
