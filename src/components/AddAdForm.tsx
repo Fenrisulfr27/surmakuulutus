@@ -225,6 +225,7 @@ export default function AddAdForm({
         <Text className="newspaper-form-note">{t("form.requiredNote")}</Text>
         <Textarea
           className="newspaper-input"
+          placeholder={t("form.topTextPlaceholder")}
           label={renderLabel(
             t("form.topText"),
             form.values.topText,

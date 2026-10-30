@@ -539,6 +539,10 @@ a:hover {
   text-align: center;
 }
 
+.newspaper-card [data-example="true"]:not(.newspaper-name) {
+  color: color-mix(in srgb, var(--paper-muted) 90%, var(--paper-sheet)) !important;
+}
+
 .newspaper-identity {
   display: flex;
   flex-direction: column;

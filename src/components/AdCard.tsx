@@ -10,20 +10,32 @@ interface AdCardProps {
   ad: Ad;
   hoverable?: boolean;
   fixedLayout?: boolean;
+  examplePreview?: boolean;
 }
 
-export default function AdCard({ ad, hoverable }: AdCardProps) {
+export default function AdCard({ ad, hoverable, examplePreview = false }: AdCardProps) {
   const { t } = useLanguage();
-  const { name, birthYear, deathYear, poem, bottomText, topText } = ad;
+  const displayAd = { ...ad };
+  const examples = {
+    name: t("form.namePlaceholder"),
+    topText: t("form.topTextPlaceholder"),
+    poem: t("form.poemPlaceholder"),
+    bottomText: t("form.mournersPlaceholder"),
+    birthYear: t("form.birthDatePlaceholder").split(".").reverse().join("-"),
+    deathYear: t("form.deathDatePlaceholder").split(".").reverse().join("-"),
+  };
+  const exampleFields = new Set<keyof typeof examples>();
+  if (examplePreview) {
+    for (const field of Object.keys(examples) as (keyof typeof examples)[]) {
+      const value = ad[field];
+      if (!value || (typeof value === "string" && !value.trim())) {
+        displayAd[field] = examples[field];
+        exampleFields.add(field);
+      }
+    }
+  }
+  const { name, birthYear, deathYear, poem, bottomText, topText } = displayAd;
   const hasOnlyName = !birthYear && !deathYear && !poem && !bottomText && !topText;
-  const dateLabel =
-    birthYear && deathYear
-      ? `${dayjs(birthYear).format("DD.MM.YYYY")} – ${dayjs(deathYear).format("DD.MM.YYYY")}`
-      : birthYear
-        ? dayjs(birthYear).format("DD.MM.YYYY")
-        : deathYear
-          ? dayjs(deathYear).format("DD.MM.YYYY")
-          : "";
 
   return (
     <Card
@@ -44,19 +56,21 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
           direction="column"
         >
           {topText && (
-            <Text className="newspaper-kicker" style={{ whiteSpace: "pre-wrap" }}>
+            <Text className="newspaper-kicker" data-example={exampleFields.has("topText") || undefined} style={{ whiteSpace: "pre-wrap" }}>
               {topText}
             </Text>
           )}
 
           <div className="newspaper-identity">
-            <Text className="newspaper-name" size="xl" fw={700}>
+            <Text className="newspaper-name" data-example={exampleFields.has("name") || undefined} size="xl" fw={700}>
               {name}
             </Text>
 
-            {dateLabel && (
+            {(birthYear || deathYear) && (
               <Text className="newspaper-dates" component="span">
-                {dateLabel}
+                {birthYear && <span data-example={exampleFields.has("birthYear") || undefined}>{dayjs(birthYear).format("DD.MM.YYYY")}</span>}
+                {birthYear && deathYear && " – "}
+                {deathYear && <span data-example={exampleFields.has("deathYear") || undefined}>{dayjs(deathYear).format("DD.MM.YYYY")}</span>}
               </Text>
             )}
           </div>
@@ -72,7 +86,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
                 alt={t("card.crossAlt")}
                 fetchPriority="high"
               />
-              <Text className="newspaper-poem" fs="italic" style={{ whiteSpace: "pre-wrap" }}>
+              <Text className="newspaper-poem" data-example={exampleFields.has("poem") || undefined} fs="italic" style={{ whiteSpace: "pre-wrap" }}>
                 {poem.replace(/\\n/g, "\n")}
               </Text>
             </Group>
@@ -81,7 +95,7 @@ export default function AdCard({ ad, hoverable }: AdCardProps) {
           {poem && bottomText && <div className="newspaper-text-divider" aria-hidden="true" />}
 
           {bottomText && (
-            <Text className="newspaper-footer" style={{ whiteSpace: "pre-wrap" }}>
+            <Text className="newspaper-footer" data-example={exampleFields.has("bottomText") || undefined} style={{ whiteSpace: "pre-wrap" }}>
               {bottomText}
             </Text>
           )}

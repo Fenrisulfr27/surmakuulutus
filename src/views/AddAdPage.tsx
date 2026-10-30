@@ -81,7 +81,7 @@ export default function AddAdPage() {
           </div>
           <Stack className="create-preview" gap="sm">
             <Text className="create-preview-title">{t("form.previewTitle")}</Text>
-            <AdCard ad={adValues} />
+            <AdCard ad={adValues} examplePreview />
           </Stack>
       </div>}
     </section>

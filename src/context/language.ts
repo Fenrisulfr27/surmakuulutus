@@ -174,62 +174,58 @@ export const translations = {
     en: "Poem",
   },
   "form.poemPlaceholder": {
-    et: `Mälestusteks tuhmunud me aeg.
-Pisarateks Sinu kaunis naer.
-Tühjuseks on roogitud mu hing.
-Ja südames vaid igatsen ma Sind.`,
-    en: `Time faded into memories.
-Your beautiful laugh into tears.
-My soul has emptied into silence.
-My heart still longs for you.`,
+    et: `Vaikselt lahkusid meie juurest,
+kuid mälestus Sinust jääb...`,
+    en: `Quietly you left our side,
+but your memory stays with us...`,
   },
   "form.topText": {
-    et: "Tekst enne lahkunu nime",
-    en: "Text before the deceased's name",
+    et: "Sissejuhatav tekst",
+    en: "Introduction",
   },
   "form.topTextPlaceholder": {
-    et: "Teatame kurbusega, et lahkus meie kallis",
-    en: "With sadness we announce the passing of our dear",
+    et: "Teatame sügava kurbusega, et meie seast on lahkunud",
+    en: "With deep sadness, we announce the passing of",
   },
   "form.name": {
     et: "Lahkunu Nimi",
     en: "Name of the deceased",
   },
   "form.namePlaceholder": {
-    et: "ema",
-    en: "mother",
+    et: "Eesnimi Perekonnanimi",
+    en: "First name Last name",
   },
   "form.birthDate": {
-    et: "Sünniaeg",
+    et: "Sünnikuupäev",
     en: "Date of birth",
   },
   "form.birthDatePlaceholder": {
-    et: "19.01.1992",
-    en: "19.01.1992",
+    et: "15.05.1950",
+    en: "15.05.1950",
   },
   "form.deathDate": {
-    et: "Surmaaeg",
+    et: "Surmakuupäev",
     en: "Date of death",
   },
   "form.deathDatePlaceholder": {
-    et: "23.03.2026",
-    en: "23.03.2026",
+    et: "23.10.2026",
+    en: "23.10.2026",
   },
   "form.mourners": {
     et: "Leinajad",
     en: "Mourners",
   },
   "form.mournersPlaceholder": {
-    et: "Leinab Rein perega",
-    en: "Mourned by Rein and family",
+    et: "Leinavad omaksed",
+    en: "Mourned by loved ones",
   },
   "form.email": {
     et: "Kuulutuse lisaja e-mail",
     en: "Submitter email",
   },
   "form.emailPlaceholder": {
-    et: "nimi@gmail.com",
-    en: "name@gmail.com",
+    et: "nimi@näide.ee",
+    en: "name@example.com",
   },
   "form.save": {
     et: "Avalda kuulutus",
