@@ -51,6 +51,11 @@ describe("source archive", () => {
     expect(() => importer.parseObituaryArchive(card().replace("o_sk_post_first_name", "changed"))).toThrow();
   });
 
+  it("does not turn a source HTML newline after br into a blank poem line", () => {
+    const html = card().replace("<br>Kolmas", "<br>\r\n   Kolmas<br>\n<br>\nNeljas");
+    expect(importer.parseObituaryArchive(html).ads[0].poem).toBe("Esimene & teine\nKolmas\nNeljas");
+  });
+
   it("rejects upstream HTTP errors and redirects", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response("unavailable", { status: 503 }));
     vi.stubGlobal("fetch", fetchMock);
@@ -81,6 +86,10 @@ describe("database import", () => {
     const publicAd = await ads.getAdBySlug(saved!.slug);
     expect(publicAd).not.toHaveProperty("sourceUrl");
     expect(publicAd).not.toHaveProperty("email");
+    await ads.AdModel.updateOne({ _id: saved!._id }, { $set: { poem: "Esimene\n\n  \nTeine\r\n\r\nKolmas" } });
+    const legacyPublicAd = await ads.getAdBySlug(saved!.slug);
+    expect(legacyPublicAd?.poem).toBe("Esimene\nTeine\nKolmas");
+    expect(legacyPublicAd).not.toHaveProperty("sourceUrl");
     await ads.AdModel.updateOne({ _id: saved!._id }, { $set: { name: "Muudetud nimi", deletedAt: new Date(), status: "rejected" } });
     expect(await importer.saveNextImportedAd(batch)).toEqual({ created: 0, existing: 1, remaining: 0 });
     const unchanged = await ads.AdModel.findById(saved!._id).lean();

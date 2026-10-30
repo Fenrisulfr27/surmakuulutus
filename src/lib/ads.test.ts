@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { toPublicAd } from "./ads";
 
 describe("toPublicAd", () => {
+  it("removes empty lines only from imported poems", () => {
+    const poem = "Esimene\n\n  \nTeine\r\n\r\nKolmas";
+    expect(toPublicAd({ name: "Mari Mets", poem, sourceUrl: "https://www.surmakuulutused.ee/kuulutused/mari-mets/" }).poem)
+      .toBe("Esimene\nTeine\nKolmas");
+    expect(toPublicAd({ name: "Mari Mets", poem }).poem).toBe(poem);
+  });
   it("returns only allowlisted public obituary fields", () => {
     const publicAd = toPublicAd({
       _id: "ad-id",

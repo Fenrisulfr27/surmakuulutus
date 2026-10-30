@@ -5,10 +5,6 @@ export const languages = ["et", "en"] as const;
 export type Language = (typeof languages)[number];
 
 export const translations = {
-  "form.ipPrivacy": {
-    et: "Rämpsposti vältimiseks säilitame saatja IP-aadressi tähtajatult. Seda näeb ainult administraator.",
-    en: "To prevent spam, we retain the submitter’s IP address without automatic expiry. Only the administrator can see it.",
-  },
   "form.saveChanges": { et: "Salvesta muudatused", en: "Save changes" },
   "form.published": {
     et: "Kuulutus on avaldatud.",

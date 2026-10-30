@@ -253,13 +253,13 @@ protections remain active. Turnstile's optional remote IP parameter is omitted w
 Manual submissions store a private `submitterIp` field on the obituary.
 It is hidden by default in Mongoose, excluded from all public serializers/projections and available only
 through authorized, uncached administrative reads. Admin pages use `Referrer-Policy: no-referrer` so IP filters
-are not forwarded in referrer headers. IPs do not appear in activity logs. The public form explains retention
-in Estonian and English. Stored email addresses and IPs must stay out of analytics and exported public data.
+are not forwarded in referrer headers. IPs do not appear in activity logs.
+Stored email addresses and IPs must stay out of analytics and exported public data.
 
 Raw IPs have **no automatic expiry**. The previous expiry field is no longer written or enforced, and the
 scheduled IP cleanup function has been removed. Redeploy to remove any previously deployed cleanup schedule.
 Existing retained IPs remain available regardless of old expiry metadata; previously purged IPs cannot be recovered.
-The form notice reflects indefinite retention. Never add a TTL index to the obituary collection: it would delete whole obituaries.
+Never add a TTL index to the obituary collection: it would delete whole obituaries.
 
 `/admin/ip-keelud` lists active bans with exact-IP search and server-side pagination. Administrators can add
 an IP manually, ban a submitter from the obituary table/detail screen, or reverse a ban. Bans have no expiry

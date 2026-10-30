@@ -9,6 +9,7 @@ import { AdminError } from "./adminHttp";
 import { normalizeSubmitterIp } from "./submitterIp.mjs";
 import { cache } from "react";
 import { blockedIpSet } from "./ipBans";
+import { normalizeImportedPoem } from "./obituaryText";
 
 export type AdminAd = Omit<Ad, "viewedBy" | "submitterIpExpiresAt"> & {
   _id: string; status: ObituaryStatus; version: number; unviewed: boolean; ipBlocked?: boolean; trashed: boolean;
@@ -18,6 +19,9 @@ const managementProjection = "+email +aiGenerated +aiGeneratedDate +aiGeneration
 
 function toAdminAd(value: unknown, administrator: string): AdminAd {
   const ad = JSON.parse(JSON.stringify(value)) as Ad & { _id: string; __v?: number };
+  if (ad.sourceUrl && typeof ad.poem === "string") {
+    ad.poem = normalizeImportedPoem(ad.poem);
+  }
   const unviewed = !ad.viewedBy?.includes(administrator);
   delete ad.viewedBy;
   delete ad.submitterIpExpiresAt;

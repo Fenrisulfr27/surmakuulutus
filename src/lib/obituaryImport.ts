@@ -3,6 +3,7 @@ import { load } from "cheerio";
 import { z } from "zod";
 import { AdModel, slugify } from "./ads";
 import { connectToDatabase } from "./mongodb";
+import { normalizeImportedPoem } from "./obituaryText";
 
 export const sourceOrigin = "https://www.surmakuulutused.ee";
 export const archiveUrl = `${sourceOrigin}/kuulutused/`;
@@ -60,7 +61,7 @@ export function parseObituaryArchive(html: string) {
       const ad = importedAdSchema.parse({
         sourceUrl: `${sourceOrigin}${url.pathname}`,
         name: [text(".o_sk_post_first_name"), text(".o_sk_post_last_name")].filter(Boolean).join(" "),
-        poem: text(".o_sk_post_poem"),
+        poem: normalizeImportedPoem(text(".o_sk_post_poem")),
         topText: text(".o_sk_post_top_text"),
         bottomText: text(".o_sk_post_bottom_text"),
         birthYear: parseDate(text(".o_sk_post_birth_date")),

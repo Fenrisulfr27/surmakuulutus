@@ -3,6 +3,7 @@ import { connectToDatabase } from "./mongodb";
 import type { AdFormValues } from "./adValidation";
 import { obituaryStatuses, positiveInteger, publishedAdFilter, type ObituaryStatus } from "./moderation";
 import { normalizeSubmitterIp } from "./submitterIp.mjs";
+import { normalizeImportedPoem } from "./obituaryText";
 
 export interface Ad {
   _id?: string;
@@ -44,7 +45,8 @@ const publicAdFields = [
   "createdAt",
 ] as const satisfies readonly PublicAdField[];
 
-const publicAdProjection = publicAdFields.join(" ");
+// Source metadata is needed to normalize legacy imported text, but never serialized.
+const publicAdProjection = [...publicAdFields, "sourceUrl"].join(" ");
 
 export interface AdsPageData {
   data: PublicAd[];
@@ -162,6 +164,9 @@ export function toPublicAd(ad: unknown): PublicAd {
   }
 
   const plain = JSON.parse(JSON.stringify(ad)) as Ad;
+  if (plain.sourceUrl && typeof plain.poem === "string") {
+    plain.poem = normalizeImportedPoem(plain.poem);
+  }
   const publicAd = Object.fromEntries(
     publicAdFields
       .filter((field) => plain[field] !== undefined)
