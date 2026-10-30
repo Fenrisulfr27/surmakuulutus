@@ -72,12 +72,14 @@ administration; it is excluded from public pages and APIs. Imported records have
 No submitter email or IP is collected or invented. Imported texts retain their original length (up to
 10,000 characters per field); the manual submission form keeps its existing limits.
 
-Set a new random `OBITUARY_IMPORT_SECRET` in the hosting environment, then deploy. Keep it separate from
-the AI endpoint secret. To check the source without writing to MongoDB, call from a trusted terminal:
+The importer uses the existing `AI_GENERATION_SECRET`, shared with the AI generation endpoint. Set the
+same value in Netlify's production Functions environment and GitHub Actions repository secrets, then deploy.
+If AI generation is already configured, no additional secret is needed. To check the source without
+writing to MongoDB, call from a trusted terminal:
 
 ```bash
 curl --fail --request POST \
-  --header "Authorization: Bearer $OBITUARY_IMPORT_SECRET" \
+  --header "Authorization: Bearer $AI_GENERATION_SECRET" \
   "$SITE_URL/api/import-obituaries?dryRun=true"
 ```
 
@@ -90,7 +92,7 @@ response limit, and do not follow upstream redirects.
 
 The GitHub Actions workflow `.github/workflows/import-obituaries.yml` runs every 12 hours at **05:30 and 17:30 UTC**
 (07:30 and 19:30 Estonian winter time, 08:30 and 20:30 summer time). Configure repository variable `SITE_URL` and repository
-secret `OBITUARY_IMPORT_SECRET` with the same value as hosting. Manual workflow runs default to preview;
+secret `AI_GENERATION_SECRET` with the same value as hosting. Manual workflow runs default to preview;
 turn off `dry_run` to publish. The workflow fails if any source cards were invalid. No import runs during
 installation, build or tests. Deployment and secret configuration are required to activate the schedule.
 

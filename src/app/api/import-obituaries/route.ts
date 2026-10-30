@@ -4,7 +4,7 @@ import { fetchObituaryArchive, importObituaries } from "../../../lib/obituaryImp
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const secret = process.env.OBITUARY_IMPORT_SECRET?.trim();
+  const secret = process.env.AI_GENERATION_SECRET?.trim();
   const provided = Buffer.from(request.headers.get("authorization") ?? "");
   const expected = Buffer.from(`Bearer ${secret ?? ""}`);
   const headers = { "Cache-Control": "private, no-store" };
